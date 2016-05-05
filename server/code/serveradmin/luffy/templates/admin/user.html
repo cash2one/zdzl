@@ -1,0 +1,65 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import input,radio,select,submit,checkbox,password %}
+{% block css %}  
+<link rel="stylesheet" href="{{ 'frontend.static'|url('css/ui-lightness/jquery-ui-1.8.19.custom.css',_external = True ) }}" type="text/css" />
+{{ super() }}
+{% endblock %}
+{% block js %} 
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/jquery-ui-1.8.19.custom.min.js',_external = True ) }}"></script>
+<script type="text/javascript">
+	function gotoPage (page) {
+		$('#msg_ret_container').hide();
+		$('#page').val(page);
+		$('a[name="submit"]').click();
+		$('#msg_ret_container').show();
+	}
+	function selectAll(obj){ 
+		$('.main-tab').find('input[type="checkbox"]').each(function(i,n){ 
+			if(obj!=this){
+				this.checked = !this.checked;
+			}
+		});
+	}
+	function delete_user(data){ 
+		$('#tr_'+data.id).remove();
+		if(data.msg){
+			return data.msg;
+		}else{
+			return '删除用户成功。';	
+		}
+		
+	}
+</script>
+{% endblock %}
+{% block jsonload %}
+	$('a[name="submit"]').click(); 
+	$( ".datetime" ).datepicker({dateFormat:'yy-mm-dd'});
+{% endblock %}
+{%- block main -%}
+<div class="panel clearfix">
+	<div class="title"> <h3 class="h-user"> 检索 </h3> </div>
+	<div class="content no-pad">
+		 {{ form.form_tag() }}
+		 <div class="twocol">
+		 {{ input(form.email) }}
+		 {{ input(form.reg_begin,class="datetime textinp") }}
+		 {{ input(form.lastlogin_begin,class="datetime textinp") }}
+		 {{ input(form.reg_end,class="datetime textinp") }}
+		 {{ input(form.lastlogin_end,class="datetime textinp") }}
+		 </div>
+		 <div class="twocol">
+		 {{ select(form.ban) }}
+		 {{ select(form.role) }}
+		 {{ select(form.order) }}
+		 {{ submit('检索') }}  
+		 </div>
+	</div>
+</div>
+
+<div class="panel clearfix">
+	<div class="title"> <h3 class="h-user"> 用户列表 </h3> </div>
+	<div class="content no-pad" id="msg_ret_container">
+		
+	</div>
+</div>
+{%- endblock -%}

@@ -1,0 +1,94 @@
+#############
+部署
+#############
+
+Python 2.7.3
+Ubuntu 12.04
+
+安装mongoDB
+导入mongo配置资源  到 Ubuntu服务器
+mongo表修改
+
+gconfig表
+
+dbPath  http://115.29.5.60:801/config/ver  前端配置路径
+
+dbVer  1  数据库版本号修改
+
+resUrl  http://115.29.5.60:801/resources   前端资源下载路径
+
+access_ip  ^(\d.\d.\d.\d)|(172.16.40.\d+)|(127.0.0.1)|(10.96.13\d.\d+)$  允许shell的网段 正则
+
+
+server表
+
+添加服务器列表sid
+
+
+安装Apache服务
+导入前端配置资源 到 Ubuntu服务器
+
+将ver资源放进  apache目录  /var/www/config/  增加linux访问权限
+
+将resources美术资源放进  apache目录  /var/www/  增加linux访问权限
+
+
+
+本地机器,远端服务器 依赖
+====
+    
+    python-dev, setuptools, pip, virtualenv, fabric, rsync
+
+
+执行dist目录下 ./dist.sh 文件
+
+创建初始化打包目录
+====
+
+    ./dist.sh dist_create
+    
+
+安装py库 注意更换国内镜像，加快下载速度 http://mirrors.aliyun.com/pypi/simple/  修改dist目录下
+fabfile文件对应名称的函数内的下载路径
+====
+    首选,将依赖的py库(查看fabfile.py PY_PKGS变量)下载到打包机器的目录: /home/game/<项目名>modules/
+    ./dist.sh pkg_down
+    运行:
+    ./dist.sh dist_pkg
+    ./dist.sh web_pkg
+
+
+修改dist目录下config目录配置
+dist.json 运行服别名配置
+config.json 服务器运行配置文件下载路径
+game目录内各服务进程配置
+
+上传配置文件
+====
+    ./dist.sh up_cfg
+    
+拷贝Ubuntu服务器上 game用户配置  cp ~/tddist/config/game/*   ~/config/td/
+
+
+初始化运行目录
+====
+    ./dist.sh names:<运行服别名> pub_init
+
+
+
+打包版本
+====
+    ./dist.sh up_svr
+
+
+发布版本到运行目录
+====
+    ./dist.sh names:<运行服别名> pub
+    
+
+
+启动logon服务进程
+启动game服务进程
+
+
+

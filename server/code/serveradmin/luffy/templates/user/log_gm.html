@@ -1,0 +1,46 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/sorttable.js') }}"></script>
+<script>
+    // function log_gm(){
+    //     var start_time = $('#start_time').val();
+    //     var end_time = $('#end_time').val();
+    //     var t = $('#t').val();
+    //     var url = $('#href').val();
+    //     location.href = url+"?start_time="+start_time+"&end_time="end_time+"&t="+t;
+    // }
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[2] == 1 %}
+<div class="span10">
+    <br />
+    GM命令日志:
+    开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    类型：<input type="text" class="input-small" id="t" value="{{ t }}">
+    <button type="button" class="btn" href="{{ url_for('user.log_gm') }}" onclick="log_gm()">查询</button>
+    {{ paginate(page_count,url_for('user.log_gm'),current_page=page) }}
+    <table class="table table-bordered sortable" id="unique_id">
+        <tr>
+            <td>ID</td>
+            <td>玩家id</td>
+            <td>执行的命令</td>
+            <td>使用时间</td>
+        </tr>
+        {% for v in ret %}
+        <tr>
+            <td>{{ v['_id'] }}</td>
+            <td>{{ v['p'] }}</td>
+            <td>{{ v['cmd'] }}</td>
+            <td>{{ v['ct']|format_date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

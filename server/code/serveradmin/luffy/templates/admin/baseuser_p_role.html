@@ -1,0 +1,270 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate, search %}
+{%- block main -%}
+
+<div class="span10">
+	
+	玩家角色表：
+	{% if g.user.role >= 300 or g.user.right[3] == 1 %}
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[2] == 1 %}
+	{{ paginate(page_count,url_for('admin.baseuser_p_role'),current_page=page) }}
+	{{ search(g.GAME_BASEUSER, coll) }}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>玩家id</td>
+			<td>角色id</td>
+			<td>状态</td>
+			<td>激活的技能</td>
+			<td>武器等级</td>
+			<td>装备1</td>
+			<td>装备2</td>
+			<td>装备3</td>
+			<td>装备4</td>
+			<td>装备5</td>
+			<td>装备6</td>
+			<td>命格1</td>
+			<td>命格2</td>
+			<td>命格3</td>
+			<td>命格4</td>
+			<td>命格5</td>
+			<td>命格6</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.pid }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.rid }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.status }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.sk }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.armLevel }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.eq1 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.eq2 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.eq3 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.eq4 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.eq5 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.eq6 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.fate1 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.fate2 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.fate3 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.fate4 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.fate5 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td><span>{{ r.fate6 }}</span><input type="text" style="display:none; width:50px; "/></td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[3] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAME_BASEUSER, table=coll, id=r['_id']) }}">删除</button>
+				<button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %}
+		<tr id="appendText" style="display:none;"> </tr>  
+	</table>
+	{% endif %}
+	<script type="text/javascript">
+		function edit_click(val){
+		var  id = val;
+		for(var i=2; i<19; i++){
+			$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		$('#'+id+' td:nth-child(2)>span').append("<font style='font-size:12px'>名玩家id</font>");
+		$('#'+id+' td:nth-child(3)>span').append("<font style='font-size:12px'>角色id</font>");
+		$('#'+id+' td:nth-child(4)>span').append("<font style='font-size:12px'>状态</font>");
+		$('#'+id+' td:nth-child(5)>span').append("<font style='font-size:12px'>激活的技能</font>");
+		$('#'+id+' td:nth-child(6)>span').append("<font style='font-size:12px'>武器等级</font>");
+		$('#'+id+' td:nth-child(7)>span').append("<font style='font-size:12px'>装备1</font>");
+		$('#'+id+' td:nth-child(8)>span').append("<font style='font-size:12px'>装备2</font>");
+		$('#'+id+' td:nth-child(9)>span').append("<font style='font-size:12px'>装备3</font>");
+		$('#'+id+' td:nth-child(10)>span').append("<font style='font-size:12px'>装备4</font>");
+		$('#'+id+' td:nth-child(11)>span').append("<font style='font-size:12px'>装备5</font>");
+		$('#'+id+' td:nth-child(12)>span').append("<font style='font-size:12px'>装备6</font>");
+		$('#'+id+' td:nth-child(13)>span').append("<font style='font-size:12px'>命格1</font>");
+		$('#'+id+' td:nth-child(14)>span').append("<font style='font-size:12px'>命格2</font>");
+		$('#'+id+' td:nth-child(15)>span').append("<font style='font-size:12px'>命格3</font>");
+		$('#'+id+' td:nth-child(16)>span').append("<font style='font-size:12px'>命格4</font>");
+		$('#'+id+' td:nth-child(17)>span').append("<font style='font-size:12px'>命格5</font>");
+		$('#'+id+' td:nth-child(18)>span').append("<font style='font-size:12px'>命格6</font>");
+		$('#'+id+' td:nth-child(19)>button:nth-child(3)').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(19)>button:nth-child(2)').css({display:"none"});s
+	}
+	function save_click(val){
+		var  id1 = val;
+		var pid = $('#'+id1+' td:nth-child(2)>input').val();
+		var rid = $('#'+id1+' td:nth-child(3)>input').val();
+		var status = $('#'+id1+' td:nth-child(4)>input').val();
+		var sk = $('#'+id1+' td:nth-child(5)>input').val();
+		var armLevel = $('#'+id1+' td:nth-child(6)>input').val();
+		var eq1 = $('#'+id1+' td:nth-child(7)>input').val();
+		var eq2 = $('#'+id1+' td:nth-child(8)>input').val();
+		var eq3 = $('#'+id1+' td:nth-child(9)>input').val();
+		var eq4 = $('#'+id1+' td:nth-child(10)>input').val();
+		var eq5 = $('#'+id1+' td:nth-child(11)>input').val();
+		var eq6 = $('#'+id1+' td:nth-child(12)>input').val();
+		var fate1 = $('#'+id1+' td:nth-child(13)>input').val();
+		var fate2 = $('#'+id1+' td:nth-child(14)>input').val();
+		var fate3 = $('#'+id1+' td:nth-child(15)>input').val();
+		var fate4 = $('#'+id1+' td:nth-child(16)>input').val();
+		var fate5 = $('#'+id1+' td:nth-child(17)>input').val();
+		var fate6 = $('#'+id1+' td:nth-child(18)>input').val();
+		$.post('/admin/baseuser/p/role/save/',{
+			id:id1,
+			pid:pid,
+			rid:rid,
+			status:status,
+			sk:sk,
+			armLevel:armLevel,
+			eq1:eq1,
+			eq2:eq2,
+			eq3:eq3,
+			eq4:eq4,
+			eq5:eq5,
+			eq6:eq6,
+			fate1:fate1,
+			fate2:fate2,
+			fate3:fate3,
+			fate4:fate4,
+			fate5:fate5,
+			fate6:fate6	
+		},function(data) {
+			if(data['success'] == "0"){
+				alert("修改角色失败");
+				location.reload() 
+			}else{
+				for(var i=2; i<19; i++){
+					$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+					$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());
+				}
+				$('#'+id1+' td:nth-child(19)>button:nth-child(2)').css({display:"inline-block"});
+				$('#'+id1+' td:nth-child(19)>button:nth-child(3)').css({display:"none"});
+			}
+		});
+	}
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#submit").click(function(){
+				var pid = $("#pid").val();
+				var rid = $("#rid").val();
+				var status = $("#status").val();
+				var sk = $("#sk").val();
+				var armLevel = $("#armLevel").val();
+				var eq1 = $("#eq1").val();
+				var eq2 = $("#eq2").val();
+				var eq3 = $("#eq3").val();
+				var eq4 = $("#eq4").val();
+				var eq5 = $("#eq5").val();
+				var eq6 = $("#eq6").val();
+				var fate1 = $("#fate1").val();
+				var fate2 = $("#fate2").val();
+				var fate3 = $("#fate3").val();
+				var fate4 = $("#fate4").val();
+				var fate5 = $("#fate5").val();
+				var fate6 = $("#fate6").val();
+				$.get('/admin/baseuser/p/role/save/',{
+					pid:pid,
+					rid:rid,
+					status:status,
+					sk:sk,
+					armLevel:armLevel,
+					eq1:eq1,
+					eq2:eq2,
+					eq3:eq3,
+					eq4:eq4,
+					eq5:eq5,
+					eq6:eq6,
+					fate1:fate1,
+					fate2:fate2,
+					fate3:fate3,
+					fate4:fate4,
+					fate5:fate5,
+					fate6:fate6						
+					},function(data){
+						if(data['success'] == "0"){
+							alert("添加角色等级失败");
+						}else{
+							text = "<tr id='"+data['id']+"'><td><span>"+data['id']+"</span></td>";
+							text +="<td><span>"+pid+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+rid+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+status+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+sk+"</span><input type='text' style='display:none; width:30px;'/></td>";
+							text +="<td><span>"+armLevel+"</span><input type='text' style='display:none; width:30px;'/></td>";
+							text +="<td><span>"+eq1+"</span><input type='text' style='display:none; width:30px;'/></td>";
+							text +="<td><span>"+eq2+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+eq3+"</span><input type='text' style='display:none; width:30px;'/></td>";
+							text +="<td><span>"+eq4+"</span><input type='text' style='display:none; width:30px;'/></td>";
+							text +="<td><span>"+eq5+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+eq6+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+fate1+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+fate2+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+fate3+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+fate4+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+fate5+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><span>"+fate6+"</span><input type='text' style='display:none; width:30px; '/></td>";
+							text +="<td><button type='button'class='btn' id='delete' onclick='GAME.load.href_click(this)' val='"+data['id']+"' href='/admin/baseuser/p/role/delete/'>删除</button>";
+							text +="<button type='button' class='btn' id='edit' onclick='edit_click("+data['id']+")'>编辑</button>";
+							text +="<button id='save' class='btn' onclick='save_click("+data['id']+")' style='display:none'>保存</button></td><tr>"
+							$('#appendText').after(text);
+						}
+					});
+				
+					
+			});
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var pid = $("#edit_pid").val();
+				var rid = $("#edit_rid").val();
+				var status = $("#edit_status").val();
+				var sk = $("#edit_sk").val();
+				var armLevel = $("#edit_armLevel").val();
+				var eq1 = $("#edit_eq1").val();
+				var eq2 = $("#edit_eq2").val();
+				var eq3 = $("#edit_eq3").val();
+				var eq4 = $("#edit_eq4").val();
+				var eq5 = $("#edit_eq5").val();
+				var eq6 = $("#edit_eq6").val();
+				var fate1 = $("#edit_fate1").val();
+				var fate2 = $("#edit_fate2").val();
+				var fate3 = $("#edit_fate3").val();
+				var fate4 = $("#edit_fate4").val();
+				var fate5 = $("#edit_fate5").val();
+				var fate6 = $("#edit_fate6").val();
+				$.get('/admin/baseuser/p/role/save/',{
+					id:id,
+					pid:pid,
+					rid:rid,
+					status:status,
+					sk:sk,
+					armLevel:armLevel,
+					eq1:eq1,
+					eq2:eq2,
+					eq3:eq3,
+					eq4:eq4,
+					eq5:eq5,
+					eq6:eq6,
+					fate1:fate1,
+					fate2:fate2,
+					fate3:fate3,
+					fate4:fate4,
+					fate5:fate5,
+					fate6:fate6	
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload() 
+					}
+				});
+			});
+		});
+	</script>
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,204 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress, paginate %}
+{%- block main -%}
+
+<div class="span10">
+	怪物等级表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	怪物id：
+	  	<select class="span2" id="edit_mid">
+			{% for item in monster_ret%}
+            <option value="{{ item['_id']}}">{{ item['_id']}}-{{ item['name']}}</option>
+            {% endfor %}
+          </select>
+	  	等级：
+	  	<input type="text" class="input-small" id="edit_level">
+	  	勇力：
+	  	<input type="text" class="input-small" id="edit_STR">
+	  	迅捷：
+	  	<input type="text" class="input-small" id="edit_DEX">
+	  	体魄
+	  	<input type="text" class="input-small" id="edit_VIT">
+	  	智略
+	  	<input type="text" class="input-small" id="edit_INT">
+	  	生命
+	  	<input type="text" class="input-small" id="edit_HP">
+	  	<br />攻击
+	  	<input type="text" class="input-small" id="edit_ATK">
+	  	绝攻
+	  	<input type="text" class="input-small" id="edit_STK">
+	  	防御
+	  	<input type="text" class="input-small" id="edit_DEF">
+	  	速度
+	  	<input type="text" class="input-small" id="edit_SPD">
+	  	聚气
+	  	<input type="text" class="input-small" id="edit_MP">
+	  	初聚气
+	  	<input type="text" class="input-small" id="edit_MPS">
+	  	回气值
+	  	<input type="text" class="input-small" id="edit_MPR">
+	  	命中率
+	  	<input type="text" class="input-small" id="edit_HIT">
+	  	<br />回避率
+	  	<input type="text" class="input-small" id="edit_MIS">
+	  	格档率
+	  	<input type="text" class="input-small" id="edit_BOK">
+	  	反击率
+	  	<input type="text" class="input-small" id="edit_COT">
+	  	连击率
+	  	<input type="text" class="input-small" id="edit_COB">
+	  	爆击率
+	  	<input type="text" class="input-small" id="edit_CRI">
+	  	高爆率
+	  	<input type="text" class="input-small" id="edit_CPR">
+	  	破甲率
+	  	<input type="text" class="input-small" id="edit_PEN">
+	  	免伤率
+	  	<input type="text" class="input-small" id="edit_TUF">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	{{ paginate(page_count,'/admin/admin/monster/level/',current_page=page) }}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>怪物id</td>
+			<td>等级</td>
+			<td>勇力</td>
+			<td>迅捷</td>
+			<td>体魄</td>
+			<td>智略</td>
+			<td>生命</td>
+			<td>攻击</td>
+			<td>绝攻</td>
+			<td>防御</td>
+			<td>速度</td>
+			<td>聚气</td>
+			<td>初聚气</td>
+			<td>回气值</td>
+			<td>命中率</td>
+			<td>回避率</td>
+			<td>格档率</td>
+			<td>反击率</td>
+			<td>连击率</td>
+			<td>爆击率</td>
+			<td>高爆率</td>
+			<td>破甲率</td>
+			<td>免伤率</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.mid }} - {{ show_monster[r.mid] }}</td>
+			<td>{{ r.level }}</td>
+			<td>{{ r.STR }}</td>
+			<td>{{ r.DEX }}</td>
+			<td>{{ r.VIT }}</td>
+			<td>{{ r.INT }}</td>
+			<td>{{ r.HP }}</td>
+			<td>{{ r.ATK }}</td>
+			<td>{{ r.STK }}</td>
+			<td>{{ r.DEF }}</td>
+			<td>{{ r.SPD }}</td>
+			<td>{{ r.MP }}</td>
+			<td>{{ r.MPS }}</td>
+			<td>{{ r.MPR }}</td>
+			<td>{{ r.HIT }}</td>
+			<td>{{ r.MIS }}</td>
+			<td>{{ r.BOK }}</td>
+			<td>{{ r.COT }}</td>
+			<td>{{ r.COB }}</td>
+			<td>{{ r.CRI }}</td>
+			<td>{{ r.CPR }}</td>
+			<td>{{ r.PEN }}</td>
+			<td>{{ r.TUF }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+                <button type="button" class="btn" id='edit' onclick="GAME.load.get_data(this)" href="{{url_for('admin.admin_data', db=g.GAMEBASE, table=coll, id=r['_id'])}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var mid = $("#edit_mid").val();
+				var level = $("#edit_level").val();
+				var STR = $("#edit_STR").val();
+				var DEX = $("#edit_DEX").val();
+				var VIT = $("#edit_VIT").val();
+				var INT = $("#edit_INT").val();
+				var HP = $("#edit_HP").val();
+				var ATK = $("#edit_ATK").val();
+				var STK = $("#edit_STK").val();
+				var DEF = $("#edit_DEF").val();
+				var SPD = $("#edit_SPD").val();
+				var MP = $("#edit_MP").val();
+				var MPS = $("#edit_MPS").val();
+				var MPR = $("#edit_MPR").val();
+				var HIT = $("#edit_HIT").val();
+				var MIS = $("#edit_MIS").val();
+				var BOK = $("#edit_BOK").val();
+				var COT = $("#edit_COT").val();
+				var COB = $("#edit_COB").val();
+				var CRI = $("#edit_CRI").val();
+				var CPR = $("#edit_CPR").val();
+				var PEN = $("#edit_PEN").val();
+				var TUF = $("#edit_TUF").val();
+				$.post('/admin/admin/monster/level/save/',{
+					id:id,
+					mid:mid,
+					level:level,
+					STR:STR,
+					DEX:DEX,
+					VIT:VIT,
+					INT:INT,
+					HP:HP,
+					ATK:ATK,
+					STK:STK,
+					DEF:DEF,
+					SPD:SPD,
+					MP:MP,
+					MPS:MPS,
+					MPR:MPR,
+					HIT:HIT,
+					MIS:MIS,
+					BOK:BOK,
+					COT:COT,
+					COB:COB,
+					CRI:CRI,
+					CPR:CPR,
+					PEN:PEN,
+					TUF:TUF,
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload() 
+					}
+				});
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

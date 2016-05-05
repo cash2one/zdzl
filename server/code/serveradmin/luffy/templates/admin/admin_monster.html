@@ -1,0 +1,150 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	怪物表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	名字：
+	  	<input type="text" class="input-small" id="edit_name">
+	  	关联npc
+	  	<select class="span1" id="edit_npc">
+            <option value="0"></option>
+            {% for npc in npc_ret %}
+            <option value="{{ npc['_id'] }}">{{ npc['_id']}} - {{ npc['name']}}</option>
+            {% endfor %}
+        </select>
+        类型：
+        <select class="span1" id="edit_type">
+            <option value="1">1-普通怪物</option>
+            <option value="2">2-boss</option>
+        </select>
+	  	动画：
+	  	<input type="text" class="input-small" id="edit_act">
+	  	性别：
+	  	<input type="text" class="input-small" id="edit_sex">
+	  	技能1：
+	  	<select class="span1" id="edit_sk1">
+			{% for item in sk_ret%}
+            <option value="{{ item['_id']}}">{{ item['_id']}}-{{ item['name']}}</option>
+            {% endfor %}
+        </select>
+	  	技能2：
+	  	<select class="span1" id="edit_sk2">
+			{% for item in sk_ret%}
+            <option value="{{ item['_id']}}">{{ item['_id']}}-{{ item['name']}}</option>
+            {% endfor %}
+        </select>
+        体型：
+        <input type="text" class="input-small" id="edit_body">
+        偏移量：
+        <input type="text" class="input-small" id="edit_offset">
+        血条偏移量：
+        <input type="text" class="input-small" id="edit_boffset">
+        品质：
+        <input type="text" class="input-small" id="edit_quality">
+	  	说明：
+	  	<input type="text" class="input-small" id="edit_info">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>关联npc</td>
+			<td>类型</td>
+			<td>动画</td>
+			<td>性别</td>
+			<td>技能1</td>
+			<td>技能2</td>
+			<td>体型</td>
+			<td>偏移量</td>
+			<td>血条偏移量</td>
+			<td>品质</td>
+			<td>说明</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.name}}</td>
+			<td>{{ r.npc }}</td>
+			<td>{{ r.type }}</td>
+			<td>{{ r.act }}</td>
+			<td>{{ r.sex }}</td>
+			<td>{{ r.sk1 }} - {{ showsk[r.sk1] }}</td>
+			<td>{{ r.sk2 }} - {{ showsk[r.sk2] }}</td>
+			<td>{{ r.body }}</td>
+			<td>{{ r.offset }}</td>
+			<td>{{ r.boffset }}</td>
+			<td>{{ r.quality }}</td>
+			<td>{{ r.info }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+                <button type="button" class="btn" id='edit' onclick="GAME.load.get_data(this)" href="{{url_for('admin.admin_data', db=g.GAMEBASE, table=coll, id=r['_id'])}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var name = $("#edit_name").val();
+				var npc = $("#edit_npc").val();
+				var type = $("#edit_type").val();
+				var act = $("#edit_act").val();
+				var sex = $("#edit_sex").val();
+				var sk1 = $("#edit_sk1").val();
+				var sk2 = $("#edit_sk2").val();
+				var body = $("#edit_body").val();
+				var offset = $("#edit_offset").val();
+				var boffset = $("#edit_boffset").val();
+				var quality = $("#edit_quality").val();
+				var info = $("#edit_info").val();
+				$.post('/admin/admin/monster/save/',{
+					id:id,
+					name:name,
+					npc:npc,
+					type:type,
+					act:act,
+					sex:sex,
+					sk1:sk1,
+					sk2:sk2,
+					body:body,
+					offset:offset,
+					boffset:boffset,
+					quality:quality,
+					info:info
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload() 
+					}
+				});
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

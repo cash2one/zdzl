@@ -1,0 +1,32 @@
+*{margin:0; padding: 0;}
+img,input{border:none;}
+body{font-size:12px;}
+.wrap{width:1000px; margin:0 auto; background:url(../images/bg.gif) no-repeat; padding-bottom:100px;}
+.header{height:110px;width:100%;}
+.header img{margin-top:50px; margin-left:50px;}
+ul{list-style:none;}
+a{color:#777777; text-decoration:none;}
+.main{width:940px; height:400px; background-color:#f2f2f2; margin:0 auto; -webkit-border-radius: 5px;}
+.left{width:412px; height:400px; float:left; background:url(../images/midLine.gif) no-repeat; background-position:100% 0; position:relative;}
+
+.ico404{background:url(../images/404.gif) no-repeat;}
+.ico500{background:url(../images/500.gif) no-repeat;}
+.err404{width:335px; height:242px;  margin:0 auto; background-position:0 80%;}
+.warning_box{width:100%; height:79px;}
+.warning{font-family:Arial; width:398px; height:79px; background:url(../images/warning.gif) no-repeat; position:absolute; left:-24px; text-indent:60px; color: #fff; line-height:73px; font-size:25px;}
+.searchForm{width:100%; margin-top:20px;}
+.search{width:249px; height:28px; background:url(../images/search_input.gif) no-repeat; clear: both; margin-left:20px; text-indent:6px; float:left; color:#333;}
+.search_btn{width:103px; height:30px; float:left; margin-left:6px; background:url(../images/search_btn.gif) no-repeat; cursor: pointer; color:#fff;}
+.text{margin:20px;}
+.title{width:100%; font-size:16px; color:#2a5580; font-weight:600;}
+.text p{ color:#777777; margin:8px 0 0 2px; line-height:22px; text-indent:23px;}
+
+.right{width:488px; height:400px; float:left; position:relative;}
+.right_mid{width:100%; height:50px; margin-top:30px;}
+.right_title{background:url(../images/blue_bg.gif) no-repeat; width:251px; height:34px; position:absolute; left:-9px; color:#fff; font-size:13px; line-height:32px; text-indent:30px; }
+
+.nav{overflow:hidden;}
+.nav ul{width:160px; padding:0 40px; float:left;}
+.nav li{height:26px; line-height:26px; border-bottom:1px solid #dcdfe3; background:url(../images/arrow.gif) no-repeat; text-indent:20px; background-position:0 10px;}
+
+.follow{font-size:16px; color:#28517a; padding-top:20px; width:100%; height:42px; line-height:42px; text-indent:22px;}

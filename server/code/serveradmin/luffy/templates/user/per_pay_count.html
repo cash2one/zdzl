@@ -1,0 +1,37 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate, platform_select %}
+{% block subjs %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/sorttable.js') }}"></script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+<div class="span10">
+    总充值数:{{all_pay|integer}},总充值人数:{{all_uids}}
+    {{ platform_select(pt) }}
+    开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    <button type="button" class="btn" href="{{ url_for('user.per_pay_count') }}" onclick="GAME.load.reg_search(this, 'day', 1)">查询</button>
+    <table class="table table-bordered sortable" id="unique_id">
+        <tr>
+            <td>pid</td>
+            <td>name</td>
+            <td>level</td>
+            <td>vip</td>
+            <td>price</td>
+        </tr>
+        {% for r in ret %}
+        <tr>{% set pid = r['pid']|integer %}
+            <td>{{ pid }}</td>
+            <td>{% if pid in infos %}{{ infos[pid]['name'] }}{%endif%}</td>
+            <td>{% if pid in infos %}{{ infos[pid]['level'] }}{%endif%}</td>
+            <td>{% if pid in infos %}{{ infos[pid]['vip'] }}{%endif%}</td>
+            <td>{{ r['sumprice']|integer }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+{% endif %}
+</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

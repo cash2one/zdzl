@@ -1,0 +1,46 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[6] == 1 %}
+{% set typeDic={1:'物品合成', 2:'技能点取回', 3:'强化等级转移', 4:'深渊挂机', 5:'食馆', 6:'元宝祭天', 7:'阵型学习',8:'阵型升级', 9:'银币猎命', 10:'元宝猎命', 11:'银币采矿', 12:'元宝采矿', 13:'时光盒重置', 14:'刷新兵符任务', 15:'兵符任务立即完成', 16:'同盟创建', 17:'同盟宝具铭刻', 18:'竞技场扣费', 19:'神秘商店购买消耗', 20:'兑换坐骑', 21:'boss战的cd时间去除的消耗', 102:'卖出物品的添加', 103:'特殊物品的添加', 104:'活动挑战奖励的添加', 105:'采矿背包不足自动变卖银币所得', 106:'主线战斗胜利奖励',
+107: '首次充值', 201: '武器升级', 202: '练厉取回', 203: '奖励添加',
+204: '竞技场挑战奖励', 205: '同盟铭刻', 206: 'GM添加',
+301: '元宝摇钱树', 302: '摇钱树银元'
+} %}
+		<div class="span10">
+
+			<br />
+			开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+			结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+			角色id：<input type="text" class="input-small" id="playerId" {% if playerId %}value="{{ playerId }}"{% endif %}}>
+			角色名：<input type="text" class="input-small" id="playerName" {% if playerName %}value="{{ playerName }}"{% endif %}}>
+			<button type="button" class="btn" href="{{ url_for('user.server_user_money') }}" onclick="GAME.load.user_money(this,1)">流水查询</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_user_money') }}" onclick="GAME.load.user_money(this,2)">统计查询</button>
+			<br />
+			{{ paginate(page_count,url_for( 'user.server_user_money' ),current_page=page, kwargs={'start_time':start_time,'end_time':end_time, 'searchType':searchType, 'playerId':playerId,'playerName':playerName }) }}
+			<table class="table table-bordered">
+				<tr>
+					<td>角色id</td>
+					<td>消费类型</td>
+					<td>银币</td>
+					<td>元宝</td>
+					<td>绑元宝</td>
+					<td>消费时间</td>
+				</tr>
+				{% for item in coinRet %}
+				<tr>
+					<td>{{ item['p'] }}</td>
+					<td>{{ item['t'] }}-{{ typeDic[item['t']] }}</td>
+					<td>{{ item['c1'] }}</td>
+					<td>{{ item['c2'] }}</td>
+					<td>{{ item['c3'] }}</td>
+					<td>{{ item['ct']|format_date() }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

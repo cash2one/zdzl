@@ -1,0 +1,59 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate %}
+{%- block subjs-%}
+<script>
+    $(document).ready(function(){
+        $('#save').click(function(){
+            var id = $('#id').val();
+            var key = $('#key').val();
+            var value = $('#value').val();
+            var t = $('#t').val();
+            var db = "{{db}}";
+            var table = "{{table}}";
+            data={id:id, key:key, value:value, t:t, db:db, table:table}
+            $.post('/admin/common/search/edit/',data,function(d){
+                if(d['success']==1){
+                    $('#info').html('更改成功');
+                }
+            })
+        });
+    });
+</script>
+{% endblock %}
+{%- block main -%}
+
+<div class="span10">
+    {% if g.user.role >= 300 or g.user.right[2] == 1 %}
+    <table class="table table-striped table-bordered table-condensed">
+        {% if ret %}
+            {% set keys = ret[0].keys() %}
+            <tr>
+                {% for k in keys%}
+                <td>{{ k }}</td>
+                {% endfor %}
+            </tr>
+            {%- for r in ret -%}
+            
+            <tr>
+                {% for k in keys%}
+                <td>{{ r[k] }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+    <div>
+        id:<input type='text' class='span2' id='id'>
+        Key:<input type='text' class='span2' id='key'>
+        Value:<input type='text' class='span2' id='value'>
+        值的类型:<input type='text' class='span2' id='t'>
+        <button type='button' id='save'>保存</button>
+    </div>
+    <p id='info'></p>
+    {% endif %}
+</div>
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}
+

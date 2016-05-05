@@ -1,0 +1,235 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate, search %}
+{% block subjs %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/sorttable.js') }}"></script>
+{% endblock%}
+{%- block main -%}
+
+<div class="span10">
+	
+	玩家表：
+	{% if g.user.role >= 300 or g.user.right[3] == 1 %}
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[2] == 1 %}
+	总玩家数：{{ count }} ,{{ paginate(page_count,url_for('admin.baseuser_player'),current_page=page) }}
+	{{ search(g.GAME_BASEUSER, coll) }}
+	<table class="table table-striped table-bordered table-condensed sortable" id="unique_id">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>用户id</td>
+			<td>银币</td>
+			<td>元宝</td>
+			<td>绑元宝</td>
+			<td>等级</td>
+			<td>经验</td>
+			<td>主角色id</td>
+			<td>练历</td>
+			<td>VIP等级</td>
+			<td>坐骑</td>
+			<td>创建时间</td>
+			<td>累计在线时间</td>
+			<td>最后登录时间</td>
+			<td>最后登出时间</td>
+			<td>最后退出的地图id</td>
+			<td>最后退出的坐标</td>
+			<td>激活的阵型id</td>
+			<td>副本数据</td>
+			<td>章节序号</td>
+			<td>玩家状态</td>
+			<td>开放的功能列表</td>
+            <td>禁止登录</td>
+            <td>禁止聊天</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.name }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.uid }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.coin1 }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.coin2 }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.coin3 }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.level }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.exp }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.rid }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.train }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.vip }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.car }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.tNew|format_date() }}</span><input type="text" style="display:none; width:75px; "/></td>
+			<td><span>{{ r.tTotal }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.tLogin|format_date() }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.tLogout|format_date() }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.mapId }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.pos }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.posId }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.stage }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td><span>{{ r.chapter }}</span>
+			  	<select class="span1" style="display:none; width:50px; ">
+			  		<option value="0">  </option>
+		            <option value="1">1 - 初章</option>
+		            <option value="2">2 - 一章</option>
+		            <option value="3">3 - 二章</option>
+		            <option value="4">4 - 三章</option>
+		            <option value="5">5 - 五章</option>
+		            <option value="6">6 - 六章</option>
+		        </select>
+			</td>
+			<td><span>{{ r.state }}</span>
+				<select class="span1" style="display:none; width:50px; ">
+			  		<option value="0">0 － 普通</option>
+		            <option value="1">1 - 打坐</option>
+		            <option value="2">2 - 运鬼</option>
+     			</select>
+			</td>
+			<td><span>{{ r.funcs }}</span><input type="text" style="display:none; width:35px; "/></td>
+            <td><span>{{ r.fbLogin }}</span><input type="text" style="display:none; width:35px; "/></td>
+            <td><span>{{ r.fbChat }}</span><input type="text" style="display:none; width:35px; "/></td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[3] == 1  %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAME_BASEUSER, table=coll, id=r['_id']) }}">删除</button>
+				<button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %} 
+		<tr id="appendText" style="display:none;"> </tr> 
+	</table>
+	{% endif %}
+	<script type="text/javascript">
+		function edit_click(val){
+		var  id = val;
+		for(i=2; i<21; i++){
+			$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		$('#'+id+' td:nth-child(21)>select').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(21)>select').val($('#'+id+' td:nth-child(21)>span').text());
+		$('#'+id+' td:nth-child(21)>span').text("");
+		$('#'+id+' td:nth-child(22)>select').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(22)>select').val($('#'+id+' td:nth-child(22)>span').text());
+		$('#'+id+' td:nth-child(22)>span').text("");
+		
+		$('#'+id+' td:nth-child(23)>input').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(23)>input').val($('#'+id+' td:nth-child(23)>span').text());
+		$('#'+id+' td:nth-child(23)>span').text("");
+
+	    $('#'+id+' td:nth-child(24)>input').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(24)>input').val($('#'+id+' td:nth-child(24)>span').text());
+	    $('#'+id+' td:nth-child(24)>span').text("");
+	    $('#'+id+' td:nth-child(25)>input').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(25)>input').val($('#'+id+' td:nth-child(25)>span').text());
+	    $('#'+id+' td:nth-child(25)>span').text("");
+		
+		$('#'+id+' td:nth-child(2)>span').append("<font style='font-size:12px'>名字</font>");
+		$('#'+id+' td:nth-child(3)>span').append("<font style='font-size:12px'>用户id</font>");
+		$('#'+id+' td:nth-child(4)>span').append("<font style='font-size:12px'>银币</font>");
+		$('#'+id+' td:nth-child(5)>span').append("<font style='font-size:12px'>元宝</font>");
+		$('#'+id+' td:nth-child(6)>span').append("<font style='font-size:12px'>绑元宝</font>");
+		$('#'+id+' td:nth-child(7)>span').append("<font style='font-size:12px'>等级</font>");
+		$('#'+id+' td:nth-child(8)>span').append("<font style='font-size:12px'>经验</font>");
+		$('#'+id+' td:nth-child(9)>span').append("<font style='font-size:12px'>主角色id</font>");
+		$('#'+id+' td:nth-child(10)>span').append("<font style='font-size:12px'>练历</font>");
+		$('#'+id+' td:nth-child(11)>span').append("<font style='font-size:12px'>VIP等级</font>");
+		$('#'+id+' td:nth-child(12)>span').append("<font style='font-size:12px'>坐骑</font>");
+		$('#'+id+' td:nth-child(13)>span').append("<font style='font-size:12px'>创建时间</font>");
+		$('#'+id+' td:nth-child(14)>span').append("<font style='font-size:12px'>累计在线时间</font>");
+		$('#'+id+' td:nth-child(15)>span').append("<font style='font-size:12px'>最后登录时间</font>");
+		$('#'+id+' td:nth-child(16)>span').append("<font style='font-size:12px'>最后登出时间</font>");
+		$('#'+id+' td:nth-child(17)>span').append("<font style='font-size:12px'>最后退出的地图id</font>");
+		$('#'+id+' td:nth-child(18)>span').append("<font style='font-size:12px'>最后退出的地图id</font>");
+		$('#'+id+' td:nth-child(19)>span').append("<font style='font-size:12px'>激活的阵型id</font>");
+		$('#'+id+' td:nth-child(20)>span').append("<font style='font-size:12px'>副本数据</font>");
+		$('#'+id+' td:nth-child(21)>span').append("<font style='font-size:12px'>章节序号</font>");
+		$('#'+id+' td:nth-child(22)>span').append("<font style='font-size:12px'>玩家状态</font>");
+		$('#'+id+' td:nth-child(23)>span').append("<font style='font-size:12px'>开放的功能列表</font>");
+	    $('#'+id+' td:nth-child(24)>span').append("<font style='font-size:12px'>禁止登录</font>");
+	    $('#'+id+' td:nth-child(25)>span').append("<font style='font-size:12px'>禁止聊天</font>");
+		$('#'+id+' td:nth-child(26)>button:nth-child(3)').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(26)>button:nth-child(2)').css({display:"none"});
+	}
+	function save_click(val){
+		var  id1 = val;
+		var name = $('#'+id1+' td:nth-child(2)>input').val();
+		var uid = $('#'+id1+' td:nth-child(3)>input').val();
+		var coin1 = $('#'+id1+' td:nth-child(4)>input').val();
+		var coin2 = $('#'+id1+' td:nth-child(5)>input').val();
+		var coin3 = $('#'+id1+' td:nth-child(6)>input').val();
+		var level = $('#'+id1+' td:nth-child(7)>input').val();
+		var exp =$('#'+id1+' td:nth-child(8)>input').val();
+		var rid =$('#'+id1+' td:nth-child(9)>input').val();
+		var train =$('#'+id1+' td:nth-child(10)>input').val();
+		var vip =$('#'+id1+' td:nth-child(11)>input').val();
+		var car = $('#'+id1+' td:nth-child(12)>input').val()
+		var tNew = $('#'+id1+' td:nth-child(13)>input').val()
+		var tTotal = $('#'+id1+' td:nth-child(14)>input').val();
+		var tLogin = $('#'+id1+' td:nth-child(15)>input').val();
+		var tLogout = $('#'+id1+' td:nth-child(16)>input').val();
+		var mapId = $('#'+id1+' td:nth-child(17)>input').val();
+		var pos = $('#'+id1+' td:nth-child(18)>input').val();
+		var posId =$('#'+id1+' td:nth-child(19)>input').val();
+		var stage = $('#'+id1+' td:nth-child(20)>input').val();
+		var chapter = $('#'+id1+' td:nth-child(21)>select').val();
+		var state = $('#'+id1+' td:nth-child(22)>select').val();
+		var funcs = $('#'+id1+' td:nth-child(23)>input').val();
+        var fbLogin = $('#'+id1+' td:nth-child(24)>input').val();
+        var fbChat = $('#'+id1+' td:nth-child(25)>input').val();
+		$.post('/admin/baseuser/player/save/',{
+			id:id1,
+			name:name,
+			uid:uid,
+			coin1:coin1,
+			coin2:coin2,
+			coin3:coin3,
+			level:level,
+			exp:exp,
+			rid:rid,
+			train:train,
+			vip:vip,
+			car:car,
+			tNew:tNew,
+			tTotal:tTotal,
+			tLogin:tLogin,
+			tLogout:tLogout,
+			mapId:mapId,
+			pos:pos,
+			posId:posId,
+			stage:stage,
+			chapter:chapter,
+			state:state,
+			funcs:funcs,
+            fbLogin:fbLogin,
+            fbChat:fbChat
+		},function(data) {
+			if(data['success'] == "0"){
+				alert("修改角色失败");
+				location.reload() 
+			}else{
+				for(i=2; i<21; i++){
+				$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+				$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());
+			}
+				$('#'+id1+' td:nth-child(21)>select').css({display:"none"});
+				$('#'+id1+' td:nth-child(22)>select').css({display:"none"});
+				$('#'+id1+' td:nth-child(21)>span').text($('#'+id1+' td:nth-child(21)>select').val());
+				$('#'+id1+' td:nth-child(22)>span').text($('#'+id1+' td:nth-child(22)>select').val());
+				$('#'+id1+' td:nth-child(26)>button:nth-child(2)').css({display:"inline-block"});
+				$('#'+id1+' td:nth-child(26)>button:nth-child(3)').css({display:"none"});
+				$('#'+id1+' td:nth-child(23)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(23)>span').text($('#'+id1+' td:nth-child(23)>input').val());
+                $('#'+id1+' td:nth-child(24)>input').css({display:"none"});
+                $('#'+id1+' td:nth-child(24)>span').text($('#'+id1+' td:nth-child(24)>input').val());
+                $('#'+id1+' td:nth-child(25)>input').css({display:"none"});
+                $('#'+id1+' td:nth-child(25)>span').text($('#'+id1+' td:nth-child(25)>input').val());
+			}
+		});
+	}
+	</script>
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

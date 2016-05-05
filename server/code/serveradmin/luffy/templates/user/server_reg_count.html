@@ -1,0 +1,95 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate, platform_select %}
+{% block subjs %}
+<script type="text/javascript">
+    function func_reg_count(obj,searchCondition){
+        var start_time = $('#start_time').val();
+        var end_time = $('#end_time').val();
+        var stype = $('#stype').val();
+        var url = $(obj).attr('href');
+        if (searchCondition){
+            location.href = url+'?start_time='+start_time+'&end_time='+end_time+'&stype='+stype + '&searchCondition='+searchCondition;
+        }else{
+            location.href = url+'?start_time='+start_time+'&end_time='+end_time+'&stype='+stype;
+        }
+    }
+
+$(function () {
+    var chart;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'line',
+                margin: [ 50, 50, 100, 80]
+            },
+            title: {
+                text: '注册人数统计'
+            },
+            xAxis: {
+                categories: {{ keys|safe }},
+                labels: {
+                    rotation: -45,
+                    align: 'right',
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                    title: {
+                    text: ''
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                            ''+ Highcharts.numberFormat(this.y, 0) +
+                            '';
+                }
+            },
+            series: [{
+                name: 'Population',
+                data: {{ rets|safe }},
+                dataLabels: {
+                    enabled: true,
+                    rotation: -90,
+                    color: '#FFFFFF',
+                    align: 'right',
+                    x: 4,
+                    y: 10,
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            }]
+        });
+    });
+
+});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role>= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+			<br />
+			注册时间搜索：开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}"> 
+			结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+            {{ platform_select(stype) }}
+			<button type="button" class="btn" href="{{ url_for('user.server_reg_count') }}" onclick="func_reg_count(this,'day')">按日统计</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_reg_count') }}" onclick="func_reg_count(this,'month')">按月统计</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_reg_count') }}" onclick="func_reg_count(this,'year')">按年统计</button>
+            <button type="button" class="btn" href="{{ url_for('user.server_reg_count') }}" onclick="func_reg_count(this,'hour')">按时统计</button>
+			<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

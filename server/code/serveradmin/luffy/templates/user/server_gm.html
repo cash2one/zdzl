@@ -1,0 +1,405 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script>
+    function gm_action(gtype){
+        var url = '{{ url_for("user.server_gm_player_order") }}';
+        var pid = $('#pid').val();
+        var data = {};
+        data['pid'] = pid;
+        data['gtype'] = gtype;
+        if (gtype == 'send_mail'||gtype=='send_mail_date'){
+            data['pids'] = $('#send_mail_pids').val();
+            data['type'] = $('#send_mail_type').val();
+            data['title'] = $('#send_mail_title').val();
+            data['content'] = $('#send_mail_content').val();
+            data['items'] = $('#send_mail_items').val();
+	    data[ '{{form.platform.id}}' ] = $('#{{form.platform.id}}').val()
+            if (gtype == 'send_mail_date'){
+                data['start_time'] = $('#send_mail_start_time').val();
+            }
+            // data['rid'] = $('#send_mail_rid').val();
+        }else if(gtype == 'search_pid'){
+            data['name'] = $('#search_pid_name').val();
+        }else if (gtype == 'change_notice'){
+            url = '{{ url_for("user.server_gm_change_notice") }}';
+            data['notice'] = $('#notice').val();
+        }else if(gtype == 'horn_msgs'){
+            data['msgs'] = $('#horn_msgs_msgs').val();
+            data['times'] = $('#horn_msgs_times').val();
+            data['interval'] = $('#horn_msgs_interval').val();
+        }else if(gtype == 'restart'){
+            if(confirm("你确信要重启服务器？")){
+                data['mins'] = $('#restart_mins').val();
+            }
+        }else if(gtype=='stop'){
+            if(confirm("你确信要停止服务器？")){
+		data['mins'] = $('#restart_mins').val();
+            }
+        }
+        else if(gtype=='notify_players'){
+            if(confirm("确定要发送信息吗?")){
+                data['msgs'] = $('#notify_players_msgs').val();
+                data['pids'] = $('#notify_players_pids').val();
+                var t_alls = document.getElementsByName('msgradio');
+                data['all'] = '0';
+                for (var i = 0; i < t_alls.length; i++)
+                {
+                    if (t_alls[i].checked){
+                        data['all'] = '1';
+                    }
+                }
+            }
+        }else if(gtype=='clean_cbe'){
+            data['rank'] = $('#clean_cbe_rank').val();
+        }else if(gtype=='add_achieve'){
+            data['pids'] = $('#add_achieve_pids').val();
+            data['aid'] = $('#add_achieve_id').val();
+            data['type'] = $('#add_achieve_type').val();
+        } else if(gtype == 'player_pay_back'){
+            data['pid'] = $('#player_pay_back_pid').val();
+            data['rid'] = $('#player_pay_back_rid').val();
+        }else if(gtype == 'start_wboss'){
+            data['t'] = $('#start_wboss_time').val();
+            data['notice'] = $('#start_wboss_notice').val();
+        }else if(gtype == 'start_awar'){
+            data['type'] = $('#start_awar_type').val();
+            data['notice'] = $('#start_awar_notice').val();
+        }else if(gtype == 'worldboss_level'){
+            data['t'] = $('#worldboss_level_time').val();
+            data['level'] = $('#worldboss_level_level').val();
+        }else if(gtype == 'gm_mail_hide'){
+            data['pid'] = $('#gm_mail_pid').val();
+        }else if(gtype == 'gm_mail_view'){
+            data['pid'] = $('#gm_mail_pid').val();
+        }else if(gtype == 'get_ally_members'){
+            data['ally_name'] = $('#ally_info').val();
+        }else if(gtype == 'set_debug_data'){
+            data['debug_ips'] = $('#debug_ips').val();
+            data['debug_status'] = $('#debug_status').val();
+    }
+        if(gtype == 'arena_init'){
+            var pass = prompt("密码","请输入清除密令");
+            if (pass == 'efun874'){
+                $.get(url, data, function(d){
+                    if(d){
+                        $('#gm_log_show').append(d['ret']);
+                        $('#gm_log_show').append('<br />');
+                    }
+                });
+            }
+        }else{
+            $.get(url, data, function(d){
+                if(d){
+                    $('#gm_log_show').append(d['ret']);
+                    $('#gm_log_show').append('<br />');
+                }
+            });
+        }
+    };
+
+    $(document).ready(function(){
+        $('#send_mail_type').change(function(){
+            var select_num = $('#send_mail_type').find('option:selected').val();
+            if (select_num == 2){
+                var ret = '';
+                ret += '<select class="span3" id="send_mail_type">';
+                ret += '<option value="1">1-竞技场奖励</option>';
+                ret += '<option value="2">2-深渊挂机奖励</option>';
+                ret += '<option value="3">3-钓鱼委托奖励</option>';
+                ret += '<option value="4">4-世界BOSS奖励</option>';
+                ret += '<option value="5">5-同盟BOSS奖励励</option>';
+                ret += '<option value="6">6-同盟组队炼妖奖励</option>';
+                ret += '<option value="7">7-每日登录次数奖励</option>';
+                ret += '<option value="8">8-在线时间奖励</option>';
+                ret += '<option value="9">9-武器升级奖励</option>';
+                ret += '<option value="10">10-首招配将奖励</option>';
+                ret += '<option value="11">11-活动礼包奖励</option>';
+                ret += '<option value="12">12-系统补偿</option>';
+                ret += '<option value="13">13-社交好友添加</option>';
+                ret += '<option value="14">14-VIP奖励</option>';
+                ret += '<option value="15">15-玩家升级奖励</option>';
+                ret += '<option value="16">16-5000元宝赠送奖励</option>';
+                ret += '</select>';
+                $('#mail_content').html(ret);
+            }else{
+                $('#mail_content').html('<textarea class="input-xlarge" id="send_mail_content" rows="2" style="margin: 0px; width: 275px; height: 35px;"></textarea>');
+            }
+        });
+    });
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 210 or g.user.right[5] == 1 %}
+		<div class="span6">
+            <table class="table table-striped table-bordered table-condensed">
+                <!--角色ID:<input type="text" class="input-small" id="pid" />-->
+                {% if g.user.role >= 210 or g.user.right[11] %}
+                <tr>
+                    <td></td>
+                    <td><input type="button" class="btn" value="全服竞技场初始化" onclick="gm_action('arena_init')"/></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>重load竞技场</td>
+                    <td>
+                        <input type="button" class="btn" value="start" onclick="gm_action('arena_start')"/>
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="stop" onclick="gm_action('arena_stop')"/>
+                    </td>
+                </tr>
+               {% if g.user.role != 220 %}
+                <tr>
+                    <td>重启服务器</td>
+                    <td>
+                        <input type="text" class="" id="restart_mins" />分钟后重启<br/>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('restart')"/><input type="button" class="btn" value="停止" onclick="gm_action('stop')"/></td>
+                </tr>
+
+                <tr>
+                    <td>重新加载敏感词</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('reload_ban_words')"/></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>开启世界BOSS</td>
+                    <td>
+                        <select class="span3" id="start_wboss_time">
+                            <option value="0">上午</option>
+                            <option value="1">下午</option>
+                        </select>
+                        <br>通知的时长(单位秒)(默认300秒):
+                        <input type="text" class="input-small" id="start_wboss_notice" />
+                    </td>
+
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('start_wboss')"/></td>
+                </tr>
+                <tr>
+                    <td>开启狩龙战</td>
+                    <td>
+                        <select class="span3" id="start_awar_type">
+                            <option value="1">烛龙飞天</option>
+                            <option value="2">魔龙降世</option>
+                        </select>
+                        <br>通知的时长(单位秒)(默认300秒):
+                        <input type="text" class="input-small" id="start_awar_notice" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('start_awar')"/></td>
+                </tr>
+                <tr>
+                    <td>改变世界boss的等级</td>
+                    <td>
+                        等级:<input type="text" class="" id="worldboss_level_level" />
+                        <select class="span3" id="worldboss_level_time">
+                            <option value="0">上午</option>
+                            <option value="1">下午</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('worldboss_level')"/></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>清除战斗力</td>
+                    <td>
+                        小于排名<input type="text" class="" id="clean_cbe_rank" /><br/>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('clean_cbe')"/></td>
+                </tr>
+                <tr>
+                    <td>查找PID</td>
+                    <td>
+                        角色名：<input type="text" class="input-small" id="search_pid_name" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('search_pid')"/></td>
+                </tr>
+                <tr>
+			<td>获得同盟成员信息</td>
+                    <td> 同盟名称：<input type="text" class="input-small" id="ally_info" /> </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('get_ally_members')"/></td>
+                </tr>
+                <tr>
+                    <td> 设置测试的ip(多个IP用英文输入法逗号分隔)：
+                    一个ip:127.0.0.1
+                    多个ip:127.0.0.1,127.0.0.2
+                    </td>
+                    <td>
+                    ips:<input type="text" class="input-small" id="debug_ips" />
+                    <select class="span3" id="debug_status">
+                        <option value="0">关闭</option>
+                        <option value="1">开启</option>
+                    </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('set_debug_data')"/></td>
+                </tr>
+                <tr>
+                    <td>更改公告</td>
+                    <td>
+                        <textarea id="notice" rows="3"></textarea>
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="执行" onclick="gm_action('change_notice')"/><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>机器人控制</td>
+                    <td>
+                        <input type="button" class="btn" value="开启" onclick="gm_action('gm_start_bot')"/>
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="停止" onclick="gm_action('gm_stop_bot')"/>
+                    </td>
+                </tr>
+                {% if g.user.role >= 210 or g.user.right[11] %}
+                <tr>
+                    <td>玩家充值奖励</td>
+                    <td>
+                        角色ID:<input type="text" class="input-small" id="player_pay_back_pid" />
+                        奖励ID:<input type="text" class="input-small" id="player_pay_back_rid" />
+                    </td>
+                    <td>
+                        <input type="button" class="btn"  value="执行" onclick="gm_action('player_pay_back')"/>
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>发送大喇叭</td>
+                    <td>
+                        消息:<textarea class="input-xlarge" id="horn_msgs_msgs" rows="2" style="margin: 0px; width: 275px; height: 35px;"></textarea><br/>(PS:不超过200字)<br/>
+                        次数:<input type="text" class="input-small" id="horn_msgs_times" /><br/>
+                        间隔:<input type="text" class="input-small" id="horn_msgs_interval" />
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="发送" onclick="gm_action('horn_msgs')"/><br/><br/><br/>
+                        <input type="button" class="btn" value="停止" onclick="gm_action('horn_stop')"/>
+                    </td>
+                </tr>
+
+                
+                
+
+
+                <tr>
+                    <td>消息推送</td>
+                    <td>
+                        pids:<textarea class="input-xlarge" id="notify_players_pids" rows="2" style="margin: 0px; width: 275px; height: 35px;"></textarea><br/>
+                        msgs:<textarea class="input-xlarge" id="notify_players_msgs" rows="2" style="margin: 0px; width: 275px; height: 35px;"></textarea><br/>
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="执行" onclick="gm_action('notify_players')"/><br/>
+                        <input type="checkbox" name="msgradio" id="all_players"/>所有玩家<br/>
+                        <br/><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>玩家邮件的控制</td>
+                    <td>
+                        玩家的id：<input type="text" class="input-small" id="gm_mail_pid" />
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="隐藏" onclick="gm_action('gm_mail_hide')"/>
+                        <input type="button" class="btn" value="显示" onclick="gm_action('gm_mail_view')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        发送邮件：
+                    </td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>玩家ID列表:</td>
+                                <td>
+                                    <textarea id="send_mail_pids" rows="3"></textarea>
+                                    <!--<input type="text" class="input-big" id="send_mail_pids">-->
+                                </td>
+                                <td>
+                                    时间：<input type="text" class="input-small" id="send_mail_start_time"  onClick="WdatePicker()">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">类型:</td>
+                                <td>
+                                    <select class="span3" id="send_mail_type">
+                                        <option value="1">普通</option>
+                                        <option value="2">奖励</option>
+                                        <option value="3">战报</option>
+                                    </select>
+                                </td>
+				<td>{{form.platform.label}} {{ form.platform }}</td>
+                            </tr>
+                            <tr>
+                                <td>邮件标题:</td>
+                                <td><input type="text" class="input-big" id="send_mail_title"></td>
+                            </tr>
+
+                            <tr>
+                                <td>邮件内容:</td>
+                                <td id="mail_content">
+                                    <textarea class="input-xlarge" id="send_mail_content" rows="2" style="margin: 0px; width: 275px; height: 35px;"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>奖励物品列表:</td>
+                                <td>
+                                    <textarea class="input-xlarge" id="send_mail_items" rows="2" style="margin: 0px; width: 275px; height: 35px;"></textarea>
+                                </td>
+                            </tr>
+                            <!-- <tr>
+                                <td>奖励ID:</td>
+                                <td><input type="text" class="input-big" id="send_mail_rid"></td>
+                            </tr> -->
+                        </table>
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="执行" onclick="gm_action('send_mail')"/><br/>
+                        <input type="button" class="btn" value="按时间执行" onclick="gm_action('send_mail_date')"/>
+
+                    </td>
+                </tr>
+                {% if g.user.role >= 210  or g.user.right[11] %}
+                <tr>
+                    <td>
+                        添加成就：
+                    </td>
+                    <td>
+                        <table>
+                            <tr>
+				    <td>玩家ID列表:</td>
+                                <td>
+                                    <textarea id="add_achieve_pids" rows="3"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">类型:</td>
+                                <td>
+                                    <select class="span3" id="add_achieve_type">
+                                        <option value="1">每天</option>
+                                        <option value="0">永远</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>成就ID:</td>
+                                <td><input type="text" class="input-big" id="add_achieve_id"></td>
+                            </tr>
+
+                        </table>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_achieve')"/></td>
+                </tr>
+                {% endif %}
+            </table>
+		</div>
+        <div class="span4">
+            <div id="gm_log_show"></div>
+        </div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width = device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="MobileOptimized" content="320"/>
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="../common/css/base.css?20121230173953"/>
+<link rel="stylesheet" href="../common/css/style_sdk.css?20121230173953"/>
+<title>公告</title>
+</head>
+
+<body>
+<center>九游登录维护公告</center>
+<div id="userContainer" style="padding: 10px;">
+    <div class="pa10 btnClick-none">
+        <p class="somber_chg tl">
+            <span>亲爱的用户：</span>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;2月22日凌晨3:00-3:30，我们对登录服务器进行升级维护，期间可能会出现登录不稳定的情况。您可以稍后尝试重新登录，如有问题请随时联系九游客服（020-66826682）。对您造成不便敬请谅解，祝您游戏愉快。
+</p>
+        </p>
+    </div>
+</div>
+<script type="text/javascript" src="../common/js/sdkBase.js"></script>
+<script type="text/javascript">
+    document.addEventListener( 'bridgeready',  function() {
+        var ancSdkBase = new sdkBase();
+        ancSdkBase.request(ancSdkBase.servType.COMMON, ancSdkBase.actions.STAT, {
+            business : 'page.user.announcement',
+            step : 'enter'
+        });
+        ancSdkBase.request(ancSdkBase.servType.COMMON, ancSdkBase.actions.STAT, {
+            business : 'page.user.announcement',
+            step : 'close'
+        });
+    });
+</script>
+</body>
+</html>

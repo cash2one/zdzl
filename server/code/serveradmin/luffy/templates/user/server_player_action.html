@@ -1,0 +1,38 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate%}
+{%- block main -%}
+{% set atype={1:"登入", 2:"登出", 3:"升级", 4:"任务完成", 5:"招募配将", 6:"学习阵型", 7:"食馆进食", 11:"深渊开宝箱", -4:"接受任务", 0:"错误", 12:"章节", 13:"地图更新",
+14:"世界地图", 15:"功能更新", 101:"记录特有的mac地址"} %}
+{% if g.user.role >= 300 or g.user.right[6] == 1 %}
+		<div class="span10">
+			<br />
+			玩家ID：<input type="text" class="input-small" id="pid" value="{% if pid %}{{pid}}{% endif %}">
+            类型：<input type="text" class="input-small" id="t" value="{% if t %}{{t}}{% endif %}">
+			起始时间：<input type="text" class="input-small" id="start_time" onClick="WdatePicker()" value="{{ start_time }}">
+			结束时间：<input type="text" class="input-small" id="end_time" onClick="WdatePicker()" value="{{ end_time }}">
+			<button type="button" class="btn" href="{{ url_for('user.server_player_action') }}" onclick="GAME.load.player_action(this)">查询</button>
+            <br />{{ paginate(page_count,url_for( 'user.server_player_action' ),current_page=page, kwargs={'pid':pid, 'start_time':start_time, 'end_time':end_time, 't':t}) }}
+            <table class="table table-bordered">
+				<tr>
+                    <td>玩家ID</td>
+                    <td>类型</td>
+                    <td>附加信息</td>
+                    <td>任务id</td>
+                    <td>时间</td>
+				</tr>
+				{% for item in ret %}
+				<tr>
+                    <td>{{ item['p'] }}</td>
+                    <td>{{item['t']}}-{{ atype[item['t']] }}</td>
+                    <td>{{ item['d'] }}</td>
+                    <td>{{ item['tid'] }}</td>
+                    <td>{{ item['ct']|format_date }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

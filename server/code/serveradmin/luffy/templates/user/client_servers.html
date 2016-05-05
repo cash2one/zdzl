@@ -1,0 +1,123 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+
+{% endblock %}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[4] == 1 %}
+<div class="span10">
+    <div class="well form-inline">
+        id:
+        <input type="text" class="input-small" id="id">
+        ip：
+        <input type="text" class="input-big" id="host">
+        端口：
+        <input type="text" class="input-small" id="port">
+        用户名：
+        <input type="text" class="input-small" id="name">
+        状态：
+        <input type="text" class="input-big" id="status">
+        服务器id
+        <input type="text" class="input-big" id="sid">
+        app
+        <input type="text" class="input-big" id="app">
+        <button type="button" class="btn" id='submit'>增加服务器</button>
+    </div>
+    <div class="well form-inline hidefive" id="disfive">
+        编辑：<br />
+        id:
+        <input type="text" class="input-big" id="edit_id" readonly="readonly">
+        ip：
+        <input type="text" class="input-big" id="edit_host">
+        端口：
+        <input type="text" class="input-small" id="edit_port">
+        用户名：
+        <input type="text" class="input-small" id="edit_name">
+        状态：
+        <input type="text" class="input-big" id="edit_status">
+        服务器id
+        <input type="text" class="input-big" id="edit_sid">
+        app
+        <input type="text" class="input-big" id="edit_app">
+        <button type="button" class="btn" id='edit_submit'>提交</button>
+        <button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <td>id</td>
+            <td>HOST</td>
+            <td>端口</td>
+            <td>用户名</td>
+            <td>状态</td>
+            <td>sid</td>
+            <td>app</td>
+            <td>操作</td>
+        </tr>
+        {%- for r in ret -%}
+        <tr>
+            <td>{{ r._id }}</td>
+            <td>{{ r.host }}</td>
+            <td>{{ r.port }}</td>
+            <td>{{ r.name }}</td>
+            <td>{{ r.status }}</td>
+            <td>{{ r.sid }}</td>
+            <td>{{ r.app }}</td>
+            <td>
+                {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+                <button type="button" class="btn" id="delete" val="{{ r._id }}" onclick="GAME.load.href_click(this)" stype="del" href="{{ url_for('user.client_servers_delete') }}">删除</button>
+                <button type="button" class="btn" id="edit" val="{{ r._id }}" onclick="GAME.load.edit_click(this, 'client_servers')" stype="edit" href="{{ url_for('user.client_servers_data') }}">编辑</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var id = $("#id").val();
+            var host = $("#host").val();
+            var port = $("#port").val();
+            var name = $("#name").val();
+            var status = $("#status").val();
+            var sid = $("#sid").val();
+            var app = $("#app").val();
+            var url = "{{ url_for('user.client_servers_save') }}";
+            $.post(url,{
+                id:id, host:host, port:port, name:name, status:status, sid:sid, app:app
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var host = $("#edit_host").val();
+            var port = $("#edit_port").val();
+            var name = $("#edit_name").val();
+            var status = $("#edit_status").val();
+            var sid = $("#edit_sid").val();
+            var app = $("#edit_app").val();
+            var url = "{{ url_for('user.client_servers_save') }}";
+            $.post(url,{
+                id:id, host:host, port:port, name:name, status:status, sid:sid, app:app
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+    });
+</script>
+{%- endblock -%}

@@ -1,0 +1,302 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">技能状态表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>说明</td>
+			<td>类型</td>
+			<td>动画</td>
+			<td>命中率</td>
+			<td>目标类型</td>
+			<td>作用人数</td>
+			<td>作用的次数</td>
+			<td>解发条件</td>
+			<td>攻击加成</td>
+			<td>受伤加成</td>
+			<td>是否不能闪避</td>
+			<td>是否不能格档</td>
+			<td>是否不能反击</td>
+			<td>是否不能攻击</td>
+			<td>实际参数加成</td>
+			<td>聚气</td>
+			<td>加气百分比</td>
+			<td>加血</td>
+			<td>加血百分比</td>
+			<td>eff</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.name }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.info }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.type }}</span>
+				<select class="span1" style="display:none;width:40px;">
+			  		<option value="1">1-普通加成</option>
+		            <option value="2">2-中毒</option>
+		            <option value="3">3-队友或自己HP</option>
+		            <option value="4">4-直加HP</option>
+		        </select>
+			</td>
+			<td><span>{{ r.act }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.rate }}</span>
+                <select class="span1" style="display:none; width:40px;">
+                    {% for i in range(1,101)%}
+                        <option value="{{i}}">{{i}}</option>
+                    {% endfor %}
+                </select>
+            </td>
+			<td><span>{{ r.target }}</span>
+                <input type="text" style="display:none; width:40px; "/>
+                <select class="span1" style="display:none; width:40px; "/>
+                    <option value="1">1-敌方目标</option>
+                    <option value="2">2-自己</option>
+                    <option value="3">3-自己全体</option>
+                    <option value="4">4-敌方首要目标</option>
+                    <option value="5">5-敌方次要目标</option>
+                </select>
+            </td>
+			<td><span>{{ r.num }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.round }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.action }}</span>
+                <select class="span1"style="display:none; width:40px; "/>
+                    <option value="1">1-攻击时</option>
+                    <option value="2">2-受伤时</option>
+                    <option value="3">3-回合结束时</option>
+                </select>
+            </td>
+			<td><span>{{ r.ahp }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.bhp }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.nomis }}</span>
+				<select class="span1" style="display:none;width:40px;">
+			  		<option value="0">0-否</option>
+		            <option value="1">1-是</option>
+		        </select>					
+			</td>
+			<td><span>{{ r.nobok }}</span>
+				<select class="span1" style="display:none;width:50px;">
+			  		<option value="0">0-否</option>
+		            <option value="1">1-是</option>
+		        </select>	
+				
+			</td>
+			<td><span>{{ r.nocot }}</span>
+				<select class="span1" style="display:none;width:50px;">
+			  		<option value="0">0-否</option>
+		            <option value="1">1-是</option>
+		        </select>	
+				
+			</td>
+			<td><span>{{ r.noatk }}</span>
+				<select class="span1" style="display:none;width:50px;">
+			  		<option value="0">0-否</option>
+		            <option value="1">1-是</option>
+		        </select>	
+				
+			</td>
+			<td><span>{{ r['value'] }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.mp }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.mp_p }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.hp }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.hp_p }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.eff }}</span>
+				<select class="span1" style="display:none;width:50px;">
+			  		<option value="">  </option>
+			  		<option value="s1">s1-定身</option>
+		            <option value="s2">s2-昏迷</option>
+		            <option value="s3">s3-中毒</option>
+		            <option value="s4">s4-灼烧</option>
+		        </select>
+			</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+
+				<button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %} 
+		<tr id="appendText" style="display:none;"> </tr> 
+	</table>
+	<script type="text/javascript">
+		function edit_click(val){
+		var id = val
+		$('#'+id+' td:nth-child(2)>input').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(3)>input').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(4)>select').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(5)>input').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(6)>select').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(7)>select').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(8)>input').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(9)>input').css({display:"inline-block"});
+	    $('#'+id+' td:nth-child(10)>select').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(2)>input').val($('#'+id+' td:nth-child(2)>span').text());
+		$('#'+id+' td:nth-child(3)>input').val($('#'+id+' td:nth-child(3)>span').text());
+		$('#'+id+' td:nth-child(4)>select').val($('#'+id+' td:nth-child(4)>span').text());
+	    $('#'+id+' td:nth-child(5)>input').val($('#'+id+' td:nth-child(5)>span').text());
+	    $('#'+id+' td:nth-child(6)>select').val($('#'+id+' td:nth-child(6)>span').text());
+	    $('#'+id+' td:nth-child(7)>select').val($('#'+id+' td:nth-child(7)>span').text());
+	    $('#'+id+' td:nth-child(8)>input').val($('#'+id+' td:nth-child(8)>span').text());
+	    $('#'+id+' td:nth-child(9)>input').val($('#'+id+' td:nth-child(9)>span').text());
+	    $('#'+id+' td:nth-child(10)>select').val($('#'+id+' td:nth-child(10)>span').text());
+		$('#'+id+' td:nth-child(2)>span').text("");
+		$('#'+id+' td:nth-child(3)>span').text("");
+		$('#'+id+' td:nth-child(4)>span').text("");
+	    $('#'+id+' td:nth-child(5)>span').text("");
+	    $('#'+id+' td:nth-child(6)>span').text("");
+	    $('#'+id+' td:nth-child(7)>span').text("");
+	    $('#'+id+' td:nth-child(8)>span').text("");
+	    $('#'+id+' td:nth-child(9)>span').text("");
+	    $('#'+id+' td:nth-child(10)>span').text("");
+		for(i=11; i<13; i++){
+			$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		for(i=13; i<17; i++){
+			$('#'+id+' td:nth-child('+i+')>select').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>select').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		for(i=17; i<22; i++){
+			$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		$('#'+id+' td:nth-child(22)>select').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(22)>select').val($('#'+id+' td:nth-child(22)>span').text());
+		$('#'+id+' td:nth-child(22)>span').text("");
+		$('#'+id+' td:nth-child(2)>span').append("<font style='font-size:12px'>名字</font>");
+		$('#'+id+' td:nth-child(3)>span').append("<font style='font-size:12px'>说明</font>");
+		$('#'+id+' td:nth-child(4)>span').append("<font style='font-size:12px'>类型</font>");
+		$('#'+id+' td:nth-child(5)>span').append("<font style='font-size:12px'>动画</font>");
+		$('#'+id+' td:nth-child(6)>span').append("<font style='font-size:12px'>命中率</font>");
+		$('#'+id+' td:nth-child(7)>span').append("<font style='font-size:12px'>目标类型</font>");
+		$('#'+id+' td:nth-child(8)>span').append("<font style='font-size:12px'>作用人数</font>");
+		$('#'+id+' td:nth-child(9)>span').append("<font style='font-size:12px'>作用的次数</font>");
+		$('#'+id+' td:nth-child(10)>span').append("<font style='font-size:12px'>解发条件</font>");
+		$('#'+id+' td:nth-child(11)>span').append("<font style='font-size:12px'>攻击加成</font>");
+		$('#'+id+' td:nth-child(12)>span').append("<font style='font-size:12px'>受伤加成</font>");
+		$('#'+id+' td:nth-child(13)>span').append("<font style='font-size:12px'>是否不能闪避</font>");
+		$('#'+id+' td:nth-child(14)>span').append("<font style='font-size:12px'>是否不能格档</font>");
+		$('#'+id+' td:nth-child(15)>span').append("<font style='font-size:12px'>是否不能反击</font>");
+		$('#'+id+' td:nth-child(16)>span').append("<font style='font-size:12px'>是否不能攻击</font>");
+		$('#'+id+' td:nth-child(17)>span').append("<font style='font-size:12px'>实际参数加成</font>");
+		$('#'+id+' td:nth-child(18)>span').append("<font style='font-size:12px'>聚气</font>");
+		$('#'+id+' td:nth-child(19)>span').append("<font style='font-size:12px'>加气百分比</font>");
+		$('#'+id+' td:nth-child(20)>span').append("<font style='font-size:12px'>加血</font>");
+		$('#'+id+' td:nth-child(21)>span').append("<font style='font-size:12px'>加血百分比</font>");
+		$('#'+id+' td:nth-child(22)>span').append("<font style='font-size:12px'>eff</font>");
+		$('#'+id+' td:nth-child(23)>button:nth-child(3)').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(23)>button:nth-child(2)').css({display:"none"});
+	}
+	function save_click(val){
+		var  id1 = val;
+		var name = $('#'+id1+' td:nth-child(2)>input').val();
+		var info = $('#'+id1+' td:nth-child(3)>input').val();
+		var type =$('#'+id1+' td:nth-child(4)>select').val();
+		var act = $('#'+id1+' td:nth-child(5)>input').val();
+		var rate = $('#'+id1+' td:nth-child(6)>select').val();
+		var target = $('#'+id1+' td:nth-child(7)>select').val();
+		var num = $('#'+id1+' td:nth-child(8)>input').val();
+		var round =$('#'+id1+' td:nth-child(9)>input').val();
+		var action =$('#'+id1+' td:nth-child(10)>select').val();
+		var ahp =$('#'+id1+' td:nth-child(11)>input').val();
+		var bhp =$('#'+id1+' td:nth-child(12)>input').val();
+		var nomis = $('#'+id1+' td:nth-child(13)>select').val()
+		var nobok = $('#'+id1+' td:nth-child(14)>select').val()
+		var nocot = $('#'+id1+' td:nth-child(15)>select').val();
+		var noatk = $('#'+id1+' td:nth-child(16)>select').val();
+		var value = $('#'+id1+' td:nth-child(17)>input').val();
+		var mp = $('#'+id1+' td:nth-child(18)>input').val();
+		var mp_p = $('#'+id1+' td:nth-child(19)>input').val();
+		var hp =$('#'+id1+' td:nth-child(20)>input').val();
+		var hp_p = $('#'+id1+' td:nth-child(21)>input').val();
+		var eff = $('#'+id1+' td:nth-child(22)>select').val();
+		
+		$.post('/admin/admin/state/save/',{
+			id:id1,
+			name:name,
+			info:info,
+			type:type,
+			act:act,
+			rate:rate,
+			target:target,
+			num:num,
+			round:round,
+			action:action,
+			ahp:ahp,
+			bhp:bhp,
+			nomis:nomis,
+			nobok:nobok,
+			nocot:nocot,
+			noatk:noatk,
+			value:value,
+			mp:mp,
+			mp_p:mp_p,
+			hp:hp,
+			hp_p:hp_p,
+			eff:eff
+		},function(data) {
+			if(data['success'] == "0"){
+				alert("修改角色失败");
+				location.reload() 
+			}else{
+				$('#'+id1+' td:nth-child(2)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(3)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(4)>select').css({display:"none"});
+	            $('#'+id1+' td:nth-child(5)>input').css({display:"none"});
+	            $('#'+id1+' td:nth-child(6)>select').css({display:"none"});
+	            $('#'+id1+' td:nth-child(7)>select').css({display:"none"});
+	            $('#'+id1+' td:nth-child(8)>input').css({display:"none"});
+	            $('#'+id1+' td:nth-child(9)>input').css({display:"none"});
+	            $('#'+id1+' td:nth-child(10)>select').css({display:"none"});
+				$('#'+id1+' td:nth-child(2)>span').text($('#'+id1+' td:nth-child(2)>input').val());
+				$('#'+id1+' td:nth-child(3)>span').text($('#'+id1+' td:nth-child(3)>input').val());
+				$('#'+id1+' td:nth-child(4)>span').text($('#'+id1+' td:nth-child(4)>select').val());
+	            $('#'+id1+' td:nth-child(5)>span').text($('#'+id1+' td:nth-child(5)>input').val());
+	            $('#'+id1+' td:nth-child(6)>span').text($('#'+id1+' td:nth-child(6)>select').val());
+	            $('#'+id1+' td:nth-child(7)>span').text($('#'+id1+' td:nth-child(7)>select').val());
+	            $('#'+id1+' td:nth-child(8)>span').text($('#'+id1+' td:nth-child(8)>input').val());
+	            $('#'+id1+' td:nth-child(9)>span').text($('#'+id1+' td:nth-child(9)>input').val());
+	            $('#'+id1+' td:nth-child(10)>span').text($('#'+id1+' td:nth-child(10)>select').val());
+				for(i=11; i<13; i++){
+				$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+				$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());
+			}
+			for(i=13; i<17; i++){
+				$('#'+id1+' td:nth-child('+i+')>select').css({display:"none"});
+				$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>select').val());
+			}
+			for(i=17; i<22; i++){
+				$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+				$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());
+			}
+				$('#'+id1+' td:nth-child(22)>select').css({display:"none"});
+				$('#'+id1+' td:nth-child(22)>span').text($('#'+id1+' td:nth-child(22)>select').val());
+				$('#'+id1+' td:nth-child(23)>button:nth-child(2)').css({display:"inline-block"});
+				$('#'+id1+' td:nth-child(23)>button:nth-child(3)').css({display:"none"});
+			}
+		});
+	}
+	</script>	
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

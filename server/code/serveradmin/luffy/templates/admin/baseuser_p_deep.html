@@ -1,0 +1,44 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate, search %}
+{%- block main -%}
+
+<div class="span10">
+    玩家深渊表：
+    {% if g.user.role >= 300 or g.user.right[2] == 1 %}
+    {{ paginate(page_count,url_for('admin.baseuser_p_deep'),current_page=page) }}
+    {{ search(g.GAME_BASEUSER, coll) }}
+    <table class="table table-striped table-bordered table-condensed">
+        <tr>
+            <td>id</td>
+            <td>玩家id</td>
+            <td>数据时间</td>
+            <td>自动挂机完成时间</td>
+            <td>当前层</td>
+            <td>累计的buff</td>
+            <td>宝箱信息</td>
+            <td>累计获取奖励</td>
+            <td>守卫信息</td>
+            <td>已清完怪的层列表</td>
+        </tr>
+        {%- for r in ret -%}
+        <tr>
+            <td>{{ r._id }}</td>
+            <td>{{ r.pid }}</td>
+            <td>{{ r.ft }}</td>
+            <td>{{ r.at }}</td>
+            <td>{{ r.fl }}</td>
+            <td>{{ r.bf }}</td>
+            <td>{{ r.box }}</td>
+            <td>{{ r.rw }}</td>
+            <td>{{ r.gd }}</td>
+            <td>{{ r.cl }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}
+

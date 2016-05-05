@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{% macro messages() %}
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      {% for category, m in messages %}
+        {% if category == 'error' %}
+        <div class="alert alert-error">
+        {% else %}
+        <div class="alert">
+        {% endif %}
+          <a href="javascript:void(0)" class="close" data-dismiss="alert">x</a>
+          {{ m }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+{% endmacro %}
+
+
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate, render_form %}
+{% block subjs %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/sorttable.js') }}"></script>
+<script type="text/javascript">
+$(function(){
+		$(".control-group").css('display', 'block')
+		var formid = "#{{form.__class__.__name__}}";
+		var $f = $(formid)
+		$(".control-group", $f).slice(0,5).wrapAll("<fieldset style='background-color: rgb(238, 238, 238);'> </fieldset>");
+		});
+
+function load_model_form(obj, rowid){
+	// var rowid = $(obj).attr('data');
+	var param = '';
+	if ( rowid != undefined )
+	{
+		var param = "mid" +  '=' + rowid ;
+	}
+
+	var formid = "#{{form.__class__.__name__}}";
+	$('#formcontain').load("{{url_for('user.config_plist')}} " + formid, 
+			param,
+			function(){
+			var $f = $(formid)
+			 $(".control-group").css('display', 'block') 
+			$(".control-group", $f).slice(0,5).wrapAll("<fieldset style='background-color: rgb(238, 238, 238);'> </fieldset>");
+			});
+}
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[15] == 1 %}
+<div class="span10">
+	{% block page_body %}
+	<div id="formcontain" class="formcontainer">
+		{% if form %} 
+		{% block body %}
+		{{ render_form(form) }}
+		{% endblock %}
+		{%endif%}
+	</div>
+	{{ messages() }}
+	{% endblock %}
+	<div>
+		{%if data%}
+		{%set fkeys = form.data.keys()%}
+		<table class="table table-bordered">
+			{%for e in data%}
+			{%if loop.first%}
+			<tr>
+				{%for k in fkeys%} 
+				<td>{{form[k].label}}</td>
+				{%endfor%}
+			</tr>
+			{%endif%}
+			<tr>
+				{%for k in fkeys%} 
+				<td>{{e[k]}}</td>
+				{%endfor%}
+				<td>
+				<button type="button" class="btn" id='edit' onclick="load_model_form(this, '{{e['_id']}}')" >编辑</button>
+				</td>
+			</tr>
+			{%endfor%}
+		</table>
+		{%endif%}
+
+	</div>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}
+

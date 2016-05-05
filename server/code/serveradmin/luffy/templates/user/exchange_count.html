@@ -1,0 +1,39 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[6] == 1 %}
+		<div class="span10">
+			<br />
+			兑换码：<input type="text" class="input-big" id="code">
+            PID:<input type="text" class="input-small" id="pid">
+			<button type="button" class="btn" href="{{ url_for('user.exchange_count') }}" onclick="GAME.load.exchange_count(this)">查询</button>
+            {{ paginate(page_count,url_for( 'user.exchange_count' ),current_page=page, kwargs={}) }}
+            <table class="table table-bordered">
+				<tr>
+					<td>兑换码</td>
+					<td>批次名</td>
+                    <td>uid</td>
+                    <td>pid</td>
+                    <td>服务器</td>
+                    <td>使用时间</td>
+				</tr>
+                {% for r in ret %}
+				<tr>
+					<td>{{ r['code'] }}</td>
+                    <td>{{r['name']}}</td>
+                    <td>{{r['uid']}}</td>
+                    <td>{{r['pid']}}</td>
+                    <td>{{r['svr']}}</td>
+                    <td>{{r['gt']|format_date}}</td>
+				</tr>
+                {% endfor %}
+			</table>
+            <div>
+                {% if pid_list %}{{ pid_list }}{% endif %}
+            </div>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

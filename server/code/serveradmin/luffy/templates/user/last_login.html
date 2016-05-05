@@ -1,0 +1,28 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+            对比统计，统计上次与当前都有登录帐号：
+            <table class="table table-bordered">
+                <tr>
+                    <td>91帐号</td>
+                    <td>UUID</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>{{sns91}}</td>
+                    <td>{{uuid}}</td>
+                </tr>
+            </table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

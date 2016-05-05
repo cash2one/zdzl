@@ -1,0 +1,16 @@
+{%- extends "user/layout.html" -%}
+{%- block main -%}
+<div>
+	<div class="index_title">
+		<h3>我的私信<span node-type="msg_num" class="W_textb">(已有4个联系人)</span></h3>
+		<div class="search">
+			<form node-type="messageSearchForm" action="/messages" method="get">
+				<input type="text" node-type="messageSearchInput" name="key_word" class="input input_default" value="查找联系人或私信内容">
+				<input type="hidden" value="1" name="is_search">
+				<a node-type="searchMessage" href="javascript:void(0);" class="btn"></a> 
+			</form>
+		</div>
+		<div class="W_btn"> <a node-type="postMsg" class="W_btn_b" href="javascript:void(0);" suda-data="key=message_anonymous_send_page&amp;value=message_anonymous_send_page"><span><img src="http://img.t.sinajs.cn/t4/style/images/common/transparent.gif?version=4cbfe64c5895a591" class="privatebtn">发私信</span></a> </div>
+	</div>
+</div>
+{%- endblock -%}

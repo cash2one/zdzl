@@ -1,0 +1,110 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress, paginate %}
+{%- block subcss -%}
+
+{%- endblock -%}
+{%- block subjs-%}
+
+<script type="text/javascript">
+	{% if values %}
+		var values = {{ values|safe }};
+	{% else %}
+		var values = null;
+	{% endif %}
+
+    function setEvent(target, item){
+		$(target).find("#id").val(item['id']);
+		$(target).find("#type").val(item['type']);
+		$(target).find("#name").val(item['name']);
+		$(target).find("#info").val(item['info']);
+		$(target).find("#condition").val(item['condition']);
+		$(target).find("#bg").val(item['bg']);
+		$(target).find("#cmd").val(item['cmd']);
+		$(target).find("#inc").val(item['inc']);
+		$(target).find("#exc").val(item['exc']);
+	};
+
+	// 生成列表html
+	function getAListHtml(){
+		result = '<div id="listItem">';
+		result += 'id:';
+		result += '<input type="text" class="span1" id="id">';
+		result += 'type:';
+		result += '<input type="text" class="span1" id="type">';
+		result += 'name:';
+		result += '<input type="text" class="span2" id="name">';
+		result += 'info:';
+		result += '<input type="text" class="span2" id="info">';
+		result += 'condition:';
+		result += '<input type="text" class="span2" id="condition">';
+		result += 'bg:';
+		result += '<input type="text" class="span3" id="bg" style="margin: 0 auto;" data-provide="typeahead" data-items="4" data-source="{{file_list}}">';
+		result += 'cmd:';
+		result += '<input type="text" class="span3" id="cmd">';
+		result += '作用服:';
+		result += '<input type="text" class="span3" id="inc">';
+		result += '排除服:';
+		result += '<input type="text" class="span3" id="exc">';
+		result += '<button onclick="$(this).parent().remove()">删除</button>';
+		result += '<br/>';
+		result += '</div>';
+		return result;
+	};
+
+	$(document).ready(function(){
+		// 初始化列表
+		if(values){
+			for (i=0;i<values.length;i++){
+				$('#theList').append(getAListHtml());
+				var target = $('#theList').find('#listItem').last();
+				setEvent(target, values[i]);
+			}
+		}
+		// 添加列表
+		$('#addList').click(function(){
+			$('#theList').append(getAListHtml());
+		});
+		// 保存
+		$('#save').click(function(){
+			var ret 	= []
+			var items 	= $('#theList').find('#listItem');
+			for (i=0;i<items.length;i++){
+				tmp = {}
+				tmp['id'] 	= parseInt($(items[i]).find('#id').val());
+				tmp['name'] = $(items[i]).find('#name').val();
+				tmp['type'] = $(items[i]).find('#type').val();
+				tmp['info'] = $(items[i]).find('#info').val();
+				tmp['condition'] = $(items[i]).find('#condition').val();
+				tmp['bg'] 	= $(items[i]).find('#bg').val();
+				tmp['cmd'] 	= $(items[i]).find('#cmd').val();
+				tmp['inc'] 	= $(items[i]).find('#inc').val();
+				tmp['exc'] 	= $(items[i]).find('#exc').val();
+				ret.push(tmp)
+			};
+			$.post('/admin/create/json/edit/',{values:JSON.stringify(ret)}, function(d){
+				if(d['ret']==1){
+					var show_msg = '<h1>保存成功</h1>';
+				}else{
+					var show_msg = '<h1>保存失败</h1>';
+				};
+				$('#ret_info').html(show_msg);
+			})
+		});
+	});
+</script>
+{% endblock %}
+{%- block main -%}
+		<div class="span10">
+            <div>{% if saved %}保存图片成功{% endif %}</div>
+			<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+				<input type="file" name="uploadify">
+				<input type="submit" value="提交">
+			</form>
+			<div id="theList" style="padding-top: 5px; padding-left: 5px; padding-bottom: 5px; background: none repeat scroll 0% 0% rgb(119, 119, 119);"></div>
+			<button id="addList" type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 40%; margin-left: 2%;">添加List</button>
+			<button id="save" type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 40%; margin-left: 2%;">保存</button><br/>
+			<div id="ret_info"></div>
+		</div>
+  	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

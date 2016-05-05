@@ -1,0 +1,181 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	战斗表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	名字：
+	  	<input type="text" class="input-small" id="edit_name">
+	  	背景：
+	  	<input type="text" class="input-small" id="edit_BG">
+	  	icon：
+	  	<input type="text" class="input-small" id="edit_icon">
+	  	位置1：
+	  	<input type="text" class="input-small" id="edit_s1">
+	  	位置2：
+	  	<input type="text" class="input-small" id="edit_s2">
+	  	位置3：
+	  	<input type="text" class="input-small" id="edit_s3">
+	  	位置4：
+	  	<input type="text" class="input-small" id="edit_s4">
+	  	位置5：
+	  	<input type="text" class="input-small" id="edit_s5">
+	  	位置6：
+	  	<input type="text" class="input-small" id="edit_s6">
+	  	位置7：
+	  	<input type="text" class="input-small" id="edit_s7">
+	  	位置8：
+	  	<input type="text" class="input-small" id="edit_s8">
+	  	位置9：
+	  	<input type="text" class="input-small" id="edit_s9">
+	  	位置10：
+	  	<input type="text" class="input-small" id="edit_s10">
+	  	位置11：
+	  	<input type="text" class="input-small" id="edit_s11">
+	  	位置12：
+	  	<input type="text" class="input-small" id="edit_s12">
+	  	位置13：
+	  	<input type="text" class="input-small" id="edit_s13">
+	  	位置14：
+	  	<input type="text" class="input-small" id="edit_s14">
+	  	位置15：
+	  	<input type="text" class="input-small" id="edit_s15">
+	  	奖励ID：
+	  	<input type="text" class="input-small" id="edit_rid">
+	  	粒子文件:
+	  	<input type="text" class="input-small" id="edit_par">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>背景</td>
+			<td>ICON</td>
+			<td>位置1</td>
+			<td>位置2</td>
+			<td>位置3</td>
+			<td>位置4</td>
+			<td>位置5</td>
+			<td>位置6</td>
+			<td>位置7</td>
+			<td>位置8</td>
+			<td>位置9</td>
+			<td>位置10</td>
+			<td>位置11</td>
+			<td>位置12</td>
+			<td>位置13</td>
+			<td>位置14</td>
+			<td>位置15</td>
+			<td>奖励ID</td>
+			<td>粒子文件</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.name}}</td>
+			<td>{{ r.BG }}</td>
+			<td>{{ r.icon }}</td>
+			<td>{{ r.s1 }}</td>
+			<td>{{ r.s2 }}</td>
+			<td>{{ r.s3 }}</td>
+			<td>{{ r.s4 }}</td>
+			<td>{{ r.s5 }}</td>
+			<td>{{ r.s6 }}</td>
+			<td>{{ r.s7 }}</td>
+			<td>{{ r.s8 }}</td>
+			<td>{{ r.s9 }}</td>
+			<td>{{ r.s10 }}</td>
+			<td>{{ r.s11 }}</td>
+			<td>{{ r.s12 }}</td>
+			<td>{{ r.s13 }}</td>
+			<td>{{ r.s14 }}</td>
+			<td>{{ r.s15 }}</td>
+			<td>{{ r.rid }}</td>
+			<td>{{ r.par }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+                <button type="button" class="btn" id='edit' onclick="GAME.load.get_data(this)" href="{{url_for('admin.admin_data', db=g.GAMEBASE, table=coll, id=r['_id'])}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var name = $("#edit_name").val();
+				var BG = $("#edit_BG").val();
+				var icon = $("#edit_icon").val();
+				var s1 = $("#edit_s1").val();
+				var s2 = $("#edit_s2").val();
+				var s3 = $("#edit_s3").val();
+				var s4 = $("#edit_s4").val();
+				var s5 = $("#edit_s5").val();
+				var s6 = $("#edit_s6").val();
+				var s7 = $("#edit_s7").val();
+				var s8 = $("#edit_s8").val();
+				var s9 = $("#edit_s9").val();
+				var s10 = $("#edit_s10").val();
+				var s11 = $("#edit_s11").val();
+				var s12 = $("#edit_s12").val();
+				var s13 = $("#edit_s13").val();
+				var s14 = $("#edit_s14").val();
+				var s15 = $("#edit_s15").val();
+				var rid = $("#edit_rid").val();
+				var par = $("#edit_par").val();
+				$.post('/admin/admin/fight/save/',{
+					id:id,
+					name:name,
+					BG:BG,
+					icon:icon,
+					s1:s1,
+					s2:s2,
+					s3:s3,
+					s4:s4,
+					s5:s5,
+					s6:s6,
+					s7:s7,
+					s8:s8,
+					s9:s9,
+					s10:s10,
+					s11:s11,
+					s12:s12,
+					s13:s13,
+					s14:s14,
+					s15:s15,
+					rid:rid,
+					par:par
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload() 
+					}
+				});
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

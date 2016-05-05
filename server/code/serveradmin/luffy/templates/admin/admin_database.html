@@ -1,0 +1,40 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	<div class="well form-inline">
+	  	当前版本：<input type="text" class="input-small" id="current_ver" readonly="readonly" value="{{ ver }}">
+	  	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	  	<button type="button" class="btn" onclick="create_database()">生成新的数据文件</button>
+	  	<button type="button" class="btn" onclick="create_xls()">备份为xls文件</button>
+        <br />
+	  	{% endif %}
+	</div>
+	<script type="text/javascript">
+		function create_database(){
+			$.get('/admin/admin/create/database/',function(data){
+				if (data['ret'] == 'success'){
+					location.reload();
+				}else{
+					alert('生成失败');
+				}
+			});
+		}
+		
+		function create_xls(){
+			$.get('/admin/admin/database/xls/',function(data){
+				if (data['ret'] == 'success'){
+					location.reload();
+				}else{
+					alert('生成失败');
+				}
+			});
+		}
+	</script>
+
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

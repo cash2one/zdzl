@@ -1,0 +1,63 @@
+{%- extends "base_layout.html" -%}
+{%- block css -%}
+<link rel="stylesheet" href="{{ 'frontend.static'|url('bootstrap/css/bootstrap.min.css') }}" type="text/css" />
+<link rel="stylesheet" href="{{ 'frontend.static'|url('bootstrap/css/bootstrap-responsive.min.css') }}" type="text/css" />  
+{%- endblock -%} 
+{%- block bootjs-%}
+<script type="text/javascript" src="{{ 'frontend.static'|url('bootstrap/js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/efun.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/My97DatePicker/WdatePicker.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/HighchartsJS/highcharts.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/HighchartsJS/modules/exporting.js') }}"></script>
+{% block subjs %}{% endblock%}
+{%- endblock -%}
+{%- block content -%}
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            {% set test_user = ['qe@efun.com'] %}
+            <a class="brand" href="#">
+                {% if g.current_server %}
+                {{ g.current_server.name }}
+                {% else %}
+                指点真龙
+                {% endif %}
+            </a>
+            <div class="nav-collapse collapse">
+
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2">
+          {% if not user_index%}
+          <div class="well sidebar-nav">
+                <div class="accordion" id="accordion2">
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseAdminStatus">
+                        管理员功能
+                      </a>
+                    </div>
+                    <div id="collapseAdminStatus" class="{% if SIDEBAR == 'other' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+                      <div class="accordion-inner">
+                        <ul>
+                              <li><a href="{{ url_for('other.server_filter') }}">名单</a></li>
+                              <hr />
+                         </ul>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div><!--/.well -->
+          {% endif %}
+        </div><!--/span-->
+    {%- block main -%}{%- endblock -%}
+{%- endblock -%}

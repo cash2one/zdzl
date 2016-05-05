@@ -1,0 +1,361 @@
+{%- macro input(field) -%}
+<div class="new_item">
+	<div class="tit">
+	{{ field.label() }}
+	</div>
+	<div class="bdmain">
+		<div class="input_bg">
+			<strong>  
+			{{ field(class="textinp",title= field.description,alt = field.description,style="width: 230px; ",**kwargs) }}
+			</strong>
+		</div>
+	</div> 
+	<div id="red_{{ field.name }}" class="new_plus" style="">
+		<div class="errormt" style="">
+			<i></i>
+			<strong><span>{{ field.description }}</span></strong>
+		</div>
+	</div>
+</div>
+{%- endmacro -%}
+
+{%- macro password(field) -%}
+<div class="new_item">
+	<div class="tit">
+	{{ field.label() }}
+	</div>
+	<div class="bdmain">
+		<div class="input_bg">
+			<strong>
+			{{ field(class="textinp",title= field.description,alt = field.description,style="width: 230px;display:none; ",rel = field.name ,**kwargs) }}
+			<input type="text" class="textinp" rel = "{{ field.name }}" id="{{ field.name }}_text" title= "{{ field.description }}" value="" alt = "{{ field.description }}" style="width: 230px;">
+			</strong>
+		</div>
+	</div> 
+	<div id="red_{{ field.name }}" class="new_plus" style="">
+		<div class="errormt" style="">
+			<i></i>
+			<strong><span>{{ field.description }}</span></strong>
+		</div>
+	</div>
+</div>
+{%- endmacro -%}
+
+{%- macro checkbox(field) -%}
+<div class="new_item">
+	<div class="tit">
+	
+	</div>
+	<div class="bdmain">
+		<div class="fragm">
+			<label>
+        	{{ field(title= field.description,alt = field.description,**kwargs) }}{{ field.label.text }}  
+        	</label>
+        </div> 
+	</div> 
+	<div id="red_{{ field.name }}" class="new_plus" style="">
+		<div class="errormt" style="">
+			<i></i>
+			<strong><span>{{ field.description }}</span></strong>
+		</div>
+	</div>
+</div>
+{%- endmacro -%}
+
+{%- macro submit(txt,endform = True) -%}
+<div class="new_item">
+	<div class="tit">
+	</div>
+	<div class="bdmain">
+		<a title="{{ txt }}" class="btn2" name="submit" href="javascript:void(0);">{{ txt }}</a>
+	</div>
+</div>
+{%- if endform -%}
+</form>
+{%- endif -%}
+{%- endmacro -%}
+
+
+{%- macro radio(field) -%} 
+<div class="new_item">
+	<div class="tit">
+	{{ field.label() }}
+	</div>
+	<div class="bdmain">
+	{% for item in field.iter_choices() %}
+		<div class="fragm">
+          <label><input type="radio" class="ra" {% if item[2] %}checked="checked"{%endif%} id="{{ field.name }}" name="{{ field.name }}" value="{{ item[0] }}"> {{ item[1] }}</label>
+        </div>
+    {% endfor %}
+	</div> 
+	<div id="red_{{ field.name }}" class="new_plus" style="">
+		<div class="errormt" style="">
+			<i></i>
+			<strong><span>{{ field.description }}</span></strong>
+		</div>
+	</div>
+</div>
+{%- endmacro -%}
+
+
+{%- macro select(field) -%} 
+<div class="new_item">
+	<div class="tit">
+	{{ field.label() }}
+	</div>
+	<div class="bdmain"> 
+		<div class="fakesel">
+          <strong>
+          	<select name="{{ field.name }}" id="{{ field.name }}">
+          		{% for item in field.iter_choices() %}
+          		<option value="{{ item[0] }}">{{ item[1] }}</option>
+          		{% endfor %}
+          	</select>
+          </strong>
+        </div> 
+	</div> 
+	<div id="red_{{ field.name }}" class="new_plus" style="">
+		<div class="errormt" style="">
+			<i></i>
+			<strong><span>{{ field.description }}</span></strong>
+		</div>
+	</div>
+</div>
+{%- endmacro -%}
+
+
+
+
+{%- macro img(src,action,cb = '""',title='删除',before='""') -%}
+<img style="cursor:pointer" src="{{ 'frontend.static' | url(src,_external = True) }}" title="{{ title }}" alt="{{ title }}" onclick="DAMY.loader.ajax_img(this,'{{ 'frontend.static' | url('images/ajax-loader3.gif') }}','{{ action }}',{{ cb }},{{ before }})" />
+{%- endmacro -%}
+
+{%- macro img_toggle(status,action,cb = '""',title='') -%}
+{%- if status -%}
+<img style="cursor:pointer" src="{{ 'frontend.static' | url('images/o1.png',_external = True) }}" title="{{ title }}" alt="{{ title }}" onclick="DAMY.loader.toggle_img(this,'{{ 'frontend.static' | url('images/o1.png') }}','{{ 'frontend.static' | url('images/x1.gif') }}','{{ 'frontend.static' | url('images/ajax-loader3.gif') }}','{{ action }}',{{ cb }})" />
+{%- else -%}
+<img style="cursor:pointer" src="{{ 'frontend.static' | url('images/x1.gif',_external = True) }}" title="{{ title }}" alt="{{ title }}" onclick="DAMY.loader.toggle_img(this,'{{ 'frontend.static' | url('images/o1.png') }}','{{ 'frontend.static' | url('images/x1.gif') }}','{{ 'frontend.static' | url('images/ajax-loader3.gif') }}','{{ action }}',{{ cb }})" />
+{%- endif -%}
+{%- endmacro -%}
+
+{%- macro progress(val,all,unite = '') -%} 
+{%- if all == 0 -%}
+{%- set tmp = '0' -%}
+{%- else -%}
+{%- set tmp = val / all * 100 -%}
+{%- set tmp = '%0.2f' | format(tmp)  -%}
+{%- set tmp = tmp | replace('.00','') -%}
+{%- endif -%} 
+<div class="progress-bar-large blue"> <div><a style="width: {{ tmp }}%;" class="blue" rel="65" title="{{ tmp }}%"> {{ val }}{{ unite }} / {{ all }}{{ unite }} </a></div> </div>
+{%- endmacro -%}
+
+{%- macro paginate(count,href,current_page=None, kwargs={})-%}
+{% if count != 0%}
+	<span class="badge"><a href="{{ href }}?page=1{% for k,v in kwargs.iteritems() %}&{{k}}={{v}}{% endfor %}">首页</a></span>
+	{% if current_page>1%}
+		<span class="badge"><a href="{{ href }}?page={{ current_page-1 }}{% for k,v in kwargs.iteritems() %}&{{k}}={{v}}{% endfor %}">上一页</a></span>
+	{% endif %}
+	<span class="badge badge-warning">{{current_page}}/{{count}}</span>
+	{% if count >current_page%}
+		<span class="badge"><a href="{{ href }}?page={{ current_page+1 }}{% for k,v in kwargs.iteritems() %}&{{k}}={{v}}{% endfor %}">下一页</a></span>
+	{% endif %}
+	<span class="badge"><a href="{{ href }}?page={{count}}{% for k,v in kwargs.iteritems() %}&{{k}}={{v}}{% endfor %}">尾页</a></span>
+	第<input type="text" class="input-small" id="page_txt">页
+	<button type="button" class="btn" id='gopage' onclick="">GO</button>
+	<script>
+		$(document).ready(function(){
+			$("#gopage").click(function(){
+				var paget = $('#page_txt').val();
+				var countt = "{{count}}";
+				if (0< parseInt(paget) & parseInt(paget) <parseInt(countt)){
+					self.location = "{{ href}}?page="+paget;
+				}
+			});
+		});
+	</script>
+{% endif %}
+{%- endmacro -%}
+
+{% macro server(serverRet, serverid, userPath) %}
+<select id="server_select">
+	<option value="">请选择服务器</option>
+	{% for s in serverRet %}
+		<option value="{{ s.mongo_id }}" {% if s.mongo_id == serverid %}selected="selected"{% endif %}>{{ s.name }}</option>
+	{% endfor %}
+</select>
+<script>
+	$('#server_select').change(function(){
+		//alert(this.value);
+		var toUrl = this.value;
+		var url = "{{ url_for(userPath) }}";
+		location.href = url+toUrl;
+	})
+</script>
+{% endmacro %}
+
+{%macro search(db, collection)%}
+<form action="{{url_for('admin.common_search')}}" method="POST" enctype="multipart/form-data"  class="well form-inline">
+	查询条件：<textarea rows="3" cols="21" name="querys"></textarea>
+	sortkey:<input type="text" class="span2" name="sort_key">
+	<select name="sort_by">
+		<option value="-1">降序</option>
+		<option value="1">升序</option>
+	</select>
+	<input type=hidden value={{db}} name="db">
+	<input type=hidden value={{collection}} name="collection">
+	<input type="submit" value="提交">
+</form>
+
+{%endmacro%}
+
+
+{%macro platform_select(stype)%}
+<select class="span2" id="stype"/>
+        <option value="-1"{% if stype==-1%} selected{%endif%}>所有平台</option>
+        <option value="1"{% if stype==1%} selected{%endif%}>博远</option>
+        <option value="2"{% if stype==2%} selected{%endif%}>点金</option>
+        <option value="3"{% if stype==3%} selected{%endif%}>EFUN</option>
+        <option value="4"{% if stype==4%} selected{%endif%}>PP</option>
+        <option value="5"{% if stype==5%} selected{%endif%}>AppStore</option>
+        <option value="6"{% if stype==6%} selected{%endif%}>AppStore-TW</option>
+        <option value="7"{% if stype==7%} selected{%endif%}>云顶</option>
+        <option value="8"{% if stype==8%} selected{%endif%}>UC</option>
+        <option value="9"{% if stype==9%} selected{%endif%}>云顶破解平台</option>
+        <option value="10"{% if stype==10%} selected{%endif%}>同步推</option>
+        <option value="11"{% if stype==11%} selected{%endif%}>当乐</option>
+        <option value="12"{% if stype==12%} selected{%endif%}>PP苹果园</option>
+</select>
+{% endmacro %}
+
+{% macro render_pagination(pagination, endpoint, param="") %}
+<div style="display: inline">
+  {%- for page in pagination.iter_pages() %}
+    {% if page %}
+      {% if page != pagination.page %}
+      {% set url = url_for(endpoint) + "?page=%s" % page + param %} 
+        <a href="{{ url }}">{{ page }}</a>
+      {% else %}
+        <strong>{{ page }}</strong>
+      {% endif %}
+    {% else %}
+      <span class="ellipsis">…</span>
+    {% endif %}
+  {%- endfor %}
+  </div>
+{%endmacro%}
+
+{% macro servers_select(g) %}
+{%set d={'apptw_res':'繁体app','bd91_res':'博动91','app_res':'简体app', 'test_zl_res':'真龙测试服',
+'test_bd91_res':'搏动测试服', 'zl_res':'国内','test_app_res':'简体app测试服','test_apptw_res':'繁体app测试服',
+'ids_res':'云顶', 'td_res':'潜龙勿用', 'appyd_res':'云顶', 'test_ids_res':'云顶测试服', 'idsc_res':'云顶越狱平台'}%}
+<script>
+function server_group(obj){
+    //var serverid = $('#default_server_type').val();
+    var group = $(obj).val();
+    var url = $(obj).attr('href');
+    $.get(url, {group:group},function(data){
+       if (data['success']==1){
+           location.reload();
+       }
+    });
+}
+</script>
+<select class="span3" id="default_server_group" onchange="server_group(this)" href="{{ url_for('user.server_set_group') }}">
+	<option></option>
+	{% for group in g.servers_group%}
+    <option {% if g.user.server_group == group%}selected{%endif%} value={{group}}>{{ d[group] }}</option>
+    {% endfor %}
+</select>
+<select class="span3" id="default_server_type" onchange="GAME.load.server_default(this)" href="{{ url_for('user.server_set_default') }}">
+        <option>选择服务器－(默认本地)</option>
+        {% for s in g.servers %}
+	   {%set disp_name = s.name %}
+	{%if s.sid%}
+	   {%set disp_name = '%s--%s' % (s.name, s.sid)%}
+	{%endif%}
+            {% if g.user.role ==400 %}
+              <option value="{{ s.mongo_id }}" {% if s.mongo_id == g.user.server %}selected="selected"{% endif %}>{{ disp_name }}</option>
+            {%else %}
+              {% if s.t != 3 %}
+	         {%if g.user.right[14] != 1 %}
+                <option value="{{ s.mongo_id }}" {% if s.mongo_id == g.user.server %}selected="selected"{% endif %}>{{ disp_name }}</option>
+		 {%endif%}
+		{%elif g.user.right[13] == 1 %}
+                <option value="{{ s.mongo_id }}" {% if s.mongo_id == g.user.server %}selected="selected"{% endif %}>{{ disp_name }}</option>
+              {% endif %}
+            {% endif %}
+        {% endfor %}
+    </select>
+  {{ g.user.nickname }} <a href="{{ url_for('user.logout',_external = True) }}" class="navbar-link">退出</a>
+ {% endmacro %}
+
+{# ---------------------- Forms -------------------------- #}
+{% macro render_field(form, field, set_focus=False, kwargs={}) %}
+  <div class="control-group{{ ' error' if field.errors else '' }}" style="display: inline-block">
+    <div class="control-label">
+	 {% if field.name != 'id' %} 
+      {{ field.label.text }}
+		{% endif %}
+    </div>
+    <div class="controls">
+    <div>
+      {% if set_focus %}
+      {{ field(autofocus='autofocus', **kwargs)|safe }}
+      {% else %}
+      {{ field(**kwargs)|safe }}
+      {% endif %}
+    </div>
+    {% if field.description %}
+    <p class="help-block">{{ field.description }}</p>
+    {% endif %}
+    {% if field.errors %}
+      <ul class="input-errors">
+      {% for e in field.errors if e is string %}
+        <li>{{ e }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro render_form_fields(form, set_focus=True, widget_args={}) %}
+    {{ form.hidden_tag() if form.hidden_tag is defined }}
+
+    {% for f in form if f.type != 'HiddenField' and f.type != 'CSRFTokenField' %}
+      {% set kwargs = widget_args.get(f.name, {}) %}
+      {{ render_field(form, f, not loop.index0 and set_focus, kwargs) }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro form_tag(form=None) %}
+<form id="{{ form.__class__.__name__  }}" action="" method="POST" class="form-inline" enctype="multipart/form-data">
+      <fieldset>
+        {{ caller() }}
+      </fieldset>
+    </form>
+{% endmacro %}
+
+{% macro render_form_buttons(cancel_url, extra=None, form=None) %}
+    <div class="control-group">
+      <div class="controls">
+        <input type="submit" class="btn btn-primary btn-large" value="提交" />
+        {% if extra %}
+        {{ extra }}
+        {% endif %}
+        {% if cancel_url %}
+        <a href="{{ cancel_url }}" class="btn btn-large">取消</a>
+        {% endif %}
+        {% if form %}
+	<a href="#" class="btn btn-large" onclick="$(this).parents('form').hide('fast')[0].reset();">取消</a>
+        {% endif %}
+      </div>
+    </div>
+{% endmacro %}
+
+{% macro render_form(form, cancel_url, extra=None, widget_args={}) -%}
+    {% call form_tag(form) %}
+        {{ render_form_fields(form, widget_args=widget_args) }}
+        {{ render_form_buttons(cancel_url, extra, form=form) }}
+    {% endcall %}
+{% endmacro %}

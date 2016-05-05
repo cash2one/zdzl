@@ -1,0 +1,100 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+
+{% endblock %}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[4] == 1 %}
+<div class="span10">
+    <!-- type:1=efun, 2=云顶 -->
+    <div class="well form-inline">
+        id:
+        <input type="text" class="input-small" id="id">
+        email：
+        <input type="text" class="input-big" id="email">
+        password：
+        <input type="text" class="input-big" id="password">
+        type:
+        <input type="text" class="input-big" id="t">
+        <button type="button" class="btn" id='submit'>增加服务器</button>
+    </div>
+    <div class="well form-inline hidefive" id="disfive">
+        编辑：<br />
+        id:
+        <input type="text" class="input-big" id="edit_id" readonly="readonly">
+        email：
+        <input type="text" class="input-big" id="edit_email">
+        password：
+        <input type="text" class="input-big" id="edit_password">
+        type:
+        <input type="text" class="input-big" id="edit_t">
+        <button type="button" class="btn" id='edit_submit'>提交</button>
+        <button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <td>id</td>
+            <td>email</td>
+            <td>password</td>
+            <td>type</td>
+            <td>操作</td>
+        </tr>
+        {%- for r in ret -%}
+        <tr>
+            <td>{{ r['_id'] }}</td>
+            <td>{{ r['email'] }}</td>
+            <td>{{ r['password'] }}</td>
+            <td>{{ r['t'] }}</td>
+            <td>
+                {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+                <button type="button" class="btn" id="delete" val="{{ r._id }}" onclick="GAME.load.href_click(this)" stype="del" href="{{ url_for('user.customer_account_delete') }}">删除</button>
+                <button type="button" class="btn" id="edit" val="{{ r._id }}" onclick="GAME.load.edit_click(this, 'customer_account')" stype="edit" href="{{ url_for('user.customer_account_data') }}">编辑</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var id = $("#id").val();
+            var email = $("#email").val();
+            var password = $("#password").val();
+            var t = $("#t").val();
+            var url = "{{ url_for('user.customer_account_save') }}";
+            $.post(url,{
+                id:id, email:email, password:password, t:t
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var email = $("#edit_email").val();
+            var password = $("#edit_password").val();
+            var t = $("#edit_t").val();
+            var url = "{{ url_for('user.customer_account_save') }}";
+            $.post(url,{
+                id:id, email:email, password:password, t:t
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+    });
+</script>
+{%- endblock -%}

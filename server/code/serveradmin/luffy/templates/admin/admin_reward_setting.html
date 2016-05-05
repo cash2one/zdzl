@@ -1,0 +1,152 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress, render_form %}
+{%- block main -%}
+
+<div class="span10">活动设置表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+        type:
+        <input type="text" class="input-small" id="edit_type">
+        开始日期：
+        <input type="text" class="input-small" id="edit_begin" placeholder="str">
+        结束日期：
+        <input type="text" class="input-small" id="edit_end" placeholder="str">
+        奖励ID：
+        <input type="text" class="input-small" id="edit_data" placeholder="str">
+        开关:
+        <select class="span1" id="edit_state">
+            <option value="0">0-否</option>
+            <option value="1">1-是</option>
+        </select>
+        服务器的ID:
+        <input type="text" class="input-small" id="edit_sids" placeholder="int">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<button type="button" class="btn" onclick="load_model_form()" >创建活动</button>
+	<strong>当前活动的id: <span id="idv" style="color: blue; font-size: 18px;">{{form.id.data|d('', True)}}</span></strong>
+<div id='formcontainer'>
+
+	{{ render_form(form, None, widget_args=form_widget_args) }}
+</div>
+	<form class="form-inline">{{f_form.filter_sids.label}} 		{{f_form.filter_sids}}
+		{{f_form.filter_sysids.label}} 		{{f_form.filter_sysids}}
+
+	</form>
+	<table class="table table-striped table-bordered " id=result_table>
+	<!-- <table class="table table-striped table-bordered table-condensed" id=result_table> -->
+		<tr>
+			<td>id</td>
+			<td>奖励类型的ID</td>
+			<td>奖励的类型名称</td>
+			<td>活动的描述名称</td>
+			<td>开始日期</td>
+			<td>结束日期</td>
+            <td>奖励内容</td>
+            <td>开关</td>
+            <td>服务器的ID</td>
+            <td>说明</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.type }}</td>
+			<td>{{ r.name }}</td>
+			<td>{{ r.desc }}</td>
+			<td>{{ r.begin }}</td>
+			<td>{{ r.end }}</td>
+	    <td style="max-width: 320px"><pre style="border: none;">{{ r.data }}</pre></td>
+            <td>{{ r.state }}</td>
+            <td>{{ r.sids }}</td>
+            <td>{{ r.fmt }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+				<button type="button" class="btn" id='edit' onclick="load_model_form(this, '{{r['_id']}}')" data="{{r['_id']}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+	function load_model_form(obj, rowid){
+		// var rowid = $(obj).attr('data');
+		var param = '';
+		if ( rowid != undefined )
+		{
+			var param = "mid" +  '=' + rowid ;
+		}
+
+		var formid = "#{{ form._id }}";
+		$('#formcontainer').load("{{url_for('admin.admin_reward_setting')}} " + formid, 
+				param,
+				function(){
+				var $f = $(formid)
+				$f.show('fast');
+				$('#idv').text($('#id', $f).val());
+				});
+
+
+	}
+
+		$(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+                var type = $("#edit_type").val();
+                var begin = $("#edit_begin").val();
+                var end = $("#edit_end").val();
+                var data = $("#edit_data").val();
+                var state = $("#edit_state").val();
+                var sids = $("#edit_sids").val();
+			$.post('/admin/admin/reward/setting/save/',{
+				id:id,
+				type:type,
+				begin:begin,
+				end:end,
+				data:data,
+				state:state,
+				sids:sids
+				})
+			.success(function(data){
+				if(data['success'] == "0"){
+					alert("添加角色等级失败");
+				}else{
+					location.reload() 
+				}
+			});
+			});
+
+			var formid = "#{{ form._id }}";
+			$("#{{f_form.filter_sids.id}}").live("change", function(){
+					var param = "{{f_form.filter_sids.id}}" +  '=' + $("#{{f_form.filter_sids.id}}" ).val();
+					param = param + "&" + "{{f_form.filter_sysids.id}}" +  '=' + $("#{{f_form.filter_sysids.id}}" ).val();
+					$("#result_table").load("{{url_for('admin.admin_reward_setting')}} #result_table", 
+						 param, 
+						 function(){});
+					});
+			$("#{{f_form.filter_sysids.id}}").live("change", function(){
+					var param = "{{f_form.filter_sids.id}}" +  '=' + $("#{{f_form.filter_sids.id}}" ).val();
+					param = param + "&" + "{{f_form.filter_sysids.id}}" +  '=' + $("#{{f_form.filter_sysids.id}}" ).val();
+					$("#result_table").load("{{url_for('admin.admin_reward_setting')}} #result_table", 
+						 param, 
+						 function(){});
+					});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

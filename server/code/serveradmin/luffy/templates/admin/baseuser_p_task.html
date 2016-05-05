@@ -1,0 +1,116 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate, search %}
+{%- block main -%}
+
+<div class="span10">
+	玩家任务表：
+	{% if g.user.role >= 300 or g.user.right[3] == 1 %}
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[2] == 1 %}
+	{{ paginate(page_count,url_for('admin.baseuser_p_task'),current_page=page) }}
+	{{ search(g.GAME_BASEUSER, coll) }}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>玩家id</td>
+			<td>任务id</td>
+			<td>当前步骤</td>
+			<td>用户状态</td>
+			<td>是否当前在进行中</td>
+			<td>特定任务奖励id</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.pid }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.tid }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.step }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.status }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.isRun }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.rid }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td>
+				{% if g.user.role >= 300  or g.user.right[3] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAME_BASEUSER, table=coll, id=r['_id']) }}">删除</button>
+				<button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+		<tr id="appendText" style="display:none;"> </tr> 
+	</table>
+	{% endif %}
+	<script type="text/javascript">
+		function edit_click(val){
+		var  id = val;
+			$('#'+id+' td:nth-child(2)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(3)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(4)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(5)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(6)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(7)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(2)>input').val($('#'+id+' td:nth-child(2)>span').text());
+			$('#'+id+' td:nth-child(3)>input').val($('#'+id+' td:nth-child(3)>span').text());
+			$('#'+id+' td:nth-child(4)>input').val($('#'+id+' td:nth-child(4)>span').text());
+			$('#'+id+' td:nth-child(5)>input').val($('#'+id+' td:nth-child(5)>span').text());
+			$('#'+id+' td:nth-child(6)>input').val($('#'+id+' td:nth-child(6)>span').text());
+			$('#'+id+' td:nth-child(7)>input').val($('#'+id+' td:nth-child(7)>span').text());
+			$('#'+id+' td:nth-child(2)>span').text("");
+			$('#'+id+' td:nth-child(3)>span').text("");
+			$('#'+id+' td:nth-child(4)>span').text("");
+			$('#'+id+' td:nth-child(5)>span').text("");
+			$('#'+id+' td:nth-child(6)>span').text("");
+			$('#'+id+' td:nth-child(7)>span').text("");
+			
+			$('#'+id+' td:nth-child(8)>button:nth-child(3)').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(8)>button:nth-child(2)').css({display:"none"});
+
+	}
+	function save_click(val){
+		var  id1 = val;
+		var pid = $('#'+id1+' td:nth-child(2)>input').val();
+		var tid = $('#'+id1+' td:nth-child(3)>input').val();
+		var step = $('#'+id1+' td:nth-child(4)>input').val();
+		var status = $('#'+id1+' td:nth-child(5)>input').val();
+		var isRun = $('#'+id1+' td:nth-child(6)>input').val();
+		var rid = $('#'+id1+' td:nth-child(7)>input').val();
+		$.post('/admin/baseuser/p/task/save/',{
+			id:id1,
+			pid:pid,
+			tid:tid,
+			step:step,
+			status:status,
+			isRun:isRun,
+			rid:rid
+		},function(data) {
+			if(data['success'] == "0"){
+				alert("修改角色失败");
+				location.reload() 
+			}else{
+				$('#'+id1+' td:nth-child(2)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(3)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(4)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(5)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(6)>input').css({display:"none"});
+				$('#'+id1+' td:nth-child(7)>input').css({display:"none"});
+				
+				$('#'+id1+' td:nth-child(2)>span').text($('#'+id1+' td:nth-child(2)>input').val());
+				$('#'+id1+' td:nth-child(3)>span').text($('#'+id1+' td:nth-child(3)>input').val());
+				$('#'+id1+' td:nth-child(4)>span').text($('#'+id1+' td:nth-child(4)>input').val());
+				$('#'+id1+' td:nth-child(5)>span').text($('#'+id1+' td:nth-child(5)>input').val());
+				$('#'+id1+' td:nth-child(6)>span').text($('#'+id1+' td:nth-child(6)>input').val());
+				$('#'+id1+' td:nth-child(7)>span').text($('#'+id1+' td:nth-child(7)>input').val());
+				
+				$('#'+id1+' td:nth-child(8)>button:nth-child(2)').css({display:"inline-block"});
+				$('#'+id1+' td:nth-child(8)>button:nth-child(3)').css({display:"none"});
+			}
+		});
+	}
+	</script>
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

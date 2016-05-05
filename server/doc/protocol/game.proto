@@ -1,0 +1,198 @@
+package game;
+
+
+//结果
+enum ResultType
+{
+	FAIL = 0;
+	SUCC = 1;
+}
+
+//性别
+enum Sex {
+	SEX_MALE = 1; //男
+	SEX_FEMALE = 2; //女
+}
+
+//种族
+enum Race {
+	RACE_MJ = 1; //猛将
+	RACE_JS = 2; //军师
+	RACE_XK = 3; //侠客
+}
+
+//物品分类
+enum ItemType {
+	IT_EQUIP = 1; //装备
+	IT_STUFF = 2; //材料
+	
+}
+
+//key-value对
+message KeyValue {
+	required string key = 1;
+	required bytes value = 2;
+}
+
+//坐标
+message Position {
+	required int32 x = 1;
+	required int32 y = 2;
+}
+
+
+//命格
+message LifeLine {
+	required int32 id = 1; //命格id
+	required int32 level = 2; //等级
+	required string attr = 3; //命格作用的属性
+	required int32 exp = 4; //当前经验
+}
+
+//装备
+message Equip {
+	required int32 id = 1; //装备id
+	required int32 level = 2; //装备等级
+}
+
+//角色物品
+message PlayerItem {
+	required int32 id = 1; //物品id
+	required int32 piid = 2; //物品列表中的id
+	required ItemType type = 3; //物品类型
+	optional int32 count = 4; // 数量
+	optional int32 useId = 5; //使用了该物品的配将id
+	optional int32 place = 6; //使用的部位,限制:命格,使用情况下才有
+	optional bytes data = 7; //附加信息如:装备强化等级、命格经验属性
+}
+
+
+//奖励物品
+message RewardItem {
+	required int32 id = 1; //物品id
+	required int32 count = 2; //数量
+	optional bytes data = 4; //附加信息如:装备强化等级、命格经验属性
+}
+
+//奖励
+message Reward {
+	optional int32 gold = 1; //银币
+	optional int32 exp = 2; //经验
+	repeated RewardItem items = 3; //奖励的物品列表 
+}
+
+
+//角色、配将属性
+message Attributes {
+	required int32 str = 1; //勇力
+	required int32 int = 2; //智略
+	required int32 vit = 3; //体魄
+	required int32 dex = 4; //迅捷
+}
+
+//穿戴,关联PlayerItem中的"物品id"
+message Equips {
+	optional int32 head = 1; //头
+	optional int32 body = 2; //身
+	optional int32 waist = 3; //腰
+	optional int32 hand = 4; //手
+	optional int32 leg = 5; //腿
+	optional int32 neck = 6; //颈
+}
+
+//命格槽,关联PlayerItem中的"物品id"
+message LifeLines {
+	optional int32 one = 1; //
+	optional int32 two = 2; //
+	optional int32 three = 3; //
+	optional int32 four = 4; //
+	optional int32 five = 5; //
+	optional int32 six = 6; //
+}
+
+//buff
+message Buff {
+	required int32 id = 1; //buff id
+	required int32 endtime = 2; //结束时间(单位秒)
+}
+
+
+//角色基础信息
+message Player {
+	required int32 pid = 1; //角色id
+	required string name = 2; //角色名
+	required Sex sex = 3; //性别
+	required int32 level = 4; //等级
+	required Race race = 5; //种族
+}
+
+
+//角色详细信息
+message PlayerInfo {
+	required int32 pid = 1; //角色id
+	required string name = 2; //角色名
+	required Sex sex = 3; //性别
+	required int32 level = 4; //等级
+}
+
+//角色配将列表
+message PlayerMember {
+	required int32 id = 1; //配将id,
+	optional Equips equips = 4; //穿戴的装备
+	optional LifeLines lines = 5; //命格槽
+}
+
+//角色任务状态
+message PlayerTaskState {
+	required int32 cur_id = 1; //当前主线任务id
+	required int32 step = 2; //执行任务所在步骤
+}
+
+
+//任务类型
+enum TaskType {
+	TT_MAIN = 1; //主线
+	TT_BRANCH = 2; //支线
+	TT_HIDE = 3; //隐藏
+	TT_ACTIVITY = 4; //活动
+}
+
+//任务条件
+message TaskCondition {
+	optional int32 level = 1; //等级
+	optional int32 depend_id = 2; //依赖任务id
+}
+
+message Message {
+	required int32 headID = 1; //头像
+	required string content = 2; //内容
+}
+
+//任务动作:对话
+message TATalk {
+	repeated Message msgs = 1; //对话列表
+}
+
+//任务动作:移动
+message TAMove {
+	required Position pos = 1; //坐标
+	optional int32 map_id = 2; //地图id
+	optional int32 speed = 3; //速度
+}
+
+//任务动作:信息提示
+message TAMessage {
+	required int32 type = 1; //样式
+	required string content = 2; //内容
+}
+
+//任务
+message Task {
+	required int32 id = 1; //任务id
+	required TaskType type = 2; //任务类型
+	required string desc = 3; //描述
+	optional TaskCondition condition = 4; //依赖条件
+	optional int32 next_id = 5; //下一个任务id
+	optional Reward reward = 6; //奖励
+	repeated bytes actions = 7; //任务步骤列表,由多种任务动作类型组成
+}

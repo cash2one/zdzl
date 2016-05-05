@@ -1,0 +1,36 @@
+
+{% extends "user/layout.html"%}
+{%- block main -%}
+
+		<div class="span9">
+			<div id="search-container">
+			</div>
+			<div id="search-data">
+		{%if data%}
+				<table class="table table-striped table-bordered table-condensed">
+					{%- for r in data -%}
+
+					{%if loop.first%}
+					<tr>
+						{%for k in form.order_keys()%} 
+						<td>{{form[k].label}}</td>
+						{%endfor%}
+					</tr>
+					{%endif%}
+
+					<tr>
+						{%for k in form.order_keys()%} 
+						<td>{{r[k]}}</td>
+						{%endfor%}
+					</tr>	
+
+					{% endfor %}  
+				</table>
+		{%endif%}
+		</div>
+			
+		</div>
+	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

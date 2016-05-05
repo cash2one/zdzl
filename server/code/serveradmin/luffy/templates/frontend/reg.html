@@ -1,0 +1,13 @@
+{%- extends "base_layout.html" -%}
+{% from "base_macros.html" import input,submit,radio,password %}
+{%- block content -%}
+{%- block js %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/jquery.simplemodal-1.4.2.js') }}"></script>
+{%- endblock %} 
+{{ form.form_tag() }}
+{{ input(form.username) }}
+{{ password(form.password) }}
+{{ radio(form.sex) }} 
+{{ input(form.nickname) }}
+{{ submit('马上注册') }}  
+{%- endblock -%}

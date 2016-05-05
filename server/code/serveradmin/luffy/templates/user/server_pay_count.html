@@ -1,0 +1,30 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#download').click(function(){
+            var url = "{{ url_for('user.server_pay_count_create') }}";
+            var start_time = $("#start_time").val();
+            var end_time = $("#end_time").val();
+            $.post(url,{start_time:start_time, end_time:end_time},function(d){
+                if (d['success']==1){
+                    location.href="/static/xlsdatabase/pay.xls";
+                };
+            });
+        });
+    });
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[9] == 1 %}
+        开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+        结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+        <button type="button" id="download" class="btn">下载统计</button>
+     <!--    <div class="span10">
+           <button id="download">下载统计</button>
+        </div> -->
+        {% endif %}
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

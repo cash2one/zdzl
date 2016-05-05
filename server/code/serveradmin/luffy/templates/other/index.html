@@ -1,0 +1,46 @@
+{% extends "other/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+
+{% endblock %}
+{%- block main -%}
+    <div class="span10">      
+    </div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var names = $("#names").val();
+            var t = $("#t").val();
+            var url = "{{ url_for('other.server_filter_order') }}";
+            $.post(url,{
+                names:names,t:t, opType:"new"
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload() 
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var names = $("#edit_names").val();
+            var t = $("#edit_t").val();
+            var url = "{{ url_for('other.server_filter_order') }}";
+            $.post(url,{
+                id:id,names:names,t:t, opType:"edit"
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload() 
+                }
+            });
+        });
+        
+    });
+</script>
+{%- endblock -%}

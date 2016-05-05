@@ -1,0 +1,73 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+$(function () {
+    var chart;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'line',
+                marginRight: 130,
+                marginBottom: 35
+            },
+            title: {
+                text: '进入章节(1=序章)',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+                categories: {{ cateList|safe }}
+            },
+            yAxis: {
+                title: {
+                    text: '易幻'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        this.x +': '+ this.y +'人';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -10,
+                y: 100,
+                borderWidth: 0
+            },
+            series: [{
+                name: '人数',
+                data: {{ countList|safe }}
+            }]
+        });
+    });
+    
+});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+
+			<br />
+			开始章节：<input type="text" class="input-small" id="startTask"  value="{{ startTask }}">
+			结束章节：<input type="text" class="input-small" id="endTask"  value="{{ endTask }}">
+			<button type="button" class="btn" href="{{ url_for('user.server_all_prologue') }}" onclick="GAME.load.all_task(this, 'Task')">统计</button>
+			<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

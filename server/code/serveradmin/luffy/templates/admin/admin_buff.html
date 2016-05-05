@@ -1,0 +1,121 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	食馆buff表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	名字：
+	  	<input type="text" class="input-small" id="edit_name" placeholder="int">
+	  	说明：
+	  	<input type="text" class="input-small" id="edit_info">
+	  	动画：
+	  	<input type="text" class="input-small" id="edit_act">
+	  	大类型：
+	  	<input type="text" class="input-small" id="edit_type">
+	  	小类型：
+	  	<input type="text" class="input-small" id="edit_stype">
+	  	buff：
+	  	<input type="text" class="input-small" id="edit_buff">
+	  	cost：
+	  	<input type="text" class="input-small" id="edit_cost">
+	  	方案：
+	  	<input type="text" class="input-small" id="edit_plan">
+	  	coin2：
+	  	<input type="text" class="input-small" id="edit_coin2" placeholder="str">
+	  	coin3：
+	  	<input type="text" class="input-small" id="edit_coin3" placeholder="str">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+    <table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>说明</td>
+			<td>动画</td>
+			<td>大类型</td>
+			<td>小类型</td>
+			<td>buff</td>
+			<td>cost</td>
+			<td>方案</td>
+			<td>coin2</td>
+			<td>coin3</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.name }}</td>
+			<td>{{ r.info}}</td>
+			<td>{{ r.act }}</td>
+			<td>{{ r.type }}</td>
+			<td>{{ r.stype }}</td>
+			<td>{{ r.buff }}</td>
+			<td>{{ r.cost }}</td>
+			<td>{{ r.plan }}</td>
+			<td>{{ r.coin2 }}</td>
+			<td>{{ r.coin3 }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+                <button type="button" class="btn" id='edit' onclick="GAME.load.get_data(this)" href="{{url_for('admin.admin_data', db=g.GAMEBASE, table=coll, id=r['_id'])}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var name = $("#edit_name").val();
+				var info = $("#edit_info").val();
+				var act = $("#edit_act").val();
+				var type = $('#edit_type').val();
+				var stype = $("#edit_stype").val();
+				var buff = $("#edit_buff").val();
+				var cost = $("#edit_cost").val();
+				var plan = $("#edit_plan").val();
+				var coin2 = $("#edit_coin2").val();
+				var coin3 = $("#edit_coin3").val();	
+				$.post('/admin/admin/buff/save/',{
+					id:id,
+					name:name,
+					info:info,
+					act:act,
+					type:type,
+					stype:stype,
+					buff:buff,
+					cost:cost,
+					plan:plan,
+					coin2:coin2,
+					coin3:coin3
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload() 
+					}
+				});
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

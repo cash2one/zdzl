@@ -1,0 +1,87 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate, platform_select %}
+{% block subjs %}
+<script type="text/javascript">
+    $(function () {
+        var chart;
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container',
+                    type: 'line',
+                    marginRight: 130,
+                    marginBottom: 55
+                },
+                title: {
+                    text: '充值人数',
+                x: -20 //center
+                },
+                subtitle: {
+                    text: '时间分布',
+                            x: -20
+                },
+                xAxis: {
+                    categories: {{ time_list|format_date_list("%Y-%m-%d")|show_cout_day("day")|safe }}
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                                this.x +': '+ this.y +'';
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 100,
+                            borderWidth: 0
+                },
+                series: [
+                    {
+                        name: '充值人数',
+                        data: {{ player_list|safe }}
+                    }
+                    ]
+            });
+        });
+    });
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >=300 or g.user.right[7] == 1 %}
+<div class="span10">
+    {{ (time_list,'%Y-%m-%d')|format_date }}
+    <br />
+    注册时间搜索：开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    {{ platform_select(stype) }}
+    <button type="button" class="btn" href="{{ url_for('user.pay_nums') }}" onclick="GAME.load.reg_search(this,'day', 1)">查询</button>
+    <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+    <table class="table table-bordered">
+        <tr>
+            <td>时间</td>
+            <td>充值人数</td>
+        </tr>
+        {% for item in time_list %}
+        <tr>
+            <td>{{ item|format_date('%Y-%m-%d') }}</td>
+            <td>{{ users[item] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,19 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import input,radio,select,submit,password %}
+ 
+{%- block main -%}
+<div class="panel clearfix">
+	<div class="title"> <h3 class="h-user"> 用户编辑 </h3> </div>
+	<div class="content no-pad">
+		 {{ form.form_tag() }} 
+		 {{ input(form.username) }} 
+		 {{ input(form.nickname) }}
+		 {{ password(form.psd) }}
+		 {{ input(form.value) }}
+		 {{ select(form.sex) }} 
+		 {{ submit('保存修改') }}   
+	</div>
+</div>
+
+ 
+{%- endblock -%}

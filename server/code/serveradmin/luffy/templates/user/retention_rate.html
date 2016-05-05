@@ -1,0 +1,59 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+    function change_rate(t){
+        var url = "/other/rate/order/";
+        var r = $("#rate_"+String(t)).val();
+        var s = "{{g.GAME_BASEUSER}}";
+        $.post(url,{t:t, r:r, s:s},function(d){
+            if (d['success']==1){
+                alert("更新成功");
+                location.reload();
+            }
+        });
+    };
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+<div class="span10">
+    注册时间：开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    <button type="button" class="btn" href="{{ url_for('user.retention_rate') }}" onclick="GAME.load.reg_search(this, '2')">统计留存率</button>
+
+    <table class="table table-bordered">
+        <tr>
+            <td>日期</td>
+            <td>2日留存率</td>
+            <td>7日留存率</td>
+            <td>15日留存率</td>
+            {% if g.user.role == 400 %}
+            <td>
+                操作
+            </td>
+            {% endif %}
+        </tr>
+
+        {% for r in time_list %}
+        <tr>
+            {% set rate = renRate.get_r(r, g.GAME_BASEUSER) %}
+            {% set date1 = r|format_date('%Y-%m-%d') %}
+            <td>{{ date1 }}</td>
+            <td>{% if r in r2  %}{{ (r2[r]*rate)|float2 }}%{% endif %}</td>
+            <td>{% if r in r7  %}{{ (r7[r]*rate)|float2 }}%{% endif %}</td>
+            <td>{% if r in r15 %}{{ (r15[r]*rate)|float2 }}%{% endif %}</td>
+            {% if g.user.role == 400 %}
+            <td>
+                <input type="text" class="input-small" id="rate_{{r|integer}}" value="{{rate}}"><button type="button" class="btn" onclick="change_rate({{r}})">修改</button>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+</div>
+{% endif %}
+</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

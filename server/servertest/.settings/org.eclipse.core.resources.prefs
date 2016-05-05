@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//client/handledata.py=utf-8
+encoding//client/test.py=utf-8
+encoding//client/testconn.py=utf-8
+encoding//server/constant.py=utf-8
+encoding//server/handledata.py=utf-8
+encoding//server/mainserver.py=utf-8
+encoding//server/openserver.py=utf-8
+encoding//server/sockmana.py=utf-8
+encoding//server/sonserver.py=utf-8

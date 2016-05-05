@@ -1,0 +1,66 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+        <script>
+        </script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[5] == 1 %}
+        {{ paginate(count,'/user/server/gm/players/',current_page=page) }}
+        总在线数：{{ total }}
+		<div class="span10">
+            <table class="table table-striped table-bordered table-condensed">
+                <tr>
+                    <td>角色ID</td>
+                    <td>角色名</td>
+                    <td>等级</td>
+                    <td>经验</td>
+                    <td>炼历</td>
+                    <td>VIP等级</td>
+                    <td>最后退出的地图id</td>
+                    <td>章节序号</td>
+                    <td>pos</td>
+                    <td>银币</td>
+                    <td>元宝</td>
+                    <td>绑元宝</td>
+                    <td>操作</td>
+                </tr>
+                {% if players != None %}
+                    {% if info_list %}
+                        {%- for p in info_list -%}
+                        <tr>
+                            <td>{{ p['id'] }}</td>
+                            <td>{{ p['name'] }}</td>
+                            <td>{{ p['level'] }}</td>
+                            <td>{{ p['exp'] }}</td>
+                            <td>{{ p['train'] }}</td>
+                            <td>{{ p['vip'] }}</td>
+                            <td>{{ p['mapId'] }}</td>
+                            <td>{{ p['chapter'] }}</td>
+                            <td>{{ p['pos'] }}</td>
+                            <td>{{ p['coin1'] }}</td>
+                            <td>{{ p['coin2'] }}</td>
+                            <td>{{ p['coin3'] }}</td>
+                            <td>
+                                {% if g.user.role >= 300 or g.user.right[5] == 1 %}
+                                {% if platform != "yd"%}
+                                <a class="btn" id='gmManage' href="{{ url_for('user.server_gm_player', pid=p['id'], name=p['name']) }}">GM管理</a>
+                                {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="13">GRPC未能连接上服务器</td>
+                    </tr>
+                {% endif %}
+            </table>
+
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

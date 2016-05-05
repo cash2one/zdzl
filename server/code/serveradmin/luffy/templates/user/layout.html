@@ -1,0 +1,204 @@
+{%- extends "base_layout.html" -%}
+{% from "base_macros.html" import servers_select %}
+{%- block css -%}
+<link rel="stylesheet" href="{{ 'frontend.static'|url('bootstrap/css/bootstrap.min.css') }}" type="text/css" />
+<link rel="stylesheet" href="{{ 'frontend.static'|url('bootstrap/css/bootstrap-responsive.min.css') }}" type="text/css" />  
+{%- endblock -%} 
+{%- block bootjs-%}
+<script type="text/javascript" src="{{ 'frontend.static'|url('bootstrap/js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/efun.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/My97DatePicker/WdatePicker.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/HighchartsJS/highcharts.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/HighchartsJS/modules/exporting.js') }}"></script>
+{% block subjs %}{% endblock%}
+{%- endblock -%}
+{%- block content -%}
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            {% set test_user = ['qe@efun.com'] %}
+            <a class="brand" href="#">
+                {% if g.current_server %}
+                {{ g.current_server.name }}
+                {% else %}
+                指点真龙
+                {% endif %}
+            </a>
+            <div class="nav-collapse collapse">
+                <p class="navbar-text pull-left">
+                    {% if g.user.role>=300 or (g.user.right and (g.user.right[1] ==1 or g.user.right[0] ==1 or
+                    g.user.right[2]==1 or g.user.right[3]==1)) %}
+                    <a href="/admin/show/">数据录入</a>
+                    {% endif %}
+                    {% if g.user.role>=300 or  (g.user.right and (g.user.right[4] ==1 or g.user.right[5] ==1 or
+                    g.user.right[6]==1 or g.user.right[7]==1 or g.user.right[9]==1)) %}
+                    <a href="/user/">服务器管理</a>
+                    {% endif %}
+                    {% if g.user.role >= 300 %}
+                    <a href="{{ url_for('admin.admin_user')}}">帐户管理</a>
+                    {% endif %}
+                </p>
+        <p class="navbar-text pull-right">
+            {{ servers_select(g) }}
+        </p>
+            <!--
+            <ul class="nav">
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+            -->
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+          
+<div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2">
+          {% if not user_index%}
+          <div class="well sidebar-nav">
+	            <div class="accordion" id="accordion2">
+
+                {% if g.user.role >= 300  or g.user.right[4] == 1 %}
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion1" href="#collapseAdminStatus">
+                        管理员功能
+                      </a>
+                    </div>
+                    <div id="collapseAdminStatus" class="{% if SIDEBAR == 'ADMIN' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+                      <div class="accordion-inner">
+                        <ul>
+                              <li><a href="{{ url_for('user.server_manage') }}">服务器管理</a></li>
+                              <li><a href="{{ url_for('user.database_backup') }}">数据库备份</a></li>
+                              <li><a href="{{ url_for('user.database_restore') }}">数据库同步</a></li>
+                              <li><a href="{{ url_for('user.database_restore_tables') }}">数据库同步表</a></li>
+                              <li><a href="{{ url_for('user.client_servers') }}">客户端服务器列表</a></li>
+                              <li><a href="{{ url_for('user.server_gconfig') }}">gconfig设置</a></li>
+                              <li><a href="{{ url_for('user.customer_account') }}">客服系统帐号管理</a></li>
+                              <li><a href="{{ url_for('user.server_function') }}">服务器其他功能</a></li>
+                              <hr />
+                             
+                         </ul>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+	            	<div class="accordion-group">
+		              <div class="accordion-heading">
+		                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseServerStatus">
+		                  服务器
+		                </a>
+		              </div>
+		              
+		              <div id="collapseServerStatus" class="{% if SIDEBAR == 'SERVER' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+		                <div class="accordion-inner">
+        				 			<ul>
+                           {% if g.user.role >= 300  or g.user.right[5] == 1 %}
+        	                 <li><a href="{{ url_for('user.server_gm') }}">GM管理(全服)</a></li>
+                           <li><a href="{{ url_for('user.server_gm_players') }}">GM在线角色管理</a></li>
+                           <hr />
+                           {% endif %}
+                           {% if g.user.role >= 300  or g.user.right[8] == 1 %}
+                           <li><a href="http://web1.zl.52yh.com:3000/" target="_bank">客服管理</a></li>
+                           {% endif %}
+                           {% if g.user.role >= 300  or g.user.right[6] == 1 %}
+                           <li><a href="{{ url_for('user.server_player_search') }}">角色查询</a></li>
+                           <li><a href="{{ url_for('user.puser_info') }}">平台账号查询</a></li>
+                           <li><a href="{{ url_for('user.server_player_action') }}">玩家行为纪录查询</a></li>
+                           <li><a href="{{ url_for('user.server_vip_info') }}">VIP信息查询</a></li>
+                           <li><a href="{{ url_for('user.server_user_money') }}">玩家资金流转</a></li>
+                           <li><a href="{{ url_for('user.query_consume_coin') }}">玩家银元统计</a></li>
+                           <li><a href="{{ url_for('user.server_rank') }}">排名</a></li>
+                           <hr />
+                           {% endif %}
+                           {% if g.user.role >= 300  or g.user.right[7] == 1 %}
+                           <li><a href="{{ url_for('user.complex_count') }}">综合报表</a></li>
+        		                <li><a href="{{ url_for('user.pay_count') }}">实时充值统计</a></li>
+                            <li><a href="{{ url_for('user.pay_nums') }}">充值人数统计</a></li>
+                            <li><a href="{{ url_for('user.pay_accouts_query') }}">充值账号查询</a></li>
+                            <li><a href="{{ url_for('user.per_pay_count') }}">角色充值统计</a></li>
+                           <li><a href="{{ url_for('user.server_online_count') }}">在线人数统计</a></li>
+                            <li><a href="{{ url_for('user.server_online_pertime') }}">平均在线时长</a></li>
+          				 				 <li><a href="{{ url_for('user.server_reg_count') }}">用户注册统计</a></li>
+          				 				 <li><a href="{{ url_for('user.server_player_count') }}">角色创建统计</a></li>
+          				 				 <li><a href="{{ url_for('user.server_all_level') }}">所有玩家等级分布</a></li>
+          				 				 <li><a href="{{ url_for('user.server_all_coin') }}">玩家资金消费分布</a></li>
+                           <li><a href="{{ url_for('user.server_all_coin_count_time') }}">玩家资金消费时间分布-总计</a></li>
+          				 				 <li><a href="{{ url_for('user.server_all_coin_time') }}">玩家资金消费时间分布-分类</a></li>
+          				 				 <li><a href="{{ url_for('user.server_all_task') }}">所有玩家任务完成分布</a></li>
+                           <li><a href="{{ url_for('user.server_all_get_task') }}">所有玩家任务接受分布</a></li>
+                           <li><a href="{{ url_for('user.server_all_prologue') }}">玩家进入章节人数</a></li>
+                           <li><a href="{{ url_for('user.server_create_player_count') }}">人数统计(开启,注册,创建)</a></li>
+                           <li><a href="{{ url_for('user.retention_rate') }}">留存率</a></li>
+                           <li><a href="{{ url_for('user.exchange_count') }}">已用兑换码</a></li>
+                           <li><a href="{{ url_for('user.last_login') }}">登录对比统计</a></li>
+                           <li><a href="{{ url_for('user.reg_level') }}">日注册用户等级</a></li>
+                           {% endif %}
+                           {% if g.user.role >= 300  or g.user.right[9] == 1 %}
+                           <li><a href="{{ url_for('user.mac_count') }}">MAC统计</a></li>
+                           <li><a href="{{ url_for('user.server_pay_count') }}">充值统计</a></li>
+                          {% endif %}
+                       </ul>
+		                </div>
+		              </div>
+		            </div>
+                    
+		            <div class="accordion-group">
+		              <div class="accordion-heading">
+		                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion3" href="#collapseLog">
+		                  LOG查询
+		                </a>
+		              </div>
+		              
+		              <div id="collapseLog" class="{% if SIDEBAR == 'LOG' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+		                <div class="accordion-inner">
+      				 			<ul>
+                      {% if g.user.role >= 300%}
+      				 				<li><a href="{{ url_for('user.log_rpc') }}">log_rpc</a></li>
+                     <li><a href="{{ url_for('user.log_user') }}">用户登录|GM操作|log</a></li>
+                     <li><a href="{{ url_for('user.log_online') }}">在线人数统计</a></li>
+                     <li><a href="{{ url_for('user.log_gm') }}">gm信息记录</a></li>
+                     {% endif %}
+                     {% if g.user.role >= 300 or g.user.right[10] == 1 %}
+                     <li><a href="{{ url_for('user.log_item') }}">物品记录</a></li>
+                     <li><a href="{{ url_for('user.log_equip') }}">装备记录</a></li>
+                     <li><a href="{{ url_for('user.log_info') }}">玩家信息记录</a></li>
+                     <li><a href="{{ url_for('user.log_coin') }}">资金记录</a></li>
+                     {% endif %}
+			                </ul>
+		                </div>
+		              </div>
+		            </div>
+                    
+
+		            <div class="accordion-group">
+		              <div class="accordion-heading">
+		                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion3" href="#collapseOP">
+				运营配置
+		                </a>
+		              </div>
+		              
+		              <div id="collapseOP" class="{% if SIDEBAR == 'OP' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+		                <div class="accordion-inner">
+      				 			<ul>
+                     {% if g.user.role >= 300 or g.user.right[15] == 1 %}
+      				 				<li><a href="{{ url_for('user.config_plist') }}">配置plist下载信息</a></li>
+                     {% endif %}
+			                </ul>
+		                </div>
+		              </div>
+		            </div>
+	          </div>
+          </div><!--/.well -->
+          {% endif %}
+        </div><!--/span-->
+    {%- block main -%}{%- endblock -%}
+{%- endblock -%}

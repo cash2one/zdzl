@@ -1,0 +1,475 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block subjs-%}
+<script type="text/javascript">
+
+Reward_Group = 1;
+Reward_Item = 2;
+
+RewardList = '{{ ret["reward"]|safe }}';
+
+function getOptionTagHtml(ary){
+	var result = '';
+	
+	for(var i=0;i<ary.length;i++){
+		result += '<option value="'+ary[i]['_id']+'">'+ary[i]['name']+'</option>';
+	}
+	//alert(result)
+	return result;
+}
+
+function getRewardHtml(){
+	var string = '<div id="reward_reward" style="margin-bottom: 20px; background: none repeat scroll 0% 0% rgb(204, 204, 204); padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">';
+	string += '概率：<input type="text" class="input-small" id="rate" placeholder="int">'
+	string +=	'<select id="reward_group_item" style="width: 600px;">\
+				  	<option value="1">分组</option>\
+				    <option value="2">物品</option>\
+				</select>';
+	string +=	'<button type="button" class="btn" id="reward_reward_remove">移除</button><button type="button" class="btn" id="reward_group_add" style="display:none">增加分组</button>'
+	string += '<div Id="reward_reward_content" style="padding-left: 20px; padding-top: 10px; background: none repeat scroll 0px 0px rgb(170, 170, 170); padding-bottom: 10px; margin-top: 5px;"></div>';
+	string += '</div>';
+	
+	return string;
+}
+
+function getRewardItemHtml(){
+	var result = '<div id="reward_item_target">';
+	result += '类型（t）:';
+	result += '<select id="reward_item_type" class="span2">';
+	result += '<option value="i">物品(i)</option>';
+	result += '<option value="e">装备(e)</option>';
+	result += '<option value="f">命格(f)</option>';
+	result += '<option value="c">坐骑(c)</option>';
+	result += '<option value="r">配将(r)</option>';
+	result += '</select>';
+	result += 'id:<input type="text" id="reward_item_id" class="input-small" placeholder="int">';
+	result += 'ids:<input type="text" id="reward_item_ids" class="input-small" placeholder="str">';
+	result += '数量(count):<input type="text" id="reward_item_count" class="input-big" placeholder="str">';
+	result += '是否能交易：<select id="reward_item_cantrade" class="span2">';
+	result += '<option value="0">否(０)</option>';
+	result += '<option value="1">是(１)</option>';
+	result += '</select>';
+	result += '品质:<input type="text" id="reward_item_quality" class="input-small" placeholder="int">'
+	result += '套装id:<input type="text" id="reward_item_set" class="input-small" placeholder="int">'
+	result += '<button type="button" class="btn" id="reward_item_remove">移除物品</button>';
+	result += '</div>';
+	return result;
+}
+
+
+function getRewardContentHtml(action){
+	var result = '';
+	
+	if(action==Reward_Group){
+		result += '<div id="reward_group_div">';
+		result += '<div id="groups">';
+		result += getRewardHtml();
+		result += '</div>';
+		result += '</div>';
+		return result;
+	}
+	if(action==Reward_Item){
+		result += '<div id="reward_item_div">';
+		result += '<div id="items">';
+		result += getRewardItemHtml();
+		result += '</div>';
+		result += '<button type="button" class="btn" id="reward_item_add">添加物品</button>';
+		result += '</div>';
+		return result;
+	}	
+	return '';
+}
+
+function addRewardGroup(rewards){
+	rewards.append(getRewardHtml());
+	addEventToMessageTarget($(rewards).find('#group_target').last());
+}
+
+function addEventToItemTarget(target){
+	$(target).find('#reward_item_remove').click(function(){
+		if(confirm('确实要删除这个物品吗?')){
+			$(target).remove();
+		}
+	});
+}
+
+function addEventToAddItemTarget(target){
+	$(target).find('#reward_item_add').click(function(){
+		$(target).append(getRewardItemHtml());
+
+	});
+}
+
+function addRewardItem(items){
+	items.append(getRewardItemHtml());
+	addEventToItemTarget($(items).find('#reward_item_target').last())
+}
+
+function addEventToRewardItemTarget(target){
+	$(target).find('#reward_item_remove').click(function(){
+		if(confirm('确实要删除这个物品吗?')){
+			$(target).remove();
+		}
+	});
+	
+	
+}
+
+function addEventToTarget(action,target){
+	if(action==Reward_Group){
+		var rewards = $(target).find('#reward_group_div #groups #reward_reward');
+		rewards.find('#reward_group_item').change(function(){
+			var action = $(this).find("option:selected").val();
+			if (action == Reward_Group){
+				rewards.find("#reward_group_add").show();
+			}else{
+				rewards.find("#reward_group_add").hide();
+			}
+			rewards.find('#reward_reward_content').html(getRewardContentHtml(action));
+			addEventToTarget(action,rewards.find('#reward_reward_content'));
+		});
+		rewards.find('#reward_group_item').get(0).selectedIndex=-1;
+		rewards.find('#reward_reward_remove').click(function(){
+			if(confirm('确实要删除这一层吗?')){
+				$(rewards).remove();
+			}
+		});
+		rewards.find('#reward_group_add').click(function(){
+			rewards.find('#reward_reward_content #reward_group_div #groups').first().append(getRewardHtml());
+			addEventToGroupTarget(rewards.find('#reward_reward_content #reward_group_div #groups #reward_reward').last());
+		});
+	}
+	if(action==Reward_Item){
+		var items = $(target).find('#items');
+		addEventToRewardItemTarget($(items).find('#reward_item_target').last());
+		
+		$(target).find('#reward_item_add').click(function(){
+			addRewardItem(items)
+		});
+	}
+}
+//在同级中增加分组
+function addEventToGroupTarget(target, isNull){
+	//为分组中的删除按钮增加方法
+	$(target).find('#reward_reward_remove').click(function(){
+		if (confirm('确定要删除这个分组？')){
+			$(target).remove();	
+		}
+	});
+	$(target).find('#reward_group_item').change(function(){
+		var action = $(this).find("option:selected").val();
+		
+		if (action == Reward_Group){
+			$(target).find("#reward_group_add").show();
+		}else{
+			$(target).find("#reward_group_add").hide();
+		}
+		$(target).find('#reward_reward_content').html(getRewardContentHtml(action));
+		addEventToTarget(action,$(target).find('#reward_reward_content'));
+	});
+	if (isNull == false){
+		$(target).find('#reward_group_item').get(0).selectedIndex=-1;
+	}
+	$(target).find('#reward_group_add').click(function(){
+		//alert('first');
+		$(target).find('#reward_reward_content #reward_group_div #groups').first().append(getRewardHtml());
+		addEventToGroupTarget($(target).find('#reward_reward_content #reward_group_div #groups #reward_reward').last(),false);
+		//addEventToGroupTarget(step.find('#reward_group_div #groups #reward_reward').last());
+	});
+}
+
+function addEventToReward(){
+	var step = $("#rewards #reward_reward").last();
+	
+	step.find('#reward_group_item').change(function(){
+		var action = $(this).find("option:selected").val();
+		if (action == Reward_Group){
+			step.find("#reward_group_add").show();
+		}else{
+			step.find("#reward_group_add").hide();
+		}
+		step.find('#reward_reward_content').html(getRewardContentHtml(action));
+		addEventToTarget(action,step.find('#reward_reward_content'));
+	});
+	step.find('#reward_group_item').get(0).selectedIndex=-1;
+
+	step.find('#reward_reward_remove').click(function(){
+		if(confirm('确实要删除这个奖励吗?')){
+			$(step).remove();
+		}
+	});
+	step.find('#reward_group_add').click(function(){
+		//alert('first');
+		step.find('#reward_reward_content #reward_group_div #groups').first().append(getRewardHtml());
+		addEventToGroupTarget(step.find('#reward_reward_content #reward_group_div #groups #reward_reward').last(),false);
+	});
+	return step;
+}
+
+function getRewardRet(){
+	var result = [];
+	var rewards = $('#rewards > #reward_reward');
+	for(var i=0;i<rewards.length;i++){
+		var tmp = {}
+		var reward = rewards[i];
+		var rate = $(reward).find('#rate').val();
+		var action = parseIntAll($(reward).find('#reward_group_item').find("option:selected").val());
+		var target = getRewardByAction(action, reward);
+		if (rate != ''){
+			tmp['g'] = parseInt(rate);
+			tmp['i'] = parseIntAll(target);
+			result.push(tmp);
+		}else{
+			if (target == undefined){
+				alert('请选择分组或是物品，如果不使用的项目请删除');
+			}else{
+				if (target.length == 1){
+					result.push(target[0]);
+				}else{
+					result.push(target);
+				}
+			}
+		}
+		//debugger;
+	}
+	return JSON.stringify(result);
+}
+
+function getRewardByAction(action, target){
+	if (action == Reward_Group){
+		var groupRet = []
+		var groups = $(target).find('#reward_reward_content #reward_group_div > #groups > #reward_reward').first();
+		var tmp_groups = $(groups).nextAll().andSelf();
+		for (var i=0;i<tmp_groups.length;i++){
+			var tmp = {}
+			var group = tmp_groups[i]
+			var rate = $(group).find('#rate').val();
+			var action2 = parseIntAll($(group).find('#reward_group_item').find("option:selected").val());
+			//getRewardByAction(action2, group);
+			var reward_ret = getRewardByAction(action2, group);
+			if (rate !=''){
+				tmp['g'] = parseInt(rate);
+				tmp['i'] = parseIntAll(reward_ret);
+				groupRet.push(tmp);
+			}else{
+				if (reward_ret == undefined){
+					alert('请选择分组或是物品，如果不使用的项目请删除');
+				}
+				if (reward_ret.length == 1){
+					groupRet.push(reward_ret[0]);
+				}else{
+					//alert(reward_ret);
+					//groupRet.push(reward_ret);
+					return reward_ret;
+				}
+				//return reward_ret;
+				//tmp['i'] = reward_ret;
+				//groupRet.push(reward_ret);
+				//groupRet.push(reward_ret[0]);
+			}
+		}
+		return groupRet;
+	}
+	if (action == Reward_Item){
+		var itemData = [];
+		var items = $(target).find('#reward_reward_content > #reward_item_div > #items > #reward_item_target');
+		for (var i =0;i<items.length;i++){
+			var item = items[i];
+			var obj = {};
+			var tmp_q = $(item).find('#reward_item_quality').val();
+			if (tmp_q != ''){ obj['q'] = parseInt(tmp_q);}
+			obj['t'] = $(item).find('#reward_item_type').find('option:selected').val();
+			tmp_i = $(item).find('#reward_item_id').val();
+			if (tmp_i !=''){ obj['i'] = parseInt(tmp_i);}
+			tmp_ids = $(item).find('#reward_item_ids').val();
+			if (tmp_ids !=''){ obj['is'] = tmp_ids;}
+			obj['c'] = $(item).find('#reward_item_count').val();
+			var tmp_s = $(item).find('#reward_item_set').val();
+			tmp_s = tmp_s.split(',')
+			if (tmp_s !=''){ obj['s'] = parseIntList(tmp_s);}
+			obj['tr'] = parseInt($(item).find('#reward_item_cantrade').find("option:selected").val());
+			itemData.push(obj);
+		}
+		return itemData;
+	}
+}
+
+$(document).ready(function(){
+	
+	//TODO add event
+	$("#add-reward").click(function(){
+		$("#rewards").append(getRewardHtml());
+		addEventToReward();
+	});
+	
+	$('#reward-submit').click(function(){
+		var reward_ret = getRewardRet();
+		var id = "{{ ret['_id'] }}";
+		var name = $("#name").val();
+		var useId = $("#useId").val();
+		var useNum = $("#useNum").val();
+		var info = $("#info").val();
+		var url = "{{ url_for('admin.admin_reward_save')}}";
+		$.post(url,{
+			id:id,name:name,useId:useId,useNum:useNum,reward:reward_ret,info:info
+		},function(d){
+			if (d['success']=='0'){
+				alert('更改失败');
+			}else{
+				window.location.href = "{{ url_for('admin.admin_reward') }}";
+			}
+		});
+
+		
+	});
+	//init reardList
+	if (RewardList){
+		var JSONReward = JSON.parse(RewardList);
+		if (JSONReward){
+			for (var i=0;i<JSONReward.length;i++){
+				$('#rewards').append(getRewardHtml());
+				var reward = addEventToReward();
+				var targetReward = JSONReward[i];
+				addContent(reward, targetReward,0);
+			}
+		}
+	}
+});
+
+function addContent(reward, rewardList,num){
+	var rewardContent = $(reward).find('#reward_reward_content').first();
+	if (rewardList['g'] == undefined){
+		$(reward).find('#reward_group_item').val('2');
+		if (num == 0){
+			rewardContent.append(getRewardContentHtml(2));
+			addEventToTarget(2,rewardContent);
+		}else{
+			rewardContent.find('#reward_item_div #items').append(getRewardItemHtml());
+		}
+		addEventToItemTarget($(rewardContent).find('#reward_item_target').last());
+		rewardContent.find('#reward_item_type').last().val(rewardList['t']);
+		rewardContent.find('#reward_item_count').last().val(rewardList['c']);
+		rewardContent.find('#reward_item_cantrade').last().val(rewardList['tr']);
+		rewardContent.find('#reward_item_id').last().val(rewardList['i']);
+		rewardContent.find('#reward_item_ids').last().val(rewardList['is']);
+		rewardContent.find('#reward_item_quality').last().val(rewardList['q']);
+		rewardContent.find('#reward_item_set').last().val(rewardList['s']);
+	}else{
+		$(reward).find('#rate').val(rewardList['g']);
+		$(reward).find('#reward_group_item').val('1');
+		$(reward).find('#reward_group_add').show();
+		var thisI = rewardList['i'];
+		for (var j=0;j<thisI.length;j++){
+			if (num ==0){
+				if (j==0 | thisI[j]['g'] != undefined){
+					rewardContent.append(getRewardContentHtml(1));
+					addEventToGroupTarget(rewardContent, true);
+				}
+				var nextReward = rewardContent.find('#reward_group_div').find('#groups > #reward_reward').last();
+				addContentMain(nextReward, thisI[j],j);
+			}else{
+				addContentMain(reward, thisI[j],j);
+			}
+		}
+	}
+}
+
+function addContentMain(reward, rewardList,num){
+	var rewardContent = $(reward).find('#reward_reward_content').first();
+	if (rewardList['g'] == undefined){
+		if (num == 0){
+			$(reward).find('#reward_group_item').val('2');
+			rewardContent.append(getRewardContentHtml(2));
+			addEventToTarget(2,rewardContent);
+		}else{
+			rewardContent.find('#reward_item_div #items').append(getRewardItemHtml());
+		}
+		addEventToItemTarget($(rewardContent).find('#reward_item_target').last());
+		rewardContent.find('#reward_item_type').last().val(rewardList['t']);
+		rewardContent.find('#reward_item_count').last().val(rewardList['c']);
+		rewardContent.find('#reward_item_cantrade').last().val(rewardList['tr']);
+		rewardContent.find('#reward_item_id').last().val(rewardList['i']);
+		rewardContent.find('#reward_item_ids').last().val(rewardList['is']);
+		rewardContent.find('#reward_item_quality').last().val(rewardList['q']);
+		rewardContent.find('#reward_item_set').last().val(rewardList['s']);
+	}else{
+		$(reward).find('#rate').val(rewardList['g']);
+		$(reward).find('#reward_group_item').val('1');
+		var thisI = rewardList['i'];
+		for (var j=0;j<thisI.length;j++){
+			if (j ==0){
+				rewardContent.append(getRewardContentHtml(1));
+				addEventToGroupTarget(rewardContent, true);
+				var nextReward = rewardContent.find('#reward_group_div').find('#groups > #reward_reward').last();
+				addContentMain(nextReward, thisI[j],j);
+			}else{
+				addContentMain(reward, thisI[j],j);
+			}
+		}
+	}
+}
+
+
+function parseGroup(group){
+	
+}
+
+
+function parseIntAll(t){
+	var i = parseInt(t);
+	if(i==NaN) i = 0;
+	return t;
+}
+
+function parseIntList(t){
+	tmp = []
+	for (var i=0;i<t.length;i++){
+		tmp.push(parseInt(t[i]));
+	}
+	return tmp;
+}
+
+</script>
+{% endblock %}
+{%- block main -%}
+	{% if g.user.role == 300 or g.user.right[0] == 1 %}
+		<div class="span10">
+
+			奖励表：
+			<div class="well form-inline">
+				名字：
+			  	<input type="text" class="input-small" id="name" placeholder="str" value="{{ ret['name'] }}">
+			  	消耗品id：
+			  	<input type="text" class="input-small" id="useId" placeholder="int" value="{{ ret['useId']}}">
+			  	消耗数量：
+			  	<input type="text" class="input-big" id="useNum" placeholder="str" style="width: 350px" value="{{ ret['useNum']}}">
+			  	说明：
+			  	<input type="text" class="input-small" id="info" placeholder="str" value="{{ ret['info']}}">
+			  	<button type="button" class="btn" id='reward-submit'>提交</button>
+			</div>
+			
+			<hr>
+			
+			<div style="margin-bottom: 50px;">
+				<div style="margin-top: 10px; font-size: 25px; margin-bottom: 10px; padding-left: 20px; text-align: center;">
+				奖励：
+				</div>
+			
+				<div class="well form-inline" id="reward-form">
+					<div id="rewards">
+					</div>
+					<div>
+						<hr>
+						<button id="add-reward" type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 96%; margin-left: 2%;">添加奖励</button>
+					</div>
+				</div>
+			
+				<hr>
+
+			</div>
+		</div>
+	{% endif %}
+	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

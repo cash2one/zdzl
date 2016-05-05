@@ -1,0 +1,7 @@
+{%- extends "base_layout.html" -%}
+{% from "base_macros.html" import input,submit %}
+{%- block content -%}
+{{ form.form_tag() }}
+{{ input(form.username) }} 
+{{ submit('找回密码') }}  
+{%- endblock -%}

@@ -1,0 +1,107 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate, platform_select %}
+{% block subjs %}
+<script type="text/javascript">
+    function func_pay_count(obj,searchCondition){
+        var start_time = $('#start_time').val();
+        var end_time = $('#end_time').val();
+        var stype = $('#stype').val();
+        var url = $(obj).attr('href');
+        if (searchCondition){
+            location.href = url+'?start_time='+start_time+'&end_time='+end_time+'&stype='+stype + '&searchCondition='+searchCondition;
+        }else{
+            location.href = url+'?start_time='+start_time+'&end_time='+end_time+'&stype='+stype;
+        }
+    }
+
+    $(function () {
+        var chart;
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container',
+                    type: 'line',
+                    marginRight: 130,
+                    marginBottom: 55
+                },
+                title: {
+                    text: '实时充值统计',
+                x: -20 //center
+                },
+                subtitle: {
+                    text: '时间分布',
+                            x: -20
+                },
+                xAxis: {
+                    categories: {{ time_list|format_date_list('%Y-%m-%d %H')|show_cout_day("hour")|safe }}
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                                this.x +': '+ this.y +'';
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 100,
+                            borderWidth: 0
+                },
+                series: [{
+                    name: '充值数',
+                    data: {{ pay_ret_list|safe }}
+                    }, {
+                        name: '充值人数',
+                                data: {{ players_nums_list|safe }}
+                    }, {
+                        name: '充值次数',
+                            data: {{ pay_nums_list|safe }}
+                }]
+            });
+        });
+    });
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+<div class="span10">
+    <!-- {{ time_list|format_date_list('%Y-%m-%d %H') }} -->
+    <br />
+    注册时间搜索：开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    {{ platform_select(stype) }}
+    <button type="button" class="btn" href="{{ url_for('user.pay_count') }}" onclick="func_pay_count(this,'hour')">查询</button>
+    <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+    <table class="table table-bordered">
+        <tr>
+            <td>时间</td>
+            <td>充值数</td>
+            <td>充值人数</td>
+            <td>充值次数</td>
+        </tr>
+        {% for item in time_list %}
+        <tr>
+            <td>{{ item|format_date('%Y-%m-%d %H') }}</td>
+            <td>{%if pay_ret[item]%}{{ pay_ret[item] }}{%else%}0{%endif%}</td>
+            <td>{%if players_nums[item]%}{{ players_nums[item] }}{%else%}0{%endif%}</td>
+            <td>{%if pay_nums[item]%}{{ pay_nums[item] }}{%else%}0{%endif%}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

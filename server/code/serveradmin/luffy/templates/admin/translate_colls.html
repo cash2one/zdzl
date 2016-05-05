@@ -1,0 +1,90 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress, render_pagination %}
+{%- block main -%}
+
+<div class="span10">
+	<form class="form-inline" method="POST" id="addform">
+		<strong>添加翻译字段</strong>
+		{{form.add_collection_name.label}} {{form.add_collection_name}} {{form.add_field_name.label}} {{form.add_field_name}}
+		{{form.add_path_submit}}
+	</form>
+	{% set tn = form.filter_entries.data %}
+	{% set params = '&' + form.filter_entries.id + '=' + tn %}
+	<div class="form-inline" style="width:!00%"> {{form.filter_entries.label}} {{form.filter_entries}} {{ render_pagination(pagination, endpoint, params) }}
+	</div>
+	<table class="table table-bordered" id="table_content">
+		<tr>
+			<td>表名</td>
+			<td>字段名</td>
+			<td>操作</td>
+		</tr>
+		 {%- for r in pagination.items -%}
+		<tr>
+			<td>{{ r.coll_name|d("") }}</td>
+			<td>{{ r.path|d("") }}</td>
+			<td>
+				<button type="button" id="update_item" onclick="del_item($(this))" data="{{ r.id }}" />删除</button>
+			</td>
+		</tr>
+		{% endfor %}  
+	</table>
+
+{{ render_pagination(pagination, endpoint, params) }}
+  <script type="text/javascript">
+	  function request_data(){
+		var data = "{{form.filter_entries.id}}" + "=" + $("#{{form.filter_entries.id}}").val();
+		window.location.href = "{{url_for('admin.translate_opertate_coll')}}" + "?" + data;
+	  }
+function edit_item(obj){
+	obj.parentsUntil("table", "tr").find("#item_content").prop("readonly", false);
+	alert("click");
+}
+function del_item(obj){
+	var item_id = obj.attr("data");
+	$.post(window.location.href, {id: item_id, op: 'del'}, function(data){
+			if (data.ost == "ok"){
+			    alert(item_id + "  id deleted successfully");
+		           obj.parentsUntil("table", "tr").remove();
+
+			    }else{
+				alert(item_id + data.ost);
+			    }
+			    }, 
+			    "json");
+}
+function post_item(obj){
+	var item_id = obj.attr("data");
+}
+		$(document).ready(function(){
+			$("#{{form.filter_entries.id}}").live("change", request_data);
+
+			$("#addform").submit(function(event){
+			/* stop form from submitting normally */
+			event.preventDefault();
+			/* get some values from elements on the page: */
+			var $form = $( this );
+			cn = $("#{{form.add_collection_name.id}}").val();
+			cf = $("#{{form.add_field_name.id}}").val();
+			cs = $("#{{form.add_path_submit.id}}").val();
+			pdata = { {{form.add_collection_name.id}}: cn, {{form.add_field_name.id}}: cf,  {{form.add_path_submit.id}}: cs};
+			url = window.location.href;
+			/* Send the data using post */
+			var posting = $.post( url, pdata);
+			/* Put the results in a div */
+			posting.done(function( data ){
+				if (data.ost == "ok"){
+				alert("添加成功")
+				window.location.href = url;
+				}
+				else{
+					alert(data.msg);
+				}
+			});
+			});
+		});
+  </script> 
+    </div><!--/span-->
+  </div><!--/row-->
+
+  <!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,29 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+            <table class="table table-bordered">
+                <tr>
+                    <td>机器数</td>
+                    <td>启动游戏统计</td>
+                    <td>注册用户数</td>
+                    <td>创建角色数</td>
+                </tr>
+                <tr>
+                    <td>{{ uid_count }}</td>
+                    <td>{{ user_count }}</td>
+                    <td>{{ user_list_count }}</td>
+                    <td>{{ player_count }}</td>
+                </tr>
+            </table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

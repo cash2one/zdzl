@@ -1,0 +1,53 @@
+{% from "base_macros.html" import pager,img,img_toggle%}
+<table class="main-tab">
+	<thead>
+		<tr>
+		 
+		<th>用户名</th>
+		<th>昵称</th>
+		<th>角色</th>
+		<th>积分</th>
+		<th>注册时间</th>
+		<th>最后登录</th>
+		<th>激活</th>
+		<th>管理员</th>
+		<th>编辑</th>
+		<th>禁用</th>
+		<th>操作</th>
+		</tr>
+	</thead>
+	<tbody>
+	{%- for item in data.items -%}
+		<tr id="tr_{{ item.mongo_id }}">  
+		<td>{{ item.username }}</td>
+		<td>{{ item.nickname }}</td>  
+		<td class="{{ 'red' if item.role == item.UNACTIVE }}">{{ item.role_name }}</td>
+		<td>{{ item.value }}</td>
+		<td>{{ item.regdate|format_date()  }}</td>
+		<td>{{ item.lastlogin|format_date()   }}</td>
+		<td>
+		{{ img_toggle(item.role != item.UNACTIVE,action=url_for('admin.user_role',id=item.mongo_id,v = item.MEMBER),title="操作") }}
+		</td> 
+		<td>
+		{{ img_toggle(item.role == item.ADMIN,action=url_for('admin.user_role',id=item.mongo_id,v = item.ADMIN),title="操作") }}
+		</td>
+		<td>
+		{{ img_toggle(item.role == item.MODERATOR,action=url_for('admin.user_role',id=item.mongo_id,v = item.MODERATOR),title="操作") }}
+		</td>  
+		<td>
+		{{ img_toggle(item.ban,action=url_for('admin.user_ban',id=item.mongo_id),title="操作") }}
+		</td> 
+		<td> 
+		<a href="{{ url_for('admin.user_edit',id = item.mongo_id) }}"><img src="{{ 'frontend.static'|url('adminimages/reminders-table-icon1.png',_external = True ) }}" title="编辑" alt="编辑"></a> 
+		{{ img('adminimages/reminders-table-icon2.png',cb = 'delete_user',action=url_for('admin.user_delete',id=item.mongo_id),title='删除用户') }} 
+		</td> 
+		</tr>
+	{%- endfor -%}
+	</tbody>
+</table>
+<div class="gallery-table-extra"> 
+	<div class="fixed"> 
+		 
+		<div class="sixcol last"> {{ pager(data,href='javascript:gotoPage(#page);') }} </div> 
+	</div> 
+</div>

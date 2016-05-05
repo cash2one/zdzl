@@ -1,0 +1,271 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	装备等级表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>装备部位</td>
+			<td>等级</td>
+			<td>勇力</td>
+			<td>迅捷</td>
+			<td>体魄</td>
+			<td>智略</td>
+			<td>生命</td>
+			<td>攻击</td>
+			<td>绝攻</td>
+			<td>防御</td>
+			<td>速度</td>
+			<td>聚气</td>
+			<td>初聚气</td>
+			<td>回气值</td>
+			<td>命中率</td>
+			<td>回避率</td>
+			<td>格档率</td>
+			<td>反击率</td>
+			<td>连击率</td>
+			<td>爆击率</td>
+			<td>高爆率</td>
+			<td>破甲率</td>
+			<td>免伤率</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.part }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.level }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.STR }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.DEX }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.VIT }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.INT }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.HP }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.ATK }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.STK }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.DEF }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.SPD }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.MP }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.MPS }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.MPR }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.HIT }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.MIS }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.BOK }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.COT }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.COB }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.CRI }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.CPR }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.PEN }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td><span>{{ r.TUF }}</span><input type="text" style="display:none; width:40px; "/></td>
+			<td> 
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+				<button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %} 
+		<tr id="appendText" style="display:none;"> </tr>  
+	</table>
+	
+	<script type="text/javascript">
+		function edit_click(val){
+		var  id = val;
+		for(i=2; i<25; i++){
+			$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		$('#'+id+' td:nth-child(2)>span').append("<font style='font-size:12px'>装备部位</font>");
+		$('#'+id+' td:nth-child(3)>span').append("<font style='font-size:12px'>等级</font>");
+		$('#'+id+' td:nth-child(4)>span').append("<font style='font-size:12px'>勇力</font>");
+		$('#'+id+' td:nth-child(5)>span').append("<font style='font-size:12px'>迅捷</font>");
+		$('#'+id+' td:nth-child(6)>span').append("<font style='font-size:12px'>体魄</font>");
+		$('#'+id+' td:nth-child(7)>span').append("<font style='font-size:12px'>智略</font>");
+		$('#'+id+' td:nth-child(8)>span').append("<font style='font-size:12px'>生命</font>");
+		$('#'+id+' td:nth-child(9)>span').append("<font style='font-size:12px'>攻击</font>");
+		$('#'+id+' td:nth-child(10)>span').append("<font style='font-size:12px'>绝攻</font>");
+		$('#'+id+' td:nth-child(11)>span').append("<font style='font-size:12px'>防御</font>");
+		$('#'+id+' td:nth-child(12)>span').append("<font style='font-size:12px'>速度</font>");
+		$('#'+id+' td:nth-child(13)>span').append("<font style='font-size:12px'>聚气</font>");
+		$('#'+id+' td:nth-child(14)>span').append("<font style='font-size:12px'>初聚气</font>");
+		$('#'+id+' td:nth-child(15)>span').append("<font style='font-size:12px'>回气值</font>");
+		$('#'+id+' td:nth-child(16)>span').append("<font style='font-size:12px'>命中率</font>");
+		$('#'+id+' td:nth-child(17)>span').append("<font style='font-size:12px'>回避率</font>");
+		$('#'+id+' td:nth-child(18)>span').append("<font style='font-size:12px'>格档率</font>");
+		$('#'+id+' td:nth-child(19)>span').append("<font style='font-size:12px'>反击率</font>");
+		$('#'+id+' td:nth-child(20)>span').append("<font style='font-size:12px'>连击率</font>");
+		$('#'+id+' td:nth-child(21)>span').append("<font style='font-size:12px'>爆击率</font>");
+		$('#'+id+' td:nth-child(22)>span').append("<font style='font-size:12px'>高爆率</font>");
+		$('#'+id+' td:nth-child(23)>span').append("<font style='font-size:12px'>破甲率</font>");
+		$('#'+id+' td:nth-child(24)>span').append("<font style='font-size:12px'>免伤率</font>");
+		$('#'+id+' td:nth-child(25)>button:nth-child(3)').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(25)>button:nth-child(2)').css({display:"none"});
+	}
+	function save_click(val){
+		var  id1 = val;
+		var part = $('#'+id1+' td:nth-child(2)>input').val();
+		var level = $('#'+id1+' td:nth-child(3)>input').val();
+		var STR =$('#'+id1+' td:nth-child(4)>input').val();
+		var DEX = $('#'+id1+' td:nth-child(5)>input').val();
+		var VIT = $('#'+id1+' td:nth-child(6)>input').val();
+		var INT = $('#'+id1+' td:nth-child(7)>input').val();
+		var HP = $('#'+id1+' td:nth-child(8)>input').val();
+		var ATK =$('#'+id1+' td:nth-child(9)>input').val();
+		var STK =$('#'+id1+' td:nth-child(10)>input').val();
+		var DEF =$('#'+id1+' td:nth-child(11)>input').val();
+		var SPD =$('#'+id1+' td:nth-child(12)>input').val();
+		var MP = $('#'+id1+' td:nth-child(13)>input').val()
+		var MPS = $('#'+id1+' td:nth-child(14)>input').val()
+		var MPR = $('#'+id1+' td:nth-child(15)>input').val();
+		var HIT = $('#'+id1+' td:nth-child(16)>input').val();
+		var MIS = $('#'+id1+' td:nth-child(17)>input').val();
+		var BOK = $('#'+id1+' td:nth-child(18)>input').val();
+		var COT = $('#'+id1+' td:nth-child(19)>input').val();
+		var COB =$('#'+id1+' td:nth-child(20)>input').val();
+		var CRI = $('#'+id1+' td:nth-child(21)>input').val();
+		var CPR = $('#'+id1+' td:nth-child(22)>input').val();
+		var PEN = $('#'+id1+' td:nth-child(23)>input').val();
+		var TUF = $('#'+id1+' td:nth-child(24)>input').val()
+		$.post('/admin/admin/eq/level/save/',{
+			id:id1,
+			part:part, 
+			level:level,
+			STR:STR,
+			DEX:DEX,
+			VIT:VIT,
+			INT:INT,
+			HP:HP,
+			ATK:ATK,
+			STK:STK,
+			DEF:DEF,
+			SPD:SPD,
+			MP:MP,
+			MPS:MPS,
+			MPR:MPR,
+			HIT:HIT,
+			MIS:MIS,
+			BOK:BOK,
+			COT:COT,
+			COB:COB,
+			CRI:CRI,
+			CPR:CPR,
+			PEN:PEN,
+			TUF:TUF
+		},function(data) {
+			if(data['success'] == "0"){
+				alert("修改角色失败");
+			}else{
+				for(i=2; i<25; i++){
+				$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+				$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());
+			}
+				$('#'+id1+' td:nth-child(25)>button:nth-child(2)').css({display:"inline-block"});
+				$('#'+id1+' td:nth-child(25)>button:nth-child(3)').css({display:"none"});
+			}
+		});
+	}
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#submit").click(function(){
+				var part = $("#part").val();
+				var level = $("#level").val();
+				var STR = $("#STR").val();
+				var DEX = $("#DEX").val();
+				var VIT = $("#VIT").val();
+				var INT = $("#INT").val();
+				var HP = $("#HP").val();
+				var ATK = $("#ATK").val();
+				var STK = $("#STK").val();
+				var DEF = $("#DEF").val();
+				var SPD = $("#SPD").val();
+				var MP = $("#MP").val();
+				var MPS = $("#MPS").val();
+				var MPR = $("#MPR").val();
+				var HIT = $("#HIT").val();
+				var MIS = $("#MIS").val();
+				var BOK = $("#BOK").val();
+				var COT = $("#COT").val();
+				var COB = $("#COB").val();
+				var CRI = $("#CRI").val();
+				var CPR = $("#CPR").val();
+				var PEN = $("#PEN").val();
+				var TUF = $("#TUF").val();
+				$.get('/admin/admin/eq/level/save/',{
+					part:part,
+					level:level,
+					STR:STR,
+					DEX:DEX,
+					VIT:VIT,
+					INT:INT,
+					HP:HP,
+					ATK:ATK,
+					STK:STK,
+					DEF:DEF,
+					SPD:SPD,
+					MP:MP,
+					MPS:MPS,
+					MPR:MPR,
+					HIT:HIT,
+					MIS:MIS,
+					BOK:BOK,
+					COT:COT,
+					COB:COB,
+					CRI:CRI,
+					CPR:CPR,
+					PEN:PEN,
+					TUF:TUF
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+					text = "<tr id='"+data['id']+"'><td>"+data['id']+"</td>";
+					text +="<td><span>"+part+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+level+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+STR+"</span><input type='text' style='display:none; width:30px;'/></td>";
+					text +="<td><span>"+DEX+"</span><input type='text' style='display:none; width:30px;'/></td>";
+					text +="<td><span>"+VIT+"</span><input type='text' style='display:none; width:30px;'/></td>";
+					text +="<td><span>"+INT+"</span><input type='text' style='display:none; width:30px;'/></td>";
+					text +="<td><span>"+HP+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+ATK+"</span><input type='text' style='display:none; width:30px;'/></td>";
+					text +="<td><span>"+STK+"</span><input type='text' style='display:none; width:30px;'/></td>";
+					text +="<td><span>"+DEF+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+SPD+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+MP+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+MPS+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+MPR+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+MIS+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+BOK+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+COT+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+COB+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+CRI+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+CPR+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+PEN+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+BOK+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><span>"+TUF+"</span><input type='text' style='display:none; width:30px; '/></td>";
+					text +="<td><button type='button'class='btn' id='delete' onclick='GAME.load.href_click(this)' val='"+data['id']+"' href='/admin/admin/eq/level/delete/'>删除</button>";
+					text +="<button type='button' class='btn' id='edit' onclick='edit_click("+data['id']+")'>编辑</button>";
+					text +="<button id='save' class='btn' onclick='save_click("+data['id']+")' style='display:none'>保存</button></td><tr>"
+					$('#appendText').after(text);
+					}
+				});
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,95 @@
+package logon;
+
+import "game.proto";
+
+//登录失败类型
+enum LoginError {
+	LE_USER_NO = 1; //用户名未注册
+	LE_PWD_ERR = 2; //密码错误
+	LE_FORBID = 3; //禁止登录
+}
+
+//登录
+message Login {
+	required string user = 1; //用户名
+	required string pwd = 2; //密码的md5值
+}
+
+//登录返回
+message LoginResponse {
+	required game.ResultType result = 1; //是否登录成功
+	optional LoginError error = 2; //失败的原因
+	required string key = 3; //登录成功,返回key
+	required string host = 4; //ip地址
+	required int port = 5; //端口
+}
+
+//登录子进程
+message Logon {
+	required string user = 1; //用户名
+	required string key = 2; //登录key
+}
+//登录返回
+message LogonResponse {
+	required game.ResultType result = 1; //是否登录成功
+}
+
+//登出
+message Logout {
+}
+
+message LogoutResponse {
+	required game.ResultType result = 1; //是否登出成功
+}
+
+//获取角色列表
+message GetPlayerList {
+}
+
+//返回角色列表
+message PlayerList {
+	repeated game.Player players = 1;
+}
+
+//新建角色
+message CreatePlayer {
+	required string name = 1; //角色名
+	required game.Sex sex = 2; //性别
+	required game.Race race = 3; //种族
+}
+
+message CreateResponse {
+	required game.ResultType result = 1; //是否新建成功
+}
+
+//进入角色
+message EnterPlayer {
+	required int32 pid = 1; //角色id
+}
+
+message EnterResponse {
+	required game.ResultType result = 1; //是否进入成功
+}
+
+//退出角色
+message LeavePlayer {
+}
+
+message LeaveResponse {
+	required game.ResultType result = 1; //是否退出成功
+}
+
+//获取初始化信息
+message GetInitInfo {
+}
+
+//返回初始化信息
+message InitInfoResponse {
+	required game.PlayerInfo info = 1; //角色详细信息
+	required game.PlayerMember members = 2; //配将列表
+	repeated game.PlayerItem items = 3; //物品列表
+	required game.PlayerTaskState taskState = 4; //任务信息
+	repeated game.Buff buffs = 5; //buff列表
+	repeated game.KeyValue others = 6; //角色其它状态信息
+}
+

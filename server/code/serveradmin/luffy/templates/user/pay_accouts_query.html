@@ -1,0 +1,42 @@
+{% extends "user/layout.html"%}
+		<br />
+{%- block main -%}
+		<div class="span10">
+			<form method="POST" action="{{url_for("user.pay_accouts_query")}}">
+				{{form.order_token.label}} {{form.order_token()}} 
+				{{ form.submit }}
+			</form>	
+			
+	<table id="order_entries" class="table table-bordered sortable" >
+		<tr>
+			<td id="fields_1">用户名</td>
+			<td id="fields_2">订单号</td>
+			<td id="fields_3">用户id</td>
+			<td id="fields_3">pid</td>
+			<td id="fields_4">订单状态</td>
+			<td id="fields_5">时间</td>
+			<td id="fields_6">价钱</td>
+			<td id="fields_7">详细数据</td>
+			<td id="fields_8">porder</td>
+			<td id="fields_9">sid</td>
+		</tr>
+			{% for e in table_entries %}
+		<tr>
+			<td>{{ e.username|d('') }}</td>
+			<td>{{ e.torder|d('') }}</td>
+			<td>{{ e.uid|d('') }}</td>
+			<td>{{ e.pid|d('') }}</td>
+			<td>{{ e.status|d('') }}</td>
+			<td>{{ e.ct|format_date() }}</td>
+			<td>{{ e.price|d('') }}</td>
+			<td>{{ e.detail|d('')|string }}</td>
+			<td>{{ e.porder|d('') }}</td>
+			<td>{{ e.sid|d('') }}</td>
+		</tr>
+		         {%endfor%}
+	</table>
+
+		</div>
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

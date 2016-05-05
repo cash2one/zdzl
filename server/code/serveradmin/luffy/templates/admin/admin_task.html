@@ -1,0 +1,56 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate %}
+{%- block subjs-%}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/json2.js') }}"></script>
+{% endblock %}
+{%- block main -%}
+
+<div class="span10">任务表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	{{ paginate(page_count,url_for('admin.admin_task'),current_page=page) }}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>任务的图标</td>
+			<td>类型</td>
+			<td>解锁条件</td>
+			<td>下一个任务id</td>
+			<td>奖励id</td>
+			<td>说明</td>
+			<td>步骤</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.name }}</td>
+			<td>{{ r.icon }}</td>
+			<td>{{ r.type }}</td>
+			<td>{{ r.unlock }}</td>
+			<td>{{ r.nextId }}</td>
+			<td>{{ r.rid }}</td>
+			<td width="300">{{ r.info }}</td>
+			<td>{{ r.step }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+				<a type="button" class="btn" href="{{ url_for('admin.admin_task_edit',id=r._id)}}">编辑</a>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	{% endif %}
+	</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

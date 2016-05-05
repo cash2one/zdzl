@@ -1,0 +1,107 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script xmlns="http://www.w3.org/1999/html">
+    function backup(obj, opType){
+        if(confirm("确定执行吗?")){
+            var url = $(obj).attr('href');
+            var mid = $(obj).attr('mid');
+            var img_html = "{{ 'frontend.static'|url('images/loading.gif') }}";
+            $('#show_loading').append('<img src="'+img_html+'" />');
+            $.get(url,{opType:opType, mid:mid},function(d){
+                $('#show_loading').html(d['info']);
+            });
+        }
+
+    };
+</script>
+{% endblock %}
+{%- block main -%}
+{% if g.user.role >= 300  or g.user.right[4] == 1 %}
+<div class="span10">
+    <div id="show_loading"></div>
+    <div class="well form-inline">
+        标识:
+        <input class="input-big" id="title"></input>
+        表名:
+        <textarea type="text" class="input-big" id="names"></textarea>
+        备注:
+        <textarea type="text" class="input-big" id="remark"></textarea>
+        <button type="button" class="btn" id='submit'>保存</button>
+    </div>
+    <div class="well form-inline hidefive" id="disfive">
+        <input class="input-big" id="edit_id" readonly></input>
+        标识:
+        <input class="input-big" id="edit_title"></input>
+        所有表名:
+        <textarea type="text" class="input-big" id="edit_names"></textarea>
+        备注:
+        <textarea type="text" class="input-big" id="edit_remark"></textarea>
+        <button type="button" class="btn" id='edit_submit'>保存</button>
+        <button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <td>标识</td>
+            <td>所有表名</td>
+            <td>备注</td>
+        </tr>
+        {%- for r in tables -%}
+        <tr>
+
+            <td><p id='{{ r.mongo_id }}_title'>{{ r.title }}</p></td>
+            <td><p id='{{ r.mongo_id }}_names'>{{ r.names }}</p></td>
+            <td><p id='{{ r.mongo_id }}_remark'>{{ r.remark }}</p></td>
+            <td>
+                {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+                <button type="button" class="btn" onclick="GAME.load.database_restore_tables_save(this, '{{ r.mongo_id }}')" stype="del" href="/user/database/restore/tables/save/">删除</button>
+                <button type="button" class="btn" onclick="GAME.load.database_restore_tables_save(this, '{{ r.mongo_id }}')" stype="edit" href="/user/database/restore/tables/save/">编辑</button>
+                <br />
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var title = $("#title").val();
+            var names = $("#names").val();
+            var remark = $("#remark").val();
+            var url = "{{ url_for('user.database_restore_tables_save') }}";
+            $.post(url,{
+                names:names, title:title, remark:remark, opType:"add"
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var title = $("#edit_title").val();
+            var names = $("#edit_names").val();
+            var remark = $("#edit_remark").val();
+            var url = "{{ url_for('user.database_restore_tables_save') }}";
+            $.post(url,{
+                names:names, id:id, title:title, remark:remark, opType:"edit"
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+    });
+</script>
+{%- endblock -%}

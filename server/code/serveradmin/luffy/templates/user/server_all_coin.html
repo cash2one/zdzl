@@ -1,0 +1,141 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+// var typeName = { '1':'物品合成', '2':'技能点取回', '3':'强化等级转移', '4':'深渊挂机', '5':'食馆', '6':'元宝祭天', '7':'阵型学习',
+//                  '8':'阵型升级', '9':'银币观星', '10':'元宝观星', '11':'银币采矿', '12':'元宝采矿', '13':'时光盒重置', '14':'刷新悬赏任务', '15':'悬赏任务立即完成', 15:'悬赏任务立即完成','16':'同盟创建',
+//                 '17':'同盟宝具铭刻', '18':'竞技场扣费', '19':'神秘商店购买消耗', '20':'兑换坐骑', '21':'boss战的cd时间去除的消耗'}
+// var types = {{ cateList|safe }};
+// var typeLast = []
+// for (var i=0; i<types.length; i++){
+// 	typeLast.push(typeName[types[i]])
+// }
+$(function () {
+    var chart;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'column'
+            },
+            title: {
+                text: '所有玩家消费分布'
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: {{ cateList|safe }}
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                backgroundColor: '#FFFFFF',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 100,
+                y: 70,
+                floating: true,
+                shadow: true
+            },
+            tooltip: {
+                formatter: function() {
+                    return ''+
+                        this.x +': '+ this.y +'';
+                }
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+                series: [
+                {
+                name: 'coin1-银币',
+                data: {{ c1List|safe }}
+    
+            }, {
+                name: 'coin2-元宝',
+                data: {{ c2List|safe }}
+    
+            }, {
+                name: 'coin3-绑元宝',
+                data: {{ c3List|safe }}
+    
+            }
+            ]
+        });
+    });
+    
+});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+            开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}"> 
+            结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+            <button type="button" class="btn" href="{{ url_for('user.server_all_coin') }}" onclick="GAME.load.reg_search(this,'day')">查询</button>
+			<br />
+			<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+            <table class="table table-bordered">
+                <tr>
+                    <td>
+                        1:物品合成, 2:技能点取回, 3:强化等级转移, 4:深渊挂机, 5:食馆, 6:元宝祭天, 7:阵型学习,
+                        8:阵型升级, 9:银币观星, 10:元宝观星, 11:银币采矿, 12:元宝采矿, 13:时光盒重置, 14:刷新悬赏任务, 15:悬赏任务立即完成, 16:同盟创建, 17:同盟宝具铭刻, 18:竞技场扣费,
+                        19:神秘商店购买消耗, 20:兑换坐骑, 21:boss战的cd时间去除的消耗
+                    </td>
+                </tr>
+            </table>
+            消费总数：
+            <table class="table table-bordered">
+                <tr>
+                    <td>总银币数</td>
+                    <td>总元宝数</td>
+                    <td>总绑元宝数</td>
+                    <td>消费总角色数</td>
+                </tr>
+                <tr>
+                    <td>{{ all_count['sumc1'] }}</td>
+                    <td>{{ all_count['sumc2'] }}</td>
+                    <td>{{ all_count['sumc3'] }}</td>
+                    <td>{{ pid_count }}
+                </tr>
+            </table>
+            获得资金：
+            <table class="table table-bordered">
+                <tr>
+                    <td>总银币数</td>
+                    <td>总元宝数</td>
+                    <td>总绑元宝数</td>
+                </tr>
+                <tr>
+                    <td>{{ get_count['sumc1'] }}</td>
+                    <td>{{ get_count['sumc2'] }}</td>
+                    <td>{{ get_count['sumc3'] }}</td>
+                </tr>
+            </table>
+            消费比率（消费/获得）:
+            <table class="table table-bordered">
+                <tr>
+                    <td>银币比率</td>
+                    <td>元宝比率</td>
+                    <td>绑元宝比率</td>
+                </tr>
+                <tr>
+                    <td>{{ all_count['sumc1']|percent(get_count['sumc1']) }}%</td>
+                    <td>{{ all_count['sumc2']|percent(get_count['sumc2']) }}%</td>
+                    <td>{{ all_count['sumc3']|percent(get_count['sumc3']) }}%</td>
+                </tr>
+            </table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,89 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script>
+    function backup(obj, opType){
+        var url = $(obj).attr('href');
+        var data = {}
+        data['opType'] = opType;
+        if(opType!='dump'){
+            data['backup_date'] = $(obj).attr('backup_date');
+        };
+        var img_html = "{{ 'frontend.static'|url('images/loading.gif') }}";
+        $('#show_loading').append('<img src="'+img_html+'" />');
+        $.get(url,data,function(d){
+            if(d['success'] == 1){
+                location.reload();
+            };
+        });
+    };
+</script>
+{% endblock %}
+{%- block main -%}
+{% if g.user.role >= 300  or g.user.right[4] == 1 %}
+<div class="span10">
+    <div id="show_loading"></div>
+    <button type="button" class="btn" id='backup' style="width: 100%; height: 50px; font-size: 25px;" onclick="backup(this, 'dump')" href="/user/database/backup/operation/">备份</button>
+    <table class="table table-bordered">
+        <tr>
+            <td>备份日期</td>
+            <td>操作</td>
+        </tr>
+        {% if ret %}
+            {%- for r in ret -%}
+            <tr>
+                <td>{{ r }}</td>
+                <td>
+                    <button type="button" class="btn" onclick="backup(this, 'del')" backup_date="{{ r }}" href="/user/database/backup/operation/">删除</button>
+                    <button type="button" class="btn" onclick="backup(this, 'restore')" backup_date="{{ r }}" href="/user/database/backup/operation/">恢复至数据库</button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var ip = $("#ip").val();
+            var port = $("#port").val();
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var backup = $("#backup").val();
+            var url = "{{ url_for('user.database_restore_operation', opType='add') }}";
+            $.post(url,{
+                name:name,ip:ip, port:port, username:username, password:password, backup:backup
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload();
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var ip = $("#edit_ip").val();
+            var port = $("#edit_port").val();
+            var username = $("#edit_username").val();
+            var password = $("#edit_password").val();
+            var backup = $("#edit_backup").val();
+            var url = "{{ url_for('user.database_restore_operation', opType='edit') }}";
+            $.post(url,{
+                name:name,id:id,ip:ip,port:port,username:username,password:password,backup:backup
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>
+{%- endblock -%}

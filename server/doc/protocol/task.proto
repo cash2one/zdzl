@@ -1,0 +1,19 @@
+package task;
+
+import "game.proto";
+
+//更新任务状态
+message UpdateTaskState {
+	required game.PlayerTaskState state = 1; //更新任务状态
+}
+
+//完成任务获取奖励
+message CompleteTask {
+	required int32 id = 1; //任务id
+}
+
+//
+message CompleteTaskResponse {
+	required int32 id = 1; //任务id
+	optional game.Reward reward = 2; //任务奖励
+}

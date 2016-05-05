@@ -1,0 +1,1 @@
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "efun.AdminUser", "name" : "_id_" }, { "v" : 1, "key" : { "u" : 1 }, "unique" : true, "ns" : "efun.AdminUser", "name" : "u_1", "dropDups" : true } ] }

@@ -1,0 +1,129 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+	$(function () {
+	    var chart;
+	    
+	    $(document).ready(function () {
+	    	
+	    	// Build the chart
+	        chart = new Highcharts.Chart({
+	            chart: {
+	                renderTo: 'container1',
+	                plotBackgroundColor: null,
+	                plotBorderWidth: null,
+	                plotShadow: false
+	            },
+	            title: {
+	                text: '玩家等级比例'
+	            },
+	            tooltip: {
+	        	    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+	            	percentageDecimals: 1
+	            },
+	            plotOptions: {
+	                pie: {
+	                    allowPointSelect: true,
+	                    cursor: 'pointer',
+	                    dataLabels: {
+	                        enabled: false
+	                    },
+	                    showInLegend: true
+	                }
+	            },
+	            series: [{
+	                type: 'pie',
+	                name: 'Browser share',
+	                data: [
+	                    {
+	                        name: '达到玩家当前等级的人数',
+	                        y: 80,
+	                        sliced: true,
+	                        selected: true
+	                    },
+	                    ['玩家',   20]
+	                ]
+	            }]
+	        });
+	    });
+	    
+	});
+	
+	$(function () {
+	    var chart;
+	    
+	    $(document).ready(function () {
+	    	
+	    	// Build the chart
+	        chart = new Highcharts.Chart({
+	            chart: {
+	                renderTo: 'container2',
+	                plotBackgroundColor: null,
+	                plotBorderWidth: null,
+	                plotShadow: false
+	            },
+	            title: {
+	                text: '玩家玩成任务比例'
+	            },
+	            tooltip: {
+	        	    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+	            	percentageDecimals: 1
+	            },
+	            plotOptions: {
+	                pie: {
+	                    allowPointSelect: true,
+	                    cursor: 'pointer',
+	                    dataLabels: {
+	                        enabled: false
+	                    },
+	                    showInLegend: true
+	                }
+	            },
+	            series: [{
+	                type: 'pie',
+	                name: 'Browser share',
+	                data: [
+	                    {
+	                        name: '达到玩家当前任务的人数',
+	                        y: 99.8,
+	                        sliced: true,
+	                        selected: true
+	                    },
+	                    ['玩家',   0.2]
+	                ]
+	            }]
+	        });
+	    });
+	    
+	});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[2] == 1 %}
+		<div class="span10">
+			<select id="server_select">
+				<option>请选择服务器</option>
+				<option value=""></option>
+				<option value=""></option>
+			</select>
+			<br />
+			角色id：<input type="text" class="input-small" id="playerId"> 
+			角色名：<input type="text" class="input-small" id="playerName">
+			<button type="button" class="btn" href="/user/server/player/level/" onclick="GAME.load.player_search(this)">查询</button>
+			<table>
+				<tr>
+					<td>ddd</td>
+				</tr>
+				<tr>
+					<td><div id="container1" style="min-width: 400px; height: 400px; margin: 0 auto"></div></td>
+					<td><div id="container2" style="min-width: 400px; height: 400px; margin: 0 auto"></div></td>
+				</tr>
+			</table>
+			
+			
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+import base64
+import json
+import web
+
+from corelib import log
+from corelib.tools import http_post_ex
+import webapi
+
+
+def get_urls(sandbox):
+    if not sandbox:
+        apple_urls = ['buy.itunes.apple.com', 443, '/verifyReceipt']
+    else:
+        apple_urls = ['sandbox.itunes.apple.com', 443, '/verifyReceipt']
+    return apple_urls
+
+
+def cb_init(sdk, app, api_url):
+    """ 设置回调处理 """
+    sns = webapi.SNS_URLS[sdk.sns]
+
+    class CallBack(app.page):
+        """支付回调"""
+        path = '%s/%s/%s' % (api_url, sns, webapi.URL_CHECK_PAY)
+        def GET(self):
+            data = web.input()
+            log.debug('[app]post:%s', data)
+            gorder, pid = data['order'], data['receipt']
+            rs, data = webapi.SNSClient.pay(gorder, pid)
+            return '{"status":%d}' % (1 if rs else 0, )
+        POST = GET
+
+
+class AppStore(object):
+    """ app store api """
+    if 0:
+        apple_urls = ['buy.itunes.apple.com', 443, '/verifyReceipt']
+    else:
+        apple_urls = ['sandbox.itunes.apple.com', 443, '/verifyReceipt']
+
+    def __init__(self, sns, url):
+        """  """
+        if isinstance(url, (str, unicode)):
+            url = eval(url)
+        self.sns = sns
+        AppStore.apple_urls = url
+
+    def cb_init(self, web_app, api_url):
+        cb_init(self, web_app, api_url)
+
+    @classmethod
+    def pay(cls, receipt, product_id, apple_urls=None):
+        """ 去apple官网检查支付情况 """
+        if apple_urls is None:
+            d = base64.decodestring(receipt)
+            apple_urls = get_urls(d.find('"Sandbox"') != -1)
+        host, port, url = apple_urls
+        log.info('[AppStore]Pay check:%s, %s', apple_urls, product_id)
+
+        jsonStr = json.dumps({"receipt-data": receipt})
+        headers = {"Content-type": "application/json"}
+        data = http_post_ex(host, port, url,
+                data=jsonStr, headers=headers, timeout=60, ssl=True)
+        if not data:
+            return False, None, None
+        decodedJson = json.loads(data)
+        status = decodedJson[u'status']
+        if status != 0:
+            return False, None, decodedJson
+        receipt = decodedJson['receipt']
+        #检查产品id
+        if receipt['product_id'] != product_id:
+            return False, None, decodedJson
+        #检查订单号
+        torder = receipt['transaction_id']
+        return True, torder, decodedJson
+
+    def test(self):
+        s = "ewoJInNpZ25hdHVyZSIgPSAiQWhXeFBjaXJOQmc5Q0Z2Y2RtZUdZU1pqbWVsVUFMdjFMaXBlbDcvSW9uTHA2cmEvSy9NdWFYWkFtN3NBZWd5UktxVWt2c2NLYnl2TWxNTytIMTQ5ajdwYnJyMWlTL0xseE1qMHhGZzZoTXlCUXNhZ0FJWEtDT1RsbEZ6cDhxa1FwYkc4Uzg4K04xRVFrTGdhb25ad1hwM2V3WWNGTkp6eXk5dkJvNFBaS1NneUFBQURWekNDQTFNd2dnSTdvQU1DQVFJQ0NHVVVrVTNaV0FTMU1BMEdDU3FHU0liM0RRRUJCUVVBTUg4eEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVNZd0pBWURWUVFMREIxQmNIQnNaU0JEWlhKMGFXWnBZMkYwYVc5dUlFRjFkR2h2Y21sMGVURXpNREVHQTFVRUF3d3FRWEJ3YkdVZ2FWUjFibVZ6SUZOMGIzSmxJRU5sY25ScFptbGpZWFJwYjI0Z1FYVjBhRzl5YVhSNU1CNFhEVEE1TURZeE5USXlNRFUxTmxvWERURTBNRFl4TkRJeU1EVTFObG93WkRFak1DRUdBMVVFQXd3YVVIVnlZMmhoYzJWU1pXTmxhWEIwUTJWeWRHbG1hV05oZEdVeEd6QVpCZ05WQkFzTUVrRndjR3hsSUdsVWRXNWxjeUJUZEc5eVpURVRNQkVHQTFVRUNnd0tRWEJ3YkdVZ1NXNWpMakVMTUFrR0ExVUVCaE1DVlZNd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFNclJqRjJjdDRJclNkaVRDaGFJMGc4cHd2L2NtSHM4cC9Sd1YvcnQvOTFYS1ZoTmw0WElCaW1LalFRTmZnSHNEczZ5anUrK0RyS0pFN3VLc3BoTWRkS1lmRkU1ckdYc0FkQkVqQndSSXhleFRldngzSExFRkdBdDFtb0t4NTA5ZGh4dGlJZERnSnYyWWFWczQ5QjB1SnZOZHk2U01xTk5MSHNETHpEUzlvWkhBZ01CQUFHamNqQndNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVVOaDNvNHAyQzBnRVl0VEpyRHRkREM1RllRem93RGdZRFZSMFBBUUgvQkFRREFnZUFNQjBHQTFVZERnUVdCQlNwZzRQeUdVakZQaEpYQ0JUTXphTittVjhrOVRBUUJnb3Foa2lHOTJOa0JnVUJCQUlGQURBTkJna3Foa2lHOXcwQkFRVUZBQU9DQVFFQUVhU2JQanRtTjRDL0lCM1FFcEszMlJ4YWNDRFhkVlhBZVZSZVM1RmFaeGMrdDg4cFFQOTNCaUF4dmRXLzNlVFNNR1k1RmJlQVlMM2V0cVA1Z204d3JGb2pYMGlreVZSU3RRKy9BUTBLRWp0cUIwN2tMczlRVWU4Y3pSOFVHZmRNMUV1bVYvVWd2RGQ0TndOWXhMUU1nNFdUUWZna1FRVnk4R1had1ZIZ2JFL1VDNlk3MDUzcEdYQms1MU5QTTN3b3hoZDNnU1JMdlhqK2xvSHNTdGNURXFlOXBCRHBtRzUrc2s0dHcrR0szR01lRU41LytlMVFUOW5wL0tsMW5qK2FCdzdDMHhzeTBiRm5hQWQxY1NTNnhkb3J5L0NVdk02Z3RLc21uT09kcVRlc2JwMGJzOHNuNldxczBDOWRnY3hSSHVPTVoydG04bnBMVW03YXJnT1N6UT09IjsKCSJwdXJjaGFzZS1pbmZvIiA9ICJld29KSW05eWFXZHBibUZzTFhCMWNtTm9ZWE5sTFdSaGRHVXRjSE4wSWlBOUlDSXlNREV6TFRBMkxURTFJREF6T2pJek9qTTVJRUZ0WlhKcFkyRXZURzl6WDBGdVoyVnNaWE1pT3dvSkluQjFjbU5vWVhObExXUmhkR1V0YlhNaUlEMGdJakV6TnpFeU9URTRNVGs1TXpNaU93b0pJblZ1YVhGMVpTMXBaR1Z1ZEdsbWFXVnlJaUE5SUNJMk1qRTFNR0V5TlRZME1HRTBaV1prT1RNMlpHUmhNVFJrTURNelpUVmhaalprTnpBNU9XTmtJanNLQ1NKdmNtbG5hVzVoYkMxMGNtRnVjMkZqZEdsdmJpMXBaQ0lnUFNBaU1qY3dNREF3TURNMk1UZzVNall6SWpzS0NTSmlkbkp6SWlBOUlDSXhMakV1TUNJN0Nna2lZWEJ3TFdsMFpXMHRhV1FpSUQwZ0lqWTBNelV6TXpBNU9DSTdDZ2tpZEhKaGJuTmhZM1JwYjI0dGFXUWlJRDBnSWpJM01EQXdNREF6TmpFNE9USTJNeUk3Q2draWNYVmhiblJwZEhraUlEMGdJakVpT3dvSkltOXlhV2RwYm1Gc0xYQjFjbU5vWVhObExXUmhkR1V0YlhNaUlEMGdJakV6TnpFeU9URTRNVGs1TXpNaU93b0pJblZ1YVhGMVpTMTJaVzVrYjNJdGFXUmxiblJwWm1sbGNpSWdQU0FpUlRNNFJUTkVOVFF0TUVJME1TMDBORUV3TFVFNU1EQXRSalUzUkRJeFJERTRNa1ZFSWpzS0NTSnBkR1Z0TFdsa0lpQTlJQ0kyTkRneU5EZ3lORGdpT3dvSkluWmxjbk5wYjI0dFpYaDBaWEp1WVd3dGFXUmxiblJwWm1sbGNpSWdQU0FpTVRVMU1UTTRPREVpT3dvSkluQnliMlIxWTNRdGFXUWlJRDBnSW1OdmJTNTJjWGN1ZW1SNmJHTnVMbU0yTUNJN0Nna2ljSFZ5WTJoaGMyVXRaR0YwWlNJZ1BTQWlNakF4TXkwd05pMHhOU0F4TURveU16b3pPU0JGZEdNdlIwMVVJanNLQ1NKdmNtbG5hVzVoYkMxd2RYSmphR0Z6WlMxa1lYUmxJaUE5SUNJeU1ERXpMVEEyTFRFMUlERXdPakl6T2pNNUlFVjBZeTlIVFZRaU93b0pJbUpwWkNJZ1BTQWlZMjl0TG5aeGR5NTZaSHBzWTI0aU93b0pJbkIxY21Ob1lYTmxMV1JoZEdVdGNITjBJaUE5SUNJeU1ERXpMVEEyTFRFMUlEQXpPakl6T2pNNUlFRnRaWEpwWTJFdlRHOXpYMEZ1WjJWc1pYTWlPd3A5IjsKCSJwb2QiID0gIjI3IjsKCSJzaWduaW5nLXN0YXR1cyIgPSAiMCI7Cn0="
+        s = 'ewoJInNpZ25hdHVyZSIgPSAiQWoxZk5BSXZyQVZ2cGh0RVFnWVJzd2puaHhSUDdJLzBQZ2s4bUhlRzBYcGtBNHVIek8wb3NlbGYrY3kvRzZ1dGxFd0twVHFkNUR5UlBBWElaT3l2d25jbmEzeENRWGdlYXl4VHBDTU5kUE1iQU5qSksvOGNSMkpOYkdKUm4vb25vbW1wWmhxaHNmNy9oMytTYnZwY1F2dkFCMFdScFhRUmlUeUtqbFpodmwzQ0FBQURWekNDQTFNd2dnSTdvQU1DQVFJQ0NHVVVrVTNaV0FTMU1BMEdDU3FHU0liM0RRRUJCUVVBTUg4eEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVNZd0pBWURWUVFMREIxQmNIQnNaU0JEWlhKMGFXWnBZMkYwYVc5dUlFRjFkR2h2Y21sMGVURXpNREVHQTFVRUF3d3FRWEJ3YkdVZ2FWUjFibVZ6SUZOMGIzSmxJRU5sY25ScFptbGpZWFJwYjI0Z1FYVjBhRzl5YVhSNU1CNFhEVEE1TURZeE5USXlNRFUxTmxvWERURTBNRFl4TkRJeU1EVTFObG93WkRFak1DRUdBMVVFQXd3YVVIVnlZMmhoYzJWU1pXTmxhWEIwUTJWeWRHbG1hV05oZEdVeEd6QVpCZ05WQkFzTUVrRndjR3hsSUdsVWRXNWxjeUJUZEc5eVpURVRNQkVHQTFVRUNnd0tRWEJ3YkdVZ1NXNWpMakVMTUFrR0ExVUVCaE1DVlZNd2daOHdEUVlKS29aSWh2Y05BUUVCQlFBRGdZMEFNSUdKQW9HQkFNclJqRjJjdDRJclNkaVRDaGFJMGc4cHd2L2NtSHM4cC9Sd1YvcnQvOTFYS1ZoTmw0WElCaW1LalFRTmZnSHNEczZ5anUrK0RyS0pFN3VLc3BoTWRkS1lmRkU1ckdYc0FkQkVqQndSSXhleFRldngzSExFRkdBdDFtb0t4NTA5ZGh4dGlJZERnSnYyWWFWczQ5QjB1SnZOZHk2U01xTk5MSHNETHpEUzlvWkhBZ01CQUFHamNqQndNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVVOaDNvNHAyQzBnRVl0VEpyRHRkREM1RllRem93RGdZRFZSMFBBUUgvQkFRREFnZUFNQjBHQTFVZERnUVdCQlNwZzRQeUdVakZQaEpYQ0JUTXphTittVjhrOVRBUUJnb3Foa2lHOTJOa0JnVUJCQUlGQURBTkJna3Foa2lHOXcwQkFRVUZBQU9DQVFFQUVhU2JQanRtTjRDL0lCM1FFcEszMlJ4YWNDRFhkVlhBZVZSZVM1RmFaeGMrdDg4cFFQOTNCaUF4dmRXLzNlVFNNR1k1RmJlQVlMM2V0cVA1Z204d3JGb2pYMGlreVZSU3RRKy9BUTBLRWp0cUIwN2tMczlRVWU4Y3pSOFVHZmRNMUV1bVYvVWd2RGQ0TndOWXhMUU1nNFdUUWZna1FRVnk4R1had1ZIZ2JFL1VDNlk3MDUzcEdYQms1MU5QTTN3b3hoZDNnU1JMdlhqK2xvSHNTdGNURXFlOXBCRHBtRzUrc2s0dHcrR0szR01lRU41LytlMVFUOW5wL0tsMW5qK2FCdzdDMHhzeTBiRm5hQWQxY1NTNnhkb3J5L0NVdk02Z3RLc21uT09kcVRlc2JwMGJzOHNuNldxczBDOWRnY3hSSHVPTVoydG04bnBMVW03YXJnT1N6UT09IjsKCSJwdXJjaGFzZS1pbmZvIiA9ICJld29KSW05eWFXZHBibUZzTFhCMWNtTm9ZWE5sTFdSaGRHVXRjSE4wSWlBOUlDSXlNREV6TFRBMkxURTRJREF3T2pVNE9qRXdJRUZ0WlhKcFkyRXZURzl6WDBGdVoyVnNaWE1pT3dvSkluVnVhWEYxWlMxcFpHVnVkR2xtYVdWeUlpQTlJQ0k0Tmpjd1ptVmpPV0psTTJWbU1qSmlObVUxTURZek9EZ3hNVE0yWTJVeVpqRTBaVFJqTjJKaUlqc0tDU0p2Y21sbmFXNWhiQzEwY21GdWMyRmpkR2x2YmkxcFpDSWdQU0FpTVRBd01EQXdNREEzTnpjeU1EYzNPQ0k3Q2draVluWnljeUlnUFNBaU1TNHdMamdpT3dvSkluUnlZVzV6WVdOMGFXOXVMV2xrSWlBOUlDSXhNREF3TURBd01EYzNOekl3TnpjNElqc0tDU0p4ZFdGdWRHbDBlU0lnUFNBaU1TSTdDZ2tpYjNKcFoybHVZV3d0Y0hWeVkyaGhjMlV0WkdGMFpTMXRjeUlnUFNBaU1UTTNNVFUwTWpJNU1EQXdNQ0k3Q2draWNISnZaSFZqZEMxcFpDSWdQU0FpWTI5dExuWnhkeTU2Wkhwc2RIY3VOakFpT3dvSkltbDBaVzB0YVdRaUlEMGdJalkwTXpZd09EY3dPQ0k3Q2draVltbGtJaUE5SUNKamIyMHVkbkYzTG5wa2VteDBkeUk3Q2draWNIVnlZMmhoYzJVdFpHRjBaUzF0Y3lJZ1BTQWlNVE0zTVRVME1qSTVNREF3TUNJN0Nna2ljSFZ5WTJoaGMyVXRaR0YwWlNJZ1BTQWlNakF4TXkwd05pMHhPQ0F3TnpvMU9Eb3hNQ0JGZEdNdlIwMVVJanNLQ1NKd2RYSmphR0Z6WlMxa1lYUmxMWEJ6ZENJZ1BTQWlNakF4TXkwd05pMHhPQ0F3TURvMU9Eb3hNQ0JCYldWeWFXTmhMMHh2YzE5QmJtZGxiR1Z6SWpzS0NTSnZjbWxuYVc1aGJDMXdkWEpqYUdGelpTMWtZWFJsSWlBOUlDSXlNREV6TFRBMkxURTRJREEzT2pVNE9qRXdJRVYwWXk5SFRWUWlPd3A5IjsKCSJlbnZpcm9ubWVudCIgPSAiU2FuZGJveCI7CgkicG9kIiA9ICIxMDAiOwoJInNpZ25pbmctc3RhdHVzIiA9ICIwIjsKfQ==',
+        print self.pay(s, 'com.vqw.zdzltw.c60')

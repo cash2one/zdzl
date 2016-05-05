@@ -1,0 +1,121 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+var typeName = { '1':'物品合成', '2':'技能点取回', '3':'强化等级转移', '4':'深渊挂机', '5':'食馆', '6':'元宝祭天', '7':'阵型学习',
+                 '8':'阵型升级', '9':'银币观星', '10':'元宝观星', '11':'银币采矿', '12':'元宝采矿', '13':'时光盒重置', '14':'悬赏任务任务', '15':'悬赏任务立即完成',
+    '16':'同盟创建', '17':'同盟宝具铭刻', '18':'竞技场扣费', '19':'神秘商店购买消耗', '20':'兑换坐骑', '21':'boss战的cd时间去除的消耗'}
+$(function () {
+    var chart;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'line',
+                marginRight: 130,
+                marginBottom: 55
+            },
+            title: {
+                text: '所有玩家资金消费分布['+typeName[{{ctype}}]+']',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '时间分布',
+                x: -20
+            },
+            xAxis: {
+                categories: {{ cateList|format_date_list(time_format)|safe }}
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        this.x +': '+ this.y +'';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -10,
+                y: 100,
+                borderWidth: 0
+            },
+            series: [{
+                name: '消费银币－coin1',
+                data: {{ c1List|safe }}
+            }, {
+                name: '消费元宝-coin2',
+                data: {{ c2List|safe }}
+            }, {
+                name: '消费绑元宝-coin3',
+                data: {{ c3List|safe }}
+            }]
+        });
+    });
+    
+});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+			<br />
+			注册时间搜索：开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}"> 
+			结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+			<select id="ctype_select">
+				<option value="1">需要查看的类型</option>
+				<option value="1" {% if ctype == 1 %}selected="selected"{% endif %}>物品合成</option>
+				<option value="2" {% if ctype == 2 %}selected="selected"{% endif %}>技能点取回</option>
+				<option value="3" {% if ctype == 3 %}selected="selected"{% endif %}>强化等级转移</option>
+				<option value="4" {% if ctype == 4 %}selected="selected"{% endif %}>深渊挂机</option>
+				<option value="5" {% if ctype == 5 %}selected="selected"{% endif %}>食馆</option>
+				<option value="6" {% if ctype == 6 %}selected="selected"{% endif %}>元宝祭天</option>
+				<option value="7" {% if ctype == 7 %}selected="selected"{% endif %}>阵型学习</option>
+				<option value="8" {% if ctype == 8 %}selected="selected"{% endif %}>阵型升级</option>
+				<option value="9" {% if ctype == 9 %}selected="selected"{% endif %}>银币观星</option>
+				<option value="10" {% if ctype == 10 %}selected="selected"{% endif %}>元宝观星</option>
+				<option value="11" {% if ctype == 11 %}selected="selected"{% endif %}>银币采矿</option>
+				<option value="12" {% if ctype == 12 %}selected="selected"{% endif %}>元宝采矿</option>
+				<option value="13" {% if ctype == 13 %}selected="selected"{% endif %}>时光盒重置</option>
+				<option value="14" {% if ctype == 14 %}selected="selected"{% endif %}>刷新悬赏任务</option>
+				<option value="15" {% if ctype == 15 %}selected="selected"{% endif %}>悬赏任务立即完成</option>
+				<option value="16" {% if ctype == 16 %}selected="selected"{% endif %}>同盟创建</option>
+                <option value="17" {% if ctype == 17 %}selected="selected"{% endif %}>同盟宝具铭刻</option>
+                <option value="18" {% if ctype == 18 %}selected="selected"{% endif %}>竞技场扣费</option>
+                <option value="19" {% if ctype == 19 %}selected="selected"{% endif %}>神秘商店购买消耗</option>
+                <option value="20" {% if ctype == 20 %}selected="selected"{% endif %}>兑换坐骑</option>
+                <option value="21" {% if ctype == 21 %}selected="selected"{% endif %}>boss战的cd时间去除的消耗</option>
+		<option value="102" {% if ctype == 102 %}selected="selected"{% endif %}>卖出物品的添加</option>
+		<option value="103" {% if ctype == 103 %}selected="selected"{% endif %}>特殊物品的添加</option>
+		<option value="104" {% if ctype == 104 %}selected="selected"{% endif %}>活动挑战奖励的添加</option>
+		<option value="105" {% if ctype == 105 %}selected="selected"{% endif %}>采矿背包不足自动变卖银币所得</option>
+		<option value="106" {% if ctype == 106 %}selected="selected"{% endif %}>主线战斗胜利奖励</option>
+
+		<option value="107" {% if ctype == 107 %}selected="selected"{% endif %}>首次充值</option>
+		<option value="201" {% if ctype == 201 %}selected="selected"{% endif %}>武器升级</option>
+		<option value="204" {% if ctype == 204 %}selected="selected"{% endif %}>竞技场挑战奖励</option>
+		<option value="205" {% if ctype == 205 %}selected="selected"{% endif %}>同盟铭刻</option>
+
+		<option value="301" {% if ctype == 301 %}selected="selected"{% endif %}>元宝摇钱树</option>
+		<option value="302" {% if ctype == 302 %}selected="selected"{% endif %}>摇钱树银元</option>
+
+			</select>
+			<button type="button" class="btn" href="{{ url_for('user.server_all_coin_time') }}" onclick="GAME.load.coin_time(this,'day')">按日统计</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_all_coin_time') }}" onclick="GAME.load.coin_time(this,'month')">按月统计</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_all_coin_time') }}" onclick="GAME.load.coin_time(this,'year')">按年统计</button>
+			<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

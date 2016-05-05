@@ -1,0 +1,1284 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block subjs-%}
+<script type="text/javascript">
+
+Task_Action_none 		= 0;
+Task_Action_talk		= 1;
+Task_Action_move		= 2;
+Task_Action_moveToNPC	= 3;
+Task_Action_addNpc		= 4;
+Task_Action_moveNpc		= 5;
+Task_Action_removeNpc	= 6;
+Task_Action_effects		= 7;
+Task_Action_unlock		= 8;
+Task_Action_stage		= 9;
+Task_Action_fight		= 10;
+Task_Action_fightAction = 11;
+Task_Action_openMap     = 12;
+Task_Action_startChapter= 13;
+
+var stages = {{ stage_ret|safe }};
+var npcs = {{ npc_ret|safe }};
+var maps = {{ map_ret|safe }};
+var fights = {{ fight_ret|safe }};
+var roles = {{ role_ret|safe }};
+var pos = {{ pos_ret|safe }};
+var chapters = {{ chapter_ret|safe }};
+
+//TODO test task data
+
+var targetTask = {};
+targetTask['id'] = 1;
+targetTask['name'] = '{{ ret["name"] }}';
+targetTask['icon'] = '{{ ret["icon"] }}';
+targetTask['type'] = parseInt("{{ ret['type'] }}");
+targetTask['nextId'] = parseInt("{{ ret['nextId'] }}");
+targetTask['rid'] = parseInt("{{ ret['rid'] }}");
+targetTask['info'] = '{{ ret["info"]|safe }}';
+targetTask['unlock'] = '{{ ret["unlock"]|safe }}';
+targetTask['step'] = '{{ ret["step"]|safe }}'
+
+function getTaskUnlockConditionHtml(){
+	var str = '<div id="unlosk_condition_condition">';
+	str += '<select id="unlosk_condition_type" style="width: 150px;">\
+			<option value="tid">已完成任务id</option>\
+			<option value="level">玩家级数</option>\
+			<option value="role">玩家有角色id</option>\
+			<option value="obj">玩家有物品id</option>\
+			<option value="equ">玩家有装备id</option>\
+			<option value="auto">自动</option>\
+			</select>';
+	str += '<input type="text" id="unlosk_condition_value" placeholder="int">';
+	str += '<button id="unlosk_condition_remove" type="button" class="btn">删除解锁条件</button>';
+	str += '</div>';
+	return str;
+}
+
+function addTaskUnlockConditionEvent(){
+	var target = $('#unlosk_condition').find('#unlosk_condition_condition').last();
+	target.find('#unlosk_condition_remove').click(function(){
+		if(confirm('确实要删除这个解锁条件吗?')){
+			$(this).parent().remove();
+		}
+	});
+}
+
+function getOptionTagHtml(ary){
+	var result = '';
+	
+	for(var i=0;i<ary.length;i++){
+		result += '<option value="'+ary[i]['_id']+'">'+ary[i]['_id']+'-'+ary[i]['name']+'</option>';
+	}
+	//alert(result)
+	return result;
+}
+
+function getTaskActionHtml(){
+	var string = '<div id="task_step" style="margin-bottom: 20px; background: none repeat scroll 0% 0% rgb(204, 204, 204); padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">';
+	string +=	'<select id="task_step_action" style="width: 600px;">\
+			  	<option value="1">task_action_talk 对话</option>\
+			    <option value="2">task_action_move 移动</option>\
+			    <option value="3">task_action_moveToNPC 移动到npc面前</option>\
+			    <option value="4">task_action_addNpc 添加NPC</option>\
+			    <option value="5">task_action_moveNpc 移动NPC</option>\
+			    <option value="6">task_action_removeNpc 删除NPC</option>\
+			    <option value="7">task_action_effects 播放效果</option>\
+			    <option value="8">task_action_unlock 解锁</option>\
+			    <option value="9">task_action_stage 进入副本</option>\
+			    <option value="10">task_action_fight 进入战斗</option>\
+			    <option value="11">task_action_fightAction 定制战斗</option>\
+			    <option value="12">task_action_openMap 修改地图</option>\
+			    <option value="13">task_action_startChapter 开启章节</option>\
+			</select>';
+	string +=	'<select id="task_auto_select" style="width: 100px;">\
+			  	<option value="0">0－不自动</option>\
+			    <option value="1">1－自动</option>\
+			</select>';
+	string +=   'ICON:<input type="text" id="task_icon" class="input-small"></input>';
+	string +=	'<button type="button" class="btn" id="task_step_remove">移除</button>'
+	string +=	'<button type="button" class="btn" id="task_step_insert" onclick="actionInsert(this)" val="testtt">上面插入</button>'
+	string += '<div Id="task_step_content" style="padding-left: 20px; padding-top: 10px; background: none repeat scroll 0px 0px rgb(170, 170, 170); padding-bottom: 10px; margin-top: 5px;"></div>';
+	string += '</div>';
+	return string;
+}
+
+function getTaskTalkMainHtml(){
+    var result = '';
+    result += '地图ID：<select id="task_step_talk_main_mid">';
+    result += getOptionTagHtml(maps);
+    result += '</select>';
+    result += 'NPCID：<select id="task_step_talk_main_mid">';
+    result += getOptionTagHtml(npcs);
+    result += '</select>';
+}
+
+function getTaskMessageTargetHtml(){
+	var result = '';
+	result += '<div id="msgs_target">';
+	result += '角色:';
+	result += '<select id="action_talk_msg_rid" >';
+	result += '<option value=""></option>';
+	result += '<option value="0">主角</option>';
+	result += getOptionTagHtml(roles);
+	result += '</select>';
+	result += 'NPC:';
+	result += '<select id="action_talk_msg_nid" >';
+	result += '<option value="0"></option>';
+	result += getOptionTagHtml(npcs);
+	result += '</select>';
+	result += '头像方向:';
+	result += '<select id="action_talk_msg_dir" class="span2">\
+				<option value="1">左</option>\
+				<option value="2">右</option>\
+				</select>';
+	result += '<input type="text" id="action_talk_msg_msg" style="width:60%; font-size: 12px; margin-bottom: 0px;"></input>';
+	result += '<button type="button" class="btn" id="action_talk_msg_remove">移除对话</button>';
+	result += '</div>';
+	
+	return result;
+}
+
+function getTaskStageProcessActionHtml(){
+	
+	var action = '<div id="process_target_action" style="background: none repeat scroll 0% 0% rgb(204, 204, 204); margin-bottom: 10px; padding-top: 10px; padding-left: 10px; padding-bottom: 10px;">\
+					<button type="button" class="btn" id="task_step_stage_process_action_remove">移除子过程</button>\
+					<select id="task_step_stage_process_action_type" >\
+			  		<option value="1">task_action_talk 对话</option>\
+				    <option value="4">task_action_addNpc 添加NPC</option>\
+				    <option value="6">task_action_removeNpc 删除NPC</option>\
+				    <option value="7">task_action_effects 播放效果</option>\
+					</select>\
+					<div id="process_target_action_content" style="margin-top: 5px;"></div></div>';
+	return action;
+}
+
+function getTaskStageProcessHtml(){
+	
+	var action = getTaskStageProcessActionHtml();
+	
+	var result = '';
+	result += '<div id="process_target" style="background: none repeat scroll 0px 0px rgb(136, 136, 136); margin-top: 10px; margin-bottom: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">';
+	
+	result += '<div style="padding-top: 5px; padding-left: 5px; padding-bottom: 5px;">';
+	result += '过程------------------------------>';
+	result += 'index<select id="task_step_stage_process_index" >\
+			  		<option value="0">每1场</option>\
+				    <option value="1">每2场</option>\
+				    <option value="2">每3场</option>\
+				    <option value="3">每4场</option>\
+				    <option value="4">每5场</option>\
+					</select>';
+	
+	result += '<button type="button" class="btn" id="action_talk_stage_process_remove">移除</button>';
+	result += '</div>';
+	
+	result += '<div style="padding-top: 5px; padding-left: 5px; padding-bottom: 5px; background: none repeat scroll 0% 0% rgb(119, 119, 119);">战斗前:</div>';
+	result += '<div id="process_target_before" style="margin-bottom: 10px;">';
+	result += '<div id="process_target_action_all" style="padding-left: 20px; padding-top: 10px; padding-bottom: 5px; background: none repeat scroll 0% 0% rgb(255, 255, 255); margin-bottom: 5px;">';
+	result += ''+action;
+	result += '</div>';
+	result += '<button type="button" class="btn" id="action_talk_stage_process_action_add">添加子过程</button>';
+	result += '</div>';
+	
+	result += '<div style="padding-top: 5px; padding-left: 5px; padding-bottom: 5px; background: none repeat scroll 0% 0% rgb(119, 119, 119);">战斗后:</div>';
+	result += '<div id="process_target_behind">';
+	result += '<div id="process_target_action_all" style="padding-left: 20px; padding-top: 10px; padding-bottom: 5px; background: none repeat scroll 0% 0% rgb(255, 255, 255); margin-bottom: 5px;">';
+	result += ''+action;
+	result += '</div>';
+	result += '<button type="button" class="btn" id="action_talk_stage_process_action_add">添加子过程</button>';
+	result += '</div>';
+	
+	result += '</div>';
+	return result;
+}
+
+function getTaskEffectOther(action){
+	if(action==13 || action==14){
+		result = 'NPCID:';
+		result += '<select id="action_talk_effect_other_npcid" class="span2">';
+		result += getOptionTagHtml(npcs);
+		result += '</select>';
+		result += 'effect1:';
+		result += '<input type="text" id="action_talk_effect_other_effect1" class="input-small">';
+		result += 'effect2:';
+		result += '<input type="text" id="action_talk_effect_other_effect2" class="input-small">';
+        result += '偏移量:';
+        result += '<input type="text" id="action_talk_effect_other_offsety" class="input-small">';
+	}else{
+		result = '<input type="text" id="action_talk_effect_other_other" class="input-small">';
+	}
+	return result;
+}
+
+function addEventToMessageTarget(target){
+	$(target).find('#action_talk_msg_remove').click(function(){
+		if(confirm('确实要删除这个对话吗?')){
+			$(target).remove();
+		}
+	});
+	
+	//action_talk_msg_add
+}
+
+function addEventToStageProcessTarget(target){
+	$(target).find('#action_talk_stage_process_remove').click(function(){
+		if(confirm('确实要删除这个副本过程吗?')){
+			$(target).remove();
+		}
+	});
+	
+	$(target).find('#action_talk_stage_process_action_add').click(function(){
+		var parent = $(this).parent();
+		parent.find('#process_target_action_all').append(getTaskStageProcessActionHtml());
+		addEventToStageProcessTargetAction(parent);
+	});
+	
+	addEventToStageProcessTargetAction(target.find('#process_target_before'));
+	addEventToStageProcessTargetAction(target.find('#process_target_behind'));
+	
+}
+
+function addEventToStageProcessTargetAction(target){
+	
+	var cer = $(target).find('#process_target_action_all');
+	cer = cer.find('#process_target_action').last();
+	
+	cer.find('#task_step_stage_process_action_remove').click(function(){
+		var parent = $(this).parent();
+		if(confirm('确实要删除这个子过程吗?')){
+			parent.remove();
+		}
+	});
+	
+	$(cer).find('#task_step_stage_process_action_type').get(0).selectedIndex = -1;
+	$(cer).find('#task_step_stage_process_action_type').change(function(){
+		
+		var parent = $(this).parent();
+		var action = $(this).find("option:selected").val();
+		parent.find('#process_target_action_content').html(getTaskContentHtml(action));
+		
+		addEventToTarget(action,parent.find('#process_target_action_content'));
+	});
+	
+}
+
+function getContentItem(){
+	result = '<div id="contentItem">';
+	result += '角色id:';
+	result += '<select id="action_talk_fightAction_rid" class="span2">';
+	result += getOptionTagHtml(roles);
+	result += '</select>'; 
+	result += '角色等级:<input type="text" id="action_talk_fightAction_rlevel" class="input-big" placeholder="int">';
+	result += '角色位置:';
+	result += '<select id="action_talk_fightAction_s" class="span2">';
+	result += '<option value="s1">s1</option>';
+	result += '<option value="s2">s2</option>';
+	result += '<option value="s3">s3</option>';
+	result += '<option value="s4">s4</option>';
+	result += '<option value="s5">s5</option>';
+	result += '<option value="s6">s6</option>';
+	result += '<option value="s7">s7</option>';
+	result += '<option value="s8">s8</option>';
+	result += '<option value="s9">s9</option>';
+	result += '<option value="s10">s10</option>';
+	result += '<option value="s11">s11</option>';
+	result += '<option value="s12">s12</option>';
+	result += '<option value="s13">s13</option>';
+	result += '<option value="s14">s14</option>';
+	result += '<option value="s15">s15</option>';
+	result += '</select>'; 
+	result += '是否队长:';
+	result += '<select id="action_talk_fightAction_isCap" class="span2">';
+	result += '<option value="0">否</option>';
+	result += '<option value="1">是</option>';
+	result += '</select>'; 
+	result += '<button type="button" class="btn" id="action_talk_fightAction_content_remove">移除</button>';
+	result += '</div>'; 
+	return result;
+}
+
+function getTaskContentHtml(action){
+	
+	var result = '';
+	
+	if(action==Task_Action_talk){
+		result += '<div id="action_talk_msgs">';
+        result += '<div id="task_step_talk_main_content">';
+        result += '地图ID：<select id="task_step_talk_main_mid">';
+        result += '<option value=""></option>';
+        result += getOptionTagHtml(maps);
+        result += '</select>';
+        result += 'NPCID：<select id="task_step_talk_main_nid">';
+        result += '<option value=""></option>';
+        result += getOptionTagHtml(npcs);
+        result += '</select>';
+        result += '</div><br />';
+		result += '<div id="msgs">';
+		result += getTaskMessageTargetHtml();
+		result += '</div>';
+		result += '<button type="button" class="btn" id="action_talk_msg_add">添加对话</button>';
+		result += '</div>';
+		return result;
+	}
+	
+	if(action==Task_Action_move){
+		result += '<div id="action_talk_move">';
+		result += '地图:';
+		result += '<select id="action_talk_move_mapid" class="span2">';
+		result += getOptionTagHtml(maps);
+		result += '</select>';
+		result += '位置:';
+		result += 'X:<input type="text" id="action_talk_move_x" class="input-big" placeholder="int">';
+		result += 'Y:<input type="text" id="action_talk_move_y" class="input-big" placeholder="int">';
+		result += '</div>';
+		return result;
+	}
+	
+	if(action==Task_Action_moveToNPC){
+		result += '<div id="action_talk_movetonpc">';
+		result += '地图:';
+		result += '<select id="action_talk_movetonpc_mapid" class="span2">';
+		result += getOptionTagHtml(maps);
+		result += '</select>';
+		
+		result += 'NPC:';
+		result += '<select id="action_talk_movetonpc_npcid" class="span2">';
+		result += getOptionTagHtml(npcs);
+		result += '</select>';
+		
+		result += '</div>';
+		return result;
+	}
+	////////////////////////////////////////////////////////////////////////
+	if(action==Task_Action_addNpc){
+		result += '<div id="action_talk_addnpc">';
+		result += '地图:';
+		result += '<select id="action_talk_addnpc_mapid" class="span2">';
+		result += getOptionTagHtml(maps);
+		result += '</select>';
+					
+		result += 'NPC:';
+		result += '<select id="action_talk_addnpc_npcid" class="span2">';
+		result += getOptionTagHtml(npcs);
+		result += '</select>';
+		
+		result += '位置:';
+		result += 'X:<input type="text" id="action_talk_addnpc_x" class="input-big" placeholder="int">';
+		result += 'Y:<input type="text" id="action_talk_addnpc_y" class="input-big" placeholder="int">';
+		result += '<select id="action_talk_movenpc_npcid_direction" class="span2">';
+		result += '<option value="1">右（1）</option>';
+		result += '<option value="-1">左（－1）</option>';
+		result += '</select>';
+		result += '</div>';
+		return result;
+	}
+	
+	if(action==Task_Action_moveNpc){
+		result += '<div id="action_talk_movenpc">';
+		result += '地图:';
+		result += '<select id="action_talk_movenpc_mapid" class="span2">';
+		result += getOptionTagHtml(maps);
+		result += '</select>';
+		
+		result += 'NPC:';
+		result += '<select id="action_talk_movenpc_npcid" class="span2">';
+		result += getOptionTagHtml(npcs);
+		result += '</select>';
+		
+		result += '位置:';
+		result += 'X:<input type="text" id="action_talk_movenpc_x" class="input-big" placeholder="int">';
+		result += 'Y:<input type="text" id="action_talk_movenpc_y" class="input-big" placeholder="int">';
+		result += '<select id="action_talk_movenpc_npcid_direction" class="span2">';
+		result += '<option value="1">右（1）</option>';
+		result += '<option value="-1">左（－1）</option>';
+		result += '</select>';
+		result += '</div>';
+		return result;
+	}
+	
+	if(action==Task_Action_removeNpc){
+		result += '<div id="action_talk_removenpc">';
+		result += '地图:';
+		result += '<select id="action_talk_removenpc_mapid" class="span2">';
+		result += getOptionTagHtml(maps);
+		result += '</select>';
+		result += 'NPC:';
+		result += '<select id="action_talk_removenpc_npcid" class="span2">';
+		result += getOptionTagHtml(npcs);
+		result += '</select>';
+		result += '</div>';
+		return result;
+	}
+	
+	////////////////////////////////////////////////////////////////////////
+	
+	if(action==Task_Action_effects){
+		result += '<div id="action_talk_effect">';
+		result += '效果:';
+		result += '<select id="action_talk_effect_id" class="span2">\
+					<option value="1">晃动</option>\
+					<option value="2">闪屏</option>\
+					<option value="3">放大屏幕</option>\
+					<option value="4">缩少屏幕</option>\
+					<option value="5">滚动字体 (全屏黑屏,中间滚动文本)</option>\
+					<option value="6">屏幕信息 (全屏黑屏,中间提示文本)</option>\
+					<option value="7">读条 (屏幕中间提示进度,显示过度文本)</option>\
+					<option value="8">显示游戏UI</option>\
+					<option value="9">隐藏游戏UI</option>\
+					<option value="10">提示章节</option>\
+					<option value="11">白屏</option>\
+					<option value="12">角色加入</option>\
+					<option value="13">播放npc动画</option>\
+					<option value="14">播放角色动画</option>\
+					<option value="15">晃动不关闭弹出框</option>\
+					<option value="16">插画</option>\
+					</select>';
+		result += '<br />other:<div id="action_talk_effect_other"></div>';
+		result += '</div>';
+		return result;
+	}
+	if(action==Task_Action_unlock){
+		result += '<div id="action_talk_unlock">';
+		result += '解锁系统功能:';
+		result += '<select id="action_talk_unlock_id" class="span2">\
+		            <option value="21">竞技场</option>\
+		            <option value="20">深渊</option>\
+		            <option value="19">同伴</option>\
+					<option value="18">隐藏任务</option>\
+					<option value="17">悬赏任务</option>\
+					<option value="16">支线任务</option>\
+					<option value="15">世界boss</option>\
+					<option value="14">采矿</option>\
+					<option value="13">修练</option>\
+					<option value="12">同盟</option>\
+					<option value="11">日常</option>\
+					<option value="10">钓鱼</option>\
+					<option value="9">社交</option>\
+					<option value="8">时光盒</option>\
+					<option value="7">观星</option>\
+					<option value="6">武器</option>\
+					<option value="5">商人</option>\
+					<option value="4">食馆</option>\
+					<option value="3">锻造</option>\
+					<option value="2">点将</option>\
+					<option value="1">阵型</option>\
+					</select>';
+		result += 'info:';
+		result += '<input type="text" id="action_talk_unlock_info" class="input-big">';
+		result += '</div>';
+		return result;
+	}
+	
+	////////////////////////////////////////////////////////////////////////
+	
+	if(action==Task_Action_stage){
+		result += '<div id="Task_Action_stage">';
+		result += '进入副本:';
+		
+		result += '<select id="Task_Action_stage_id" class="span2">';
+		result += getOptionTagHtml(stages);
+		result += '</select>';
+		
+		result += '<div id="Task_Action_stage_process" style="">';
+		result += '<div id="process">';
+		result += getTaskStageProcessHtml();
+		result += '</div>';
+		result += '</div>';
+		
+		result += '<button type="button" id="action_talk_stage_process_add" style="height: 30px; margin-right: auto; width: 96%; margin-left: 2%; font-size: 16px;" >添加副本过程</button>';
+		result += '<br>';
+		result += '</div>';
+		return result;
+	}
+	if(action==Task_Action_fight){
+		result += '<div id="action_talk_fight">';
+		result += '进入战斗:';
+		result += '<select id="action_talk_fight_id" class="span2">';
+		result += getOptionTagHtml(fights);
+		result += '</select>';
+		result += '</div>';
+		return result;
+	}
+	if(action==Task_Action_fightAction){
+		result += '战斗id:';
+		result += '<select id="action_talk_fightAction_fid" class="span2">';
+		result += getOptionTagHtml(fights);
+		result += '</select>';
+		result += 'position_id:';
+		result += '<select id="action_talk_fightAction_posId" class="span2">';
+		result += getOptionTagHtml(pos);
+		result += '</select>'; 
+		result += '阵型等级：<input type="text" id="action_talk_fightAction_posLevel" class="input-small">';
+		result += '<button type="button" class="btn" id="action_talk_fightAction_content_add">添加</button>'
+		result += '<div id="action_talk_fightAction_content"></div>';
+		return result;
+	}
+    if(action==Task_Action_openMap){
+        result += '<div id="Task_Action_openMap_content">';
+        result += '章节ID:';
+        result += '<select id="Task_Action_openMap_cid" class="span2">';
+        result += getOptionTagHtml(chapters);
+        result += '</select>';
+        result += '设置地图:';
+        result += '<select id="Task_Action_openMap_mid" class="span2">';
+        result += getOptionTagHtml(maps);
+        result += '</select>';
+        result += '</div>';
+        return result;
+    }
+    if(action=Task_Action_startChapter){
+        result += '<div id="Task_Action_startChapter_content">';
+        result += '章节ID:';
+        result += '<select id="Task_Action_startChapter_cid" class="span2">';
+        result += '<option value="101">章节一</option>';
+        result += '<option value="102">章节二</option>';
+        result += '<option value="103">章节三</option>';
+        result += '<option value="104">章节四</option>';
+        result += '</select>';
+        result += '设置地图:';
+        result += '<select id="Task_Action_startChapter_mid" class="span2">';
+        result += getOptionTagHtml(maps);
+        result += '</select>';
+        result += '</div>';
+        return result;
+    }
+	
+	return '';
+}
+
+function addTaskMessage(msgs){
+	msgs.append(getTaskMessageTargetHtml());
+	addEventToMessageTarget($(msgs).find('#msgs_target').last());
+}
+function addTaskFightProcess(process){
+	process.append(getTaskStageProcessHtml());
+	addEventToStageProcessTarget($(process).find('#process_target').last());
+}
+
+function addEventToTarget(action,target){
+	if(action==Task_Action_talk){
+		var msgs = $(target).find('#msgs');
+		addEventToMessageTarget($(msgs).find('#msgs_target').last());
+		
+		$(target).find('#action_talk_msg_add').click(function(){
+			addTaskMessage(msgs);
+		});
+	}
+	if(action==Task_Action_stage){
+		var process = $(target).find('#process');
+		addEventToStageProcessTarget($(process).find('#process_target').last());
+		
+		$(target).find('#action_talk_stage_process_add').click(function(){
+			var c = process.children();
+			if(c.length>=5){
+				return;
+			}
+			addTaskFightProcess(process);
+		});
+	}
+	if(action==Task_Action_effects){
+		$(target).find('#action_talk_effect_id').change(function(){
+			$(target).find('#action_talk_effect_other').html(getTaskEffectOther($(this).val()));
+		});
+	}
+	if(action == Task_Action_fightAction){
+		var content = $(target).find('#action_talk_fightAction_content');
+		$(target).find('#action_talk_fightAction_content_add').click(function(){
+			addFightActionItem(content);
+		});
+		
+		
+	}
+}
+
+function addFightActionItem(obj){
+	obj.append(getContentItem());
+	addEventToFightActionItem(obj)
+}
+
+function addEventToFightActionItem(obj){
+	var item = $(obj).find('#contentItem').last();
+	item.find('#action_talk_fightAction_content_remove').click(function(){
+		item.remove();
+	})
+}
+
+function addEventToEffectsTask(obj){
+	$(obj).find('#action_talk_effect_id').change(function(){
+		if(confirm('确实要删除这个对话吗?')){
+			$(target).remove();
+		}
+	});
+}
+
+function addEventToTaskAction(){
+	var step = $("#steps #task_step").last();
+	step.find('#task_step_action').change(function(){
+		var action = $(this).find("option:selected").val();
+		step.find('#task_step_content').html(getTaskContentHtml(action));
+		addEventToTarget(action,step.find('#task_step_content'));
+		
+	});
+	step.find('#task_step_action').get(0).selectedIndex=-1;
+	
+	step.find('#task_step_remove').click(function(){
+		if(confirm('确实要删除这个过程吗?')){
+			$(step).remove();
+		}
+	});
+	return step;
+}
+
+function actionInsert(obj){
+	$(obj).parent().before(getTaskActionHtml());
+	var step = $(obj).parent().prev();
+	step.find('#task_step_action').change(function(){
+		var action = $(this).find("option:selected").val();
+		step.find('#task_step_content').html(getTaskContentHtml(action));
+		addEventToTarget(action,step.find('#task_step_content'));
+		
+	});
+	step.find('#task_step_action').get(0).selectedIndex=-1;
+	
+	step.find('#task_step_remove').click(function(){
+		if(confirm('确实要删除这个过程吗?')){
+			$(step).remove();
+		}
+	});
+}
+
+$(document).ready(function(){
+	
+	//TODO add event
+	$("#add-step").click(function(){
+		$("#steps").append(getTaskActionHtml());
+		addEventToTaskAction();
+	});
+	
+	$('#task-submit').click(function(){
+		var step = getSteps();
+		var unlock = getTaskUnlockCondition();
+		var id = "{{ ret['_id'] }}";
+		var name = $("#name").val();
+		var icon = $("#icon").val();
+		var type = $("#type").val();
+		var rid = $("#rid").val();
+		var nextId = $("#nextId").val();
+		var info = $("#info").val();
+		var url = "{{ url_for('admin.admin_task_save')}}";
+		$.post(url,{
+			id:id,name:name,icon:icon,type:type,rid:rid,nextId:nextId,step:step,info:info,unlock:unlock
+		},function(d){
+			if (d['success']=='0'){
+				alert('更改失败');
+			}
+		});
+	})
+	
+	$('#unlosk_condition_add').click(function(){
+		$('#unlosk_condition').append(getTaskUnlockConditionHtml());
+		addTaskUnlockConditionEvent();
+	});
+	
+	//TODO init data
+	if(targetTask){
+		if(targetTask['unlock']){
+			var unlocks = targetTask['unlock'].split('|');
+			for(var i=0;i<unlocks.length;i++){
+				$('#unlosk_condition').append(getTaskUnlockConditionHtml());
+				addTaskUnlockConditionEvent();
+				
+				var target = $('#unlosk_condition').find('#unlosk_condition_condition').last();
+				var unlock = unlocks[i];
+				var kv = unlock.split(':');
+				
+				if(kv[0]=='task'){ $(target).find('#unlosk_condition_type').get(0).selectedIndex = 0; }
+				if(kv[0]=='level'){ $(target).find('#unlosk_condition_type').get(0).selectedIndex = 1; }
+				if(kv[0]=='role'){ $(target).find('#unlosk_condition_type').get(0).selectedIndex = 2; }
+				if(kv[0]=='obj'){ $(target).find('#unlosk_condition_type').get(0).selectedIndex = 3; }
+				if(kv[0]=='equ'){ $(target).find('#unlosk_condition_type').get(0).selectedIndex = 4; }
+				if(kv[0]=='auto'){ $(target).find('#unlosk_condition_type').get(0).selectedIndex = 5; }
+				if(kv[0] == 'level'){
+					var unlock = unlock.replace('level:','');
+					$(target).find('#unlosk_condition_value').val(unlock);
+				}else{
+					$(target).find('#unlosk_condition_value').val(kv[1]);
+				}
+			}
+		}
+		if(targetTask['step']){
+			var process = eval('(' + targetTask['step'] + ')');
+			var steps = process['step'];
+			for(var i=0;i<steps.length;i++){
+				$("#steps").append(getTaskActionHtml());
+				var step = addEventToTaskAction();
+				
+				var targetStep = steps[i];
+				var action = targetStep['action'];
+				var data = targetStep['data'];
+				step.find('#task_auto_select').val(targetStep['auto']);
+				step.find('#task_icon').val(targetStep['icon']);
+				checkSelectOption(step.find('#task_step_action'),action);
+				
+				var content = step.find('#task_step_content');
+				content.html(getTaskContentHtml(action));
+				addEventToTarget(action,content);
+				if(action==Task_Action_talk || action==Task_Action_stage){
+					
+					if(action==Task_Action_talk){
+						
+						var msgs = $(content).find('#msgs');
+						$(msgs).find('#msgs_target').last().remove();
+                        if('ret' in targetStep){
+                            var main_mid_nid = $(content).find('#task_step_talk_main_content')
+                            checkSelectOption(main_mid_nid.find('#task_step_talk_main_mid'),targetStep['ret']['mid']);
+                            checkSelectOption(main_mid_nid.find('#task_step_talk_main_nid'),targetStep['ret']['nid']);
+                        }
+						for(var m=0;m<data.length;m++){
+							addTaskMessage(msgs);
+							
+							var msg = data[m];
+							var message = $(msgs).find('#msgs_target').last();
+							
+							checkSelectOption(message.find('#action_talk_msg_rid'),msg['rid']);
+							checkSelectOption(message.find('#action_talk_msg_nid'),msg['nid']);
+							checkSelectOption(message.find('#action_talk_msg_dir'),msg['dir']);
+							message.find('#action_talk_msg_msg').val(msg['msg']);
+							
+						}
+					}
+					
+					if(action==Task_Action_stage){
+						
+						checkSelectOption(content.find('#Task_Action_stage_id'),data['sid']);
+						
+						var process = $(content).find('#process');
+						var processAll = data['process'];
+						
+						if(processAll.length>0){
+							$(process).find('#process_target').last().remove();
+						}
+						
+						for(var m=0;m<processAll.length;m++){
+							addTaskFightProcess(process);
+							var last = $(process).find('#process_target').last();
+							var tp = processAll[m];
+							
+							checkSelectOption(last.find('#task_step_stage_process_index'),tp['index']);
+							addTaskSecProess(tp['before'],last.find('#process_target_before'));
+							addTaskSecProess(tp['behind'],last.find('#process_target_behind'));
+							
+						}
+					}
+				}else{
+					if(action==Task_Action_move){
+						checkSelectOption(content.find('#action_talk_move_mapid'),data['mapId']);
+						content.find('#action_talk_move_x').val(checkPointValue(data['point'],'x'));
+						content.find('#action_talk_move_y').val(checkPointValue(data['point'],'y'));
+					}
+					if(action==Task_Action_moveToNPC){
+						checkSelectOption(content.find('#action_talk_movetonpc_mapid'),data['mapId']);
+						checkSelectOption(content.find('#action_talk_movetonpc_npcid'),data['npcId']);
+						
+						
+					}
+					if(action==Task_Action_addNpc){
+						checkSelectOption(content.find('#action_talk_addnpc_mapid'),data['mapId']);
+						checkSelectOption(content.find('#action_talk_addnpc_npcid'),data['npcId']);
+						checkSelectOption(content.find('#action_talk_movenpc_npcid_direction'),data['direction']);
+						
+						content.find('#action_talk_addnpc_x').val(checkPointValue(data['point'],'x'));
+						content.find('#action_talk_addnpc_y').val(checkPointValue(data['point'],'y'));
+					}
+					if(action==Task_Action_moveNpc){
+						checkSelectOption(content.find('#action_talk_movenpc_mapid'),data['mapId']);
+						checkSelectOption(content.find('#action_talk_movenpc_npcid'),data['npcId']);
+						content.find('#action_talk_movenpc_x').val(checkPointValue(data['point'],'x'));
+						content.find('#action_talk_movenpc_y').val(checkPointValue(data['point'],'y'));
+						checkSelectOption(content.find('#action_talk_movetonpc_npcid_direction'),data['direction']);
+					}
+					if(action==Task_Action_removeNpc){
+						checkSelectOption(content.find('#action_talk_removenpc_mapid'),data['mapId']);
+						checkSelectOption(content.find('#action_talk_removenpc_npcid'),data['npcId']);
+					}
+					if(action==Task_Action_effects){
+						checkSelectOption(content.find('#action_talk_effect_id'),data['eid']);
+						content.find('#action_talk_effect_other').html(getTaskEffectOther(data['eid']));
+						if(data['eid']==13 || data['eid']==14){
+							content.find('#action_talk_effect_other #action_talk_effect_other_npcid').val(data['other']['npcid']);
+							content.find('#action_talk_effect_other #action_talk_effect_other_effect1').val(data['other']['effect1']);
+							content.find('#action_talk_effect_other #action_talk_effect_other_effect2').val(data['other']['effect2']);
+                            content.find('#action_talk_effect_other #action_talk_effect_other_offsety').val(data['other']['offsety']);
+
+						}else{
+							content.find('#action_talk_effect_other #action_talk_effect_other_other').val(data['other']);
+						}
+					}
+					if(action==Task_Action_unlock){
+						checkSelectOption(content.find('#action_talk_unlock_id'),data['unlockID']);
+						content.find('#action_talk_unlock_info').val(data['unlockInfo']);
+					}
+					if(action==Task_Action_fight){
+						checkSelectOption(content.find('#action_talk_fight_id'),data['fid']);
+					}
+					if(action==Task_Action_fightAction){
+						checkSelectOption(content.find('#action_talk_fightAction_fid'),data['fid']);
+						content.find('#action_talk_fightAction_posId').val(data['posId']);
+						content.find('#action_talk_fightAction_posLevel').val(data['posLevel']);
+						for(var j=0;j<data['roles'].length;j++){
+							itemContent = content.find('#action_talk_fightAction_content');
+							addFightActionItem(itemContent);
+							var lastItem = itemContent.find('#contentItem').last();
+							lastItem.find('#action_talk_fightAction_rid').val(data['roles'][j]['rid']);
+							lastItem.find('#action_talk_fightAction_rlevel').val(data['roles'][j]['rlevel']);
+							lastItem.find('#action_talk_fightAction_s').val(data['roles'][j]['s']);
+							lastItem.find('#action_talk_fightAction_isCap').val(data['roles'][j]['isCap']);
+						}
+					}
+                    if(action==Task_Action_openMap){
+                        checkSelectOption(content.find('#Task_Action_openMap_cid'),data['cid']);
+                        checkSelectOption(content.find('#Task_Action_openMap_mid'),data['mid']);
+                    }
+                    if(action==Task_Action_startChapter){
+                        checkSelectOption(content.find('#Task_Action_startChapter_cid'),data['cid']);
+                        checkSelectOption(content.find('#Task_Action_startChapter_mid'),data['mid']);
+                    }
+				}
+			}
+		}
+	}
+	
+});
+
+function addTaskSecProess(data, target){
+	
+	if(!data) return;
+	
+	if(data.length>0) $(target).find('#process_target_action').remove();
+	for(var i=0;i<data.length;i++){
+		
+		target.find('#process_target_action_all').append(getTaskStageProcessActionHtml());
+		addEventToStageProcessTargetAction(target);
+		
+		var last = target.find('#process_target_action_all').find('#process_target_action').last();
+		var d = data[i];
+		var action = d['action'];
+		var td = d['data'];
+		
+		checkSelectOption(last.find('#task_step_stage_process_action_type'),action);
+		
+		var content = last.find('#process_target_action_content');
+		$(content).html(getTaskContentHtml(action));
+		
+		addEventToTarget(action,content);
+		
+		if(d['action']==Task_Action_talk){
+			
+			$(content).find('#msgs_target').remove();
+			var msgs = $(content).find('#msgs');
+            if ('ret' in d){
+                var main_mid_nid = $(content).find('#task_step_talk_main_content')
+                checkSelectOption(main_mid_nid.find('#task_step_talk_main_mid'),d['ret']['mid']);
+                checkSelectOption(main_mid_nid.find('#task_step_talk_main_nid'),d['ret']['nid']);
+            }
+			for(var m=0;m<td.length;m++){
+				addTaskMessage(msgs);
+				
+				var msg = td[m];
+				var message = $(msgs).find('#msgs_target').last();
+				
+				checkSelectOption(message.find('#action_talk_msg_rid'),msg['rid']);
+				checkSelectOption(message.find('#action_talk_msg_nid'),msg['nid']);
+				checkSelectOption(message.find('#action_talk_msg_dir'),msg['dir']);
+				message.find('#action_talk_msg_msg').val(msg['msg']);
+				
+			}
+			
+		}
+		if(d['action']==Task_Action_addNpc){
+			checkSelectOption(last.find('#action_talk_addnpc_mapid'),td['mapId']);
+			checkSelectOption(last.find('#action_talk_addnpc_npcid'),td['npcId']);
+			checkSelectOption(last.find('#action_talk_movenpc_npcid_direction'),td['direction']);
+			
+			last.find('#action_talk_addnpc_x').val(checkPointValue(td['point'],'x'));
+			last.find('#action_talk_addnpc_y').val(checkPointValue(td['point'],'y'));
+		}
+		if(d['action']==Task_Action_removeNpc){
+			checkSelectOption(last.find('#action_talk_removenpc_mapid'),td['mapId']);
+			checkSelectOption(last.find('#action_talk_removenpc_npcid'),td['npcId']);
+		}
+		if(d['action']==Task_Action_effects){
+			checkSelectOption(last.find('#action_talk_effect_id'),td['eid']);
+			last.find('#action_talk_effect_other').html(getTaskEffectOther(td['eid']))
+			if(td['eid']==13 || td['eid']==14){
+				last.find('#action_talk_effect_other #action_talk_effect_other_npcid').val(td['other']['npcid']);
+				last.find('#action_talk_effect_other #action_talk_effect_other_effect1').val(td['other']['effect1']);
+				last.find('#action_talk_effect_other #action_talk_effect_other_effect2').val(td['other']['effect2']);
+                last.find('#action_talk_effect_other #action_talk_effect_other_offsety').val(td['other']['offsety']);
+
+			}else{
+				last.find('#action_talk_effect_other #action_talk_effect_other_other').val(td['other']);
+			}
+		}
+		
+	}
+	
+	
+}
+
+function checkSelectOption(target,value){
+	var options = target.children('option');
+	for(var i=0;i<options.length;i++){
+		var option = options[i];
+		if(option.value==value){
+			target.get(0).selectedIndex = i;
+			return;
+		}
+	}
+}
+function checkPointValue(str,target){
+	str = str.replace(/{/,'');
+	str = str.replace(/}/,'');
+	var point = str.split(',');
+	if(target=='x') return parseIntAll(point[0]);
+	if(target=='y') return parseIntAll(point[1]);
+	return 0;
+}
+
+function getSteps(){
+	var result = [];
+	var steps = $('#steps').find('#task_step');
+	for(var i=0;i<steps.length;i++){
+		var step = steps[i];
+		var action = parseIntAll($(step).find('#task_step_action').find("option:selected").val());
+		var auto = parseInt($(step).find('#task_auto_select').find("option:selected").val());
+		var icon = $(step).find('#task_icon').val();
+		var target = getStepByAction(action, step, auto, icon);
+		if(target['data']){
+			result.push(target);
+		}
+	}
+	var data = {};
+	data['count'] = result.length;
+	data['step'] = result;
+	return JSON.stringify(data);
+}
+
+function getStepByAction(action,target,auto, icon){
+	data = {}
+	data['action'] = action;
+	data['auto'] = auto;
+	data['icon'] = icon
+	if(action==Task_Action_talk){
+		data['data'] = [];
+		var msgs = $(target).find('#msgs_target');
+        var main_mid_nid = $(target).find('#task_step_talk_main_content')
+        data['ret'] = {}
+        data['ret']['mid'] = $(main_mid_nid).find('#task_step_talk_main_mid').val()
+        data['ret']['nid'] = $(main_mid_nid).find('#task_step_talk_main_nid').val()
+		for(var i=0;i<msgs.length;i++){
+			var msg = msgs[i];
+			var obj = {};
+			obj['rid'] = parseIntAll($(msg).find('#action_talk_msg_rid').find("option:selected").val());
+			obj['nid'] = parseIntAll($(msg).find('#action_talk_msg_nid').find("option:selected").val());
+			obj['dir'] = parseIntAll($(msg).find('#action_talk_msg_dir').find("option:selected").val());
+			obj['msg'] = $(msg).find('#action_talk_msg_msg').val();
+			data['data'].push(obj);
+		}
+	}
+	if(action==Task_Action_move){
+		data['data'] = {};
+		var x = parseIntAll($(target).find('#action_talk_move_x').val());
+		var y = parseIntAll($(target).find('#action_talk_move_y').val());
+		data['data']['mapId'] = parseIntAll($(target).find('#action_talk_move_mapid').find("option:selected").val());
+		data['data']['point'] = '{'+x+','+y+'}';
+	}
+	if(action==Task_Action_moveToNPC){
+		data['data'] = {};
+		data['data']['mapId'] = parseIntAll($(target).find('#action_talk_movetonpc_mapid').find("option:selected").val());
+		data['data']['npcId'] = parseIntAll($(target).find('#action_talk_movetonpc_npcid').find("option:selected").val());
+		
+	}
+	
+	if(action==Task_Action_addNpc){
+		data['data'] = {};
+		data['data']['mapId'] = parseIntAll($(target).find('#action_talk_addnpc_mapid').find("option:selected").val());
+		data['data']['npcId'] = parseIntAll($(target).find('#action_talk_addnpc_npcid').find("option:selected").val());
+		data['data']['direction'] = parseIntAll($(target).find('#action_talk_movenpc_npcid_direction').find("option:selected").val());
+		var x = parseIntAll($(target).find('#action_talk_addnpc_x').val());
+		var y = parseIntAll($(target).find('#action_talk_addnpc_y').val());
+		data['data']['point'] = '{'+x+','+y+'}';
+	}
+	if(action==Task_Action_moveNpc){
+		data['data'] = {};
+		data['data']['mapId'] = parseIntAll($(target).find('#action_talk_movenpc_mapid').find("option:selected").val());
+		data['data']['npcId'] = parseIntAll($(target).find('#action_talk_movenpc_npcid').find("option:selected").val());
+		data['data']['direction'] = parseIntAll($(target).find('#action_talk_movenpc_npcid_direction').find("option:selected").val());
+		var x = parseIntAll($(target).find('#action_talk_movenpc_x').val());
+		var y = parseIntAll($(target).find('#action_talk_movenpc_y').val());
+		data['data']['point'] = '{'+x+','+y+'}';
+	}
+	if(action==Task_Action_removeNpc){
+		data['data'] = {};
+		data['data']['mapId'] = parseIntAll($(target).find('#action_talk_removenpc_mapid').find("option:selected").val());
+		data['data']['npcId'] = parseIntAll($(target).find('#action_talk_removenpc_npcid').find("option:selected").val());
+	}
+	if(action==Task_Action_effects){
+		data['data'] = {};
+		data['data']['eid'] = parseIntAll($(target).find('#action_talk_effect_id').find("option:selected").val());
+		if(data['data']['eid']==13 || data['data']['eid']==14){
+			data['data']['other'] = {}
+			if (data['data']['eid'] != 14){
+				data['data']['other']['npcid'] = $(target).find('#action_talk_effect_other #action_talk_effect_other_npcid').val();
+			}
+			data['data']['other']['effect1'] = $(target).find('#action_talk_effect_other #action_talk_effect_other_effect1').val();
+			data['data']['other']['effect2'] = $(target).find('#action_talk_effect_other #action_talk_effect_other_effect2').val();
+            data['data']['other']['offsety'] = $(target).find('#action_talk_effect_other #action_talk_effect_other_offsety').val();
+
+		}else{
+			data['data']['other'] = $(target).find('#action_talk_effect_other #action_talk_effect_other_other').val();
+		}
+	}
+	if(action==Task_Action_unlock){
+		data['data'] = {};
+		data['data']['unlockID'] = parseIntAll($(target).find('#action_talk_unlock_id').find("option:selected").val());
+		data['data']['unlockInfo'] = parseIntAll($(target).find('#action_talk_unlock_info').val());
+	}
+	
+	if(action==Task_Action_stage){
+		data['data'] = {};
+		data['data']['sid'] = parseIntAll($(target).find('#Task_Action_stage_id').find("option:selected").val());
+		data['data']['process'] = {};
+		data['data']['process'] = getTaskStageProcessData($(target).find('#process'));
+	}
+	if(action==Task_Action_fight){
+		data['data'] = {};
+		data['data']['fid'] = parseIntAll($(target).find('#action_talk_fight_id').find("option:selected").val());
+	}
+	if(action == Task_Action_fightAction){
+		data['data'] = {};
+		data['data']['fid'] = parseIntAll($(target).find('#action_talk_fightAction_fid').find("option:selected").val());
+		data['data']['posId'] = parseIntAll($(target).find('#action_talk_fightAction_posId').val());
+		data['data']['posLevel'] = parseIntAll($(target).find('#action_talk_fightAction_posLevel').val());
+		data['data']['roles'] = [];
+		var items = $(target).find('#action_talk_fightAction_content').find("#contentItem");
+		for (var i=0;i<items.length;i++){
+			var item = items[i];
+			var rid = $(item).find('#action_talk_fightAction_rid').val();
+			var rlevel = $(item).find('#action_talk_fightAction_rlevel').val();
+			var s = $(item).find('#action_talk_fightAction_s').val();
+			var isCap = $(item).find('#action_talk_fightAction_isCap').val();
+			data['data']['roles'].push({'rid':rid, 'rlevel':rlevel, 's':s, 'isCap':isCap});
+		}
+	}
+    if(action == Task_Action_openMap){
+        data['data'] = {};
+        data['data']['cid'] = parseIntAll($(target).find('#Task_Action_openMap_cid').find("option:selected").val());
+        data['data']['mid'] = parseIntAll($(target).find('#Task_Action_openMap_mid').find("option:selected").val());
+    }
+    if(action == Task_Action_startChapter){
+        data['data'] = {};
+        data['data']['cid'] = parseIntAll($(target).find('#Task_Action_startChapter_cid').find("option:selected").val());
+        data['data']['mid'] = parseIntAll($(target).find('#Task_Action_startChapter_mid').find("option:selected").val());
+    }
+	return data;
+}
+
+function getTaskStageProcessData(target){
+	var result = [];
+	
+	var allProcess = $(target).find('#process_target');
+	for(var i=0;i<allProcess.length;i++){
+		var data = {};
+		var process = allProcess[i];
+		
+		before = getTaskStageProcessActionData($(process).find('#process_target_before'));
+		behind = getTaskStageProcessActionData($(process).find('#process_target_behind'));
+		
+		if(before.length>0 || behind.length>0){
+			data['index'] = parseIntAll($(process).find('#task_step_stage_process_index').find("option:selected").val());
+			if(before.length>0) data['before'] = before;
+			if(behind.length>0) data['behind'] = behind;
+			result.push(data);
+		}
+		
+	}
+	
+	return result;
+}
+
+function getTaskStageProcessActionData(target){
+	var result = [];
+	var allActionBefore = $(target).find('#process_target_action');
+	for(var j=0;j<allActionBefore.length;j++){
+		
+		var action = allActionBefore[j];
+		var actionType = parseIntAll($(action).find('#task_step_stage_process_action_type').find("option:selected").val());
+		
+		if(actionType==Task_Action_talk){
+			var actionData = {};
+			actionData['action'] = actionType;
+			actionData['data'] = [];
+            var main_mid_nid = $(action).find('#task_step_talk_main_content')
+            actionData['ret'] = {}
+            actionData['ret']['mid'] = $(main_mid_nid).find('#task_step_talk_main_mid').val()
+            actionData['ret']['nid'] = $(main_mid_nid).find('#task_step_talk_main_nid').val()
+			var msgs = $(action).find('#msgs_target');
+			for(var i=0;i<msgs.length;i++){
+				var msg = msgs[i];
+				var obj = {};
+				obj['rid'] = parseIntAll($(msg).find('#action_talk_msg_rid').find("option:selected").val());
+				obj['nid'] = parseIntAll($(msg).find('#action_talk_msg_nid').find("option:selected").val());
+				obj['dir'] = parseIntAll($(msg).find('#action_talk_msg_dir').find("option:selected").val());
+				obj['msg'] = $(msg).find('#action_talk_msg_msg').val();
+				if(obj['msg'].length>0) actionData['data'].push(obj);
+			}
+			
+			result.push(actionData);
+		}
+		if(actionType==Task_Action_addNpc){
+			var actionData = {};
+			actionData['action'] = actionType;
+			actionData['data'] = {};
+			
+			actionData['data']['mapId'] = parseIntAll($(action).find('#action_talk_addnpc_mapid').find("option:selected").val());
+			actionData['data']['npcId'] = parseIntAll($(action).find('#action_talk_addnpc_npcid').find("option:selected").val());
+			
+			var x = parseIntAll($(action).find('#action_talk_addnpc_x').val());
+			var y = parseIntAll($(action).find('#action_talk_addnpc_y').val());
+			
+			actionData['data']['point'] = '{'+x+','+y+'}';
+			
+			result.push(actionData);
+		}
+		if(actionType==Task_Action_removeNpc){
+			var actionData = {};
+			actionData['action'] = actionType;
+			actionData['data'] = {};
+			
+			actionData['data']['mapId'] = parseIntAll($(action).find('#action_talk_removenpc_mapid').find("option:selected").val());
+			actionData['data']['npcId'] = parseIntAll($(action).find('#action_talk_removenpc_npcid').find("option:selected").val());
+			result.push(actionData);
+		}
+		if(actionType==Task_Action_effects){
+			var actionData = {};
+			actionData['action'] = actionType;
+			actionData['data'] = {};
+			
+			actionData['data']['eid'] = parseIntAll($(action).find('#action_talk_effect_id').find("option:selected").val());
+			if(actionData['data']['eid']==13 || actionData['data']['eid']==14){
+				actionData['data']['other'] = {};
+				if (actionData['data']['eid']!=14){
+					actionData['data']['other']['npcid'] = $(action).find('#action_talk_effect_other #action_talk_effect_other_npcid').val();
+				}
+				actionData['data']['other']['effect1'] = $(action).find('#action_talk_effect_other #action_talk_effect_other_effect1').val();
+				actionData['data']['other']['effect2'] = $(action).find('#action_talk_effect_other #action_talk_effect_other_effect2').val();
+                actionData['data']['other']['offsety'] = $(action).find('#action_talk_effect_other #action_talk_effect_other_offsety').val();
+
+			}else{
+				actionData['data']['other'] = $(action).find('#action_talk_effect_other #action_talk_effect_other_other').val();
+			}
+			result.push(actionData);
+		}
+	}
+	return result;
+}
+
+function getTaskUnlockCondition(){
+	var result = [];
+	var unlosks = $('#unlosk_condition').find('#unlosk_condition_condition');
+	for(var i=0;i<unlosks.length;i++){
+		var unlosk = unlosks[i];
+		var key = $(unlosk).find('#unlosk_condition_type').find("option:selected").val();
+		//var value = parseIntAll($(unlosk).find('#unlosk_condition_value').val());
+		//if(value>0){
+		//	result.push(key+':'+value);
+		//}
+		var value = parseIntAll($(unlosk).find('#unlosk_condition_value').val());
+		result.push(key+':'+value);
+	}
+	return result.join('|');
+}
+
+function parseIntAll(t){
+	var i = parseInt(t);
+	if(i==NaN) i = 0;
+	return t;
+}
+
+function nextTask(){
+	window.location.href = "{{ url_for('admin.admin_task_edit',id=id+1) }}";
+}
+function lastTask(){
+    window.location.href = "{{ url_for('admin.admin_task_edit',id=id-1) }}";
+}
+</script>
+{% endblock %}
+{%- block main -%}
+{% if g.user.role == 300 or g.user.right[0] == 1 %}
+		<div class="span10">
+
+			<hr>
+			
+			<div>
+			任务表：
+			</div>
+			<div class="well form-inline">
+			<ul>
+			<li>名字：<input type="text" class="input-small" id="name" placeholder="str" value="{{ ret['name'] }}"></li>
+			<li>图标：<input type="text" class="input-small" id="icon" placeholder="str" value="{{ ret['icon'] }}"></li>
+			
+			<li>类型：
+			
+			<select id="type" style="width: 300px;">
+			<option value="1" {% if ret['type'] == 1%}selected="sellected"{% endif%}>1-主线任务</option>
+			<option value="2" {% if ret['type'] == 2%}selected="sellected"{% endif%}>2-支线任务</option>
+			<option value="3" {% if ret['type'] == 3%}selected="sellected"{% endif%}>3-特殊任务</option>
+			<option value="4" {% if ret['type'] == 4%}selected="sellected"{% endif%}>4-隐藏任务</option>
+			</select>
+			
+			</li>
+			
+			<li>奖励：<input type="text" class="input-small" id="rid" placeholder="int" value="{{ ret['rid'] }}"></li>
+			<li>下个任务：<input type="text" class="input-small" id="nextId" placeholder="int"  value="{{ ret['nextId'] }}"></li>
+			<li>
+			解锁条件：<br>
+			<div>
+			<div id="unlosk_condition">
+			</div>
+			<button id="unlosk_condition_add" type="button" class="btn">添加解锁条件</button>
+			
+			</div>
+			</li>
+			<li>任务说明：<br><textarea type="text" class="input-xlarge" id="info" placeholder="str" style="width: 500px;height:50px;" >{{ ret['info'] }}</textarea></li>
+			<li></li>
+			</ul>
+			</div>
+			
+			<hr>
+			
+			<div style="margin-bottom: 50px;">
+			<div style="margin-top: 10px; font-size: 25px; margin-bottom: 10px; padding-left: 20px; text-align: center;">
+			步骤：
+			</div>
+			
+			<div class="well form-inline" id="step-form">
+			<div id="steps">
+			</div>
+			<div>
+			<hr>
+			<button id="add-step" type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 96%; margin-left: 2%;">添加步骤</button>
+			</div>
+			
+			</div>
+            <button type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 25%; margin-left: 2%;" onclick="lastTask()">上一任务</button>
+			<button type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 25%; margin-left: 2%;" onclick="nextTask()">下一任务</button>
+            <button type="button" class="btn" style="height: 50px; font-size: 18px; margin-right: auto; width: 25%; margin-left: 2%;" id='task-submit'>保存</button>
+                <hr>
+
+		</div>
+	</div><!--/row-->
+{% endif %}
+</div><!--/.fluid-container-->
+{%- endblock -%}

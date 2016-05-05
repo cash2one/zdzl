@@ -1,0 +1,67 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+<div class="span10">
+    开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    <button type="button" class="btn" href="{{ url_for('user.reg_level') }}" onclick="GAME.load.reg_search(this,'day')">查询</button>
+
+    <table class="table table-bordered">
+        <tr>
+            <td>时间</td>
+            <td>角色数</td>
+            <td>LV1</td>
+            <td>LV2</td>
+            <td>LV3</td>
+            <td>LV4</td>
+            <td>LV5</td>
+            <td>LV6</td>
+            <td>LV7</td>
+            <td>LV8</td>
+            <td>LV9</td>
+            <td>LV10</td>
+            <td>LV11</td>
+            <td>LV12</td>
+            <td>LV13</td>
+            <td>LV14</td>
+            <td>LV15</td>
+            <td>LV16</td>
+            <td>LV17</td>
+            <td>LV17+</td>
+        </tr>
+        {% for r in ret %}
+        <tr>
+            <td>{{ r[0]|format_date('%Y-%m-%d') }}</td>
+            <td>{{ r[1]['count'] }}</td>
+            <td>{%if r[1][1]%}{{r[1][1]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][2]%}{{r[1][2]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][3]%}{{r[1][3]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][4]%}{{r[1][4]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][5]%}{{r[1][5]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][6]%}{{r[1][6]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][7]%}{{r[1][7]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][8]%}{{r[1][8]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][9]%}{{r[1][9]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][10]%}{{r[1][10]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][11]%}{{r[1][11]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][12]%}{{r[1][12]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][13]%}{{r[1][13]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][14]%}{{r[1][14]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][15]%}{{r[1][15]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][16]%}{{r[1][16]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][17]%}{{r[1][17]}}{%else%}0{%endif%}</td>
+            <td>{%if r[1][18]%}{{r[1][18]}}{%else%}0{%endif%}</td>
+
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+{% endif %}
+</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

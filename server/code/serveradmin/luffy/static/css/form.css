@@ -1,0 +1,597 @@
+@charset "utf-8";
+
+body, div, label, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, p, blockquote, th, td {
+    border: 0 none;
+    margin: 0;
+    outline: 0 none;
+    padding: 0;
+}
+input {
+    font-size: 18px;
+}
+i {
+    font-style: normal;
+}
+strong, h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+}
+a {
+    text-decoration: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+a em {
+    font-family: "宋体";
+}
+address, caption, cite, code, dfn, em, th, var {
+    font-style: normal;
+    font-weight: normal;
+}
+.clear, .clearit {
+    clear: both;
+    margin: 0;
+    padding: 0;
+}
+/*------------------------ form item ----------------------------*/
+.new_item {
+    clear: both;
+    overflow: hidden;
+}
+.new_item .tit {
+    float: left;
+    font-size: 14px;
+    height: 50px;
+    line-height: 41px;
+    text-align: right;
+    width: 103px;
+}
+.new_item .bdmain {
+    display: inline;
+    float: left;
+    margin-right: 5px;
+    padding-left: 6px; 
+}
+.new_item .fragm {
+    float: left;
+    height: 26px;
+    margin-right: 7px;
+    padding: 12px 0 12px 4px;
+}
+.new_item .fragm label {
+    font-size: 14px;
+    vertical-align: middle;
+}
+.new_item .fragm input.ra {
+    border: medium none;
+    margin-right: 2px;
+    vertical-align: -2px;
+}
+
+.new_item .input_bg{
+	 float: left;
+	 margin: 0;
+	 background: url("../images/textbg.png") no-repeat scroll left -41px transparent;
+	 padding-left: 5px;
+}
+.new_item .input_bg_hover{
+	background: url("../images/textbg.png") no-repeat scroll left 0 transparent;
+	float: left;
+	padding-left: 5px;
+}
+
+.new_item .bdmain strong{
+	background: url("../images/textbg.png") no-repeat scroll right -41px transparent;
+    float: left;
+    height: 35px;
+    padding: 3px 5px 3px 3px;
+    line-height:35px;
+}
+.new_item .bdmain .input_bg_hover strong{
+	background: url("../images/textbg.png") no-repeat scroll right 0 transparent; 
+}
+
+.new_item .textinp {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: medium none;
+    color: #000000;
+    font-size: 14px;
+    height: 27px;
+    line-height: 26px;
+    margin: 2px 0 0;
+    width: 52px;
+    color: #999999; 
+    outline:none;
+}
+.new_item .input_bg_hover .textinp { 
+    color: #333333;
+}
+
+.new_item .new_plus{
+	float:left;
+	display:none;
+}
+.new_item .new_plus .errormt {
+    margin-top: 3px;
+    position: absolute; 
+}
+/****************  error **************/
+.errormt {
+    background: none repeat scroll 0 0 #FFEAEA;
+    border: 1px solid #E5C3C4;
+    border-radius: 3px 3px 3px 3px;
+    color: #CC0000;
+    height: 35px;
+    line-height: 35px;
+    padding: 0 3px;
+    position: absolute;
+    white-space: nowrap;
+    z-index: 99;
+} 
+.errormt i, .success i, .notice1 i, .msnlogin i, .loading i {
+    background: url("../images/tipicon.png") no-repeat scroll 0 0 transparent;
+    display: inline-block;
+    height: 16px;
+    line-height: 0;
+    margin: 0 3px;
+    position: relative;
+    width: 16px;
+}
+.errormt i {
+    background-position: 0 -80px;
+    top: 4px;
+}
+/*********** select ************/
+.fakesel, .fakeselhover {
+    background: url("../images/textbg.png") no-repeat scroll left -41px transparent;
+    display: inline;
+    float: left;
+    margin-right: 4px;
+    padding-left: 10px;
+}
+.fakesel strong, .fakeselhover strong {
+    background: url("../images/textbg.png") repeat scroll right -41px transparent;
+    float: left;
+    height: 35px;
+    padding: 3px 13px 3px 3px;
+}
+.fakesel select, .fakeselhover select {
+    border: 0 none;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/********** button *********/
+.btn2{
+    background: url("../images/new_btn.png") no-repeat scroll 0 -100px transparent;
+    display: inline-block;
+    height: 42px;
+    
+}
+.btn2 {
+    background-position: 0 0;
+    width: 134px;
+    line-height:42px;
+    color:#FFF;
+    text-align:center;
+    font-weight:bold;
+    font-size:18px;
+}
+.btn2:hover {
+    background-position: -135px 0;
+}
+.btn2loading,.btn2loading:hover{
+	background:url(../images/regloading.gif) no-repeat 0 0;cursor:default;
+}
+
+
+
+
+/*!
+ * jQuery Notty
+ * http://www.userdot.net/#!/jquery
+ *
+ * Copyright 2011, UserDot www.userdot.net
+ * Licensed under the GPL Version 3 license.
+ * Version 1.0.0
+ *
+ */
+ #nottys {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 280px;
+    z-index: 999;
+}
+
+/*bg #FFFBCC  border #E6DB55*/
+#nottys .notty {
+    padding: 10px;
+    margin-bottom: 20px;
+    background: #FFFBCC;
+    color: #c00;
+    text-shadow: #E6DB55 0px 1px 2px;
+    font: normal 12px/17px Helvetica;
+    border:1px solid #E6DB55;
+
+    
+    background: -webkit-linear-gradient(#FFFBCC, #E6DB55), -webkit-linear-gradient(#FFFBCC, #FFFBCC);
+    
+    background: -moz-linear-gradient(0% 100% 90deg, #E6DB55, #FFFBCC) repeat scroll 0 0 transparent;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: #E6DB55 0px 2px 13px, #E6DB55 0px -3px 13px, rgba(255,255,255,0.5) 0px 1px 0px inset;
+    -moz-box-shadow: #E6DB55 0px 2px 13px, #E6DB55 0px -3px 13px, rgba(255,255,255,0.5) 0px 1px 0px inset;
+    box-shadow : #E6DB55 0px 2px 13px, #E6DB55 0px -3px 13px, #E6DB55 0px 1px 0px inset
+    position: relative;
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    overflow: hidden;
+    _overflow: visible;
+    _zoom: 1;
+}
+.pop {
+    -webkit-animation-duration: .5s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-name: pop;
+    -webkit-animation-timing-function: ease-in;
+}
+
+.remove {
+    -webkit-animation-iteration-count: 1; 
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-animation-duration: 0.3s; 
+    -webkit-animation-name: 'remove';
+}
+
+#nottys .notty.click {
+    cursor: pointer;
+}
+#nottys .notty .hide {
+    position: absolute;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 20px;
+    height: 20px;
+    background: black;
+    right: 0px;
+    top: 0px;
+    padding: 5px;
+    padding-right: 15px;
+    padding-left: 15px;
+    background: -webkit-linear-gradient(#FFFBCC, #FFFBCC);
+    background: -moz-linear-gradient(0% 100% 90deg, #FFFBCC, #FFFBCC);
+    -webkit-border-top-right-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    -moz-border-radius-bottomleft: 6px;
+    -moz-border-radius-topright: 6px;
+    -webkit-box-shadow: #FFFBCC 0px -1px 0px inset, #FFFBCC 0px 1px 0px inset, #FFFBCC 0px 5px 6px;
+    -moz-box-shadow: #FFFBCC 0px -1px 0px inset, #FFFBCC 0px 1px 0px inset, #FFFBCC 0px 5px 6px;
+    box-shadow: #FFFBCC 0px -1px 0px inset, #FFFBCC 0px 1px 0px inset, #E6DB55 0px 5px 6px;
+    border-left: 1px solid rgba(255,255,255,0.5);
+    cursor: pointer;
+    display: none;
+}
+#nottys .notty .hide:hover {
+    background: white;
+    background: -webkit-linear-gradient(#fff, rgba(255,255,255,0.9));
+    background: -moz-linear-gradient(0% 100% 90deg, rgba(255, 255, 255, 0.9), #fff);
+    color: black;
+    text-shadow: none;
+}
+#nottys .notty .right, #nottys .notty .left {
+    width: 79%;
+    height: 100%;
+    float: left;
+}
+#nottys .notty .time {
+    font-size: 9px;
+    position: relative;
+}
+#nottys .notty .right .time {
+    margin-left: 19px;
+}
+#nottys .notty .left {
+    width: 20%;
+}
+#nottys .notty .right {
+
+}
+#nottys .notty .right .inner {
+    padding-left: 19px;
+}
+#nottys .notty .left .img:after {
+    content: '';
+    background: white;
+    background: -webkit-linear-gradient(transparent, rgba(255,255,255,0.6), transparent);
+    background: -moz-linear-gradient(0% 100% 90deg, transparent, rgba(255,255,255,0.6), transparent);
+    width: 1px;
+    height: 50px;
+    position: absolute;
+    right: -10px;
+}
+#nottys .notty .left .img {
+    width: 100%;
+    background-size: auto 100%;
+    height: 50px;
+    position: relative;
+}
+#nottys .notty:after {
+    content: "."; 
+    visibility: hidden; 
+    display: block; 
+    clear: both; 
+    height: 0; 
+    font-size: 0;
+}
+#nottys .notty h2 {
+    margin: 0px 0px 5px 0px;
+    font-size: 14px;
+    text-shadow: black 0px 2px 4px;
+    color: #fff;
+}
+
+#nottys .notice{
+	background: url('../images/block.png');
+}
+#nottys .ok{
+	background: url('../images/accept.png');
+}
+@-webkit-keyframes pop { 
+    from { 
+	    -webkit-transform: scale(.1); 
+	    opacity: 0 
+	} 
+	80% { 
+	    -webkit-transform: scale(1.05); 
+	    opacity: 1 
+	} 
+	to { 
+	    -webkit-transform: scale(1); 
+	} 
+}
+@-webkit-keyframes remove { 
+	0% {
+	    opacity: 1; 
+	} 
+	100% { 
+	    right:  -223px; 
+	    opacity: 0; 
+	}
+}
+/*------------------------------------------------------------------*/
+#confirm {display:none;width:auto;}
+/* Overlay */
+#confirm-overlay {background-color:#eee; cursor:wait;}
+#confirm-container a.modal-close,
+#confirm-container a.modal-close:link,
+#confirm-container a.modal-close:active,
+#confirm-container a.modal-close:visited { 
+	right:15px; 
+	top:15px;
+	background: url("../images/gnbimgs.gif") no-repeat scroll 0 -193px transparent;
+    height: 7px;
+    overflow: hidden;
+    position: absolute;
+    z-index:1005; 
+    width: 8px;
+	}
+#confirm-container a.modal-close:hover {color:#ccc;}
+
+
+.mBlogLayer .top_r, .mBlogLayer .top_l, .mBlogLayer .bottom_l, .mBlogLayer .bottom_r {
+    background: url("../images/logoNew_nocache.png") no-repeat scroll 0 0 transparent;
+    height: 5px;
+    width: 5px;
+}
+.mBlogLayer .top_c, .mBlogLayer .bottom_c, .mBlogLayer .mid_l, .mBlogLayer .mid_r {
+    background: url("../images/wraplayer_09.png") repeat scroll 0 0 transparent;
+    height: 5px;
+}
+.mBlogLayer .top_l {
+    background-position: 0 -304px;
+}
+.mBlogLayer .top_r {
+    background-position: -5px -304px;
+}
+.mBlogLayer .mid_c {
+    background: none repeat scroll 0 0 #FFFFFF;
+}
+.mBlogLayer .layerBox {
+    border: 1px solid #A0A0A0;
+}
+.mBlogLayer .layerBox .layerBoxTop {
+    height: 27px;
+    line-height: 27px;
+    padding: 1px;
+}
+.mBlogLayer .layerBox .layerBoxTop .topCon {
+    background: url("../images/layerctbg.gif") repeat-x scroll 0 0 transparent;
+    height: 27px;
+    line-height: 27px;
+    padding: 0 10px;
+    position: relative;
+}
+.layerBoxTop .topCon strong {
+    float: left;
+    font-weight: bold;
+}
+ 
+.layerBoxCon {
+    overflow: hidden;
+}
+.layerBoxCon .commonLayer2 {
+    padding: 20px;
+}
+.layerBoxCon .commonLayer2 .layerL {
+    float: left;
+    padding-right: 10px;
+    width: 50px;
+}
+.PY_ib_1 {
+    background-image: url("../images/PY_icon.gif");
+    background-position: 0 0;
+}
+.PY_ib_2 {
+    background-image: url("../images/PY_icon.gif");
+    background-position: -50px 0;
+}
+.PY_ib_3 {
+    background-image: url("../images/PY_icon.gif");
+    background-position: -100px 0;
+} 
+.PY_ib {
+    height: 50px;
+    width: 50px;
+}
+.layerBoxCon .commonLayer2 .layerR {
+    margin-left: 60px;
+    padding: 8px 0 5px;
+}
+.commonLayer2 .layerR strong, .commonLayer2 .layerRN strong {
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 24px;
+}
+.layerBoxCon .MIB_btn {
+    margin-top: 20px;
+    text-align:center;
+}
+ 
+.mBlogLayer .bottom_r {
+    background-position: -5px -309px;
+}
+.mBlogLayer .bottom_l {
+    background-position: 0 -309px;
+}
+.mBlogLayer .bottom_r {
+    background-position: -5px -309px;
+}
+
+.btn_normal, .btn_normal em, .newabtn_ok, .newabtn_ok em, .btn_notclick, .btn_notclick em, .newbtnadd, .newbtnadd em, .newbtnadd_dis, .newbtnadd_dis em, .btn_add, .btn_add em, .btn_green, .btn_green em, .newabtngrn, .newabtngrn em, .newbbtngrn, .newbbtngrn em, .btn_add, .btn_add em, .btn_gray, .btn_gray em, .btn_notclickbig, .btn_notclickbig em, .btn_longc {
+    background: url("../images/common/new_index_bg.png") no-repeat scroll -320px -100px transparent;
+    color: #333333;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: normal;
+    height: 23px;
+    line-height: 23px;
+    text-decoration: none;
+}
+.btn_normal {
+    background-position: -320px -100px;
+    height: 23px;
+    line-height: 23px;
+    padding-left: 20px;
+}
+a.btn_normal, a.btn_normal em, a.btn_normal:hover, a.btn_normal:hover em, a.newabtn_ok, a.newabtn_ok em, a.newabtn_ok:hover, a.newabtn_ok:hover em, a.btn_notclick, a.btn_notclick em, a.btn_green, a.btn_green em, a.btn_green:hover, a.btn_green:hover em, a.btn_gray, a.btn_gray em, a.btn_gray:hover, a.btn_gray:hover em, a.btn_notclickbig, a.btn_notclickbig em {
+    background: url("../images/btn.png") no-repeat scroll -999px 0 transparent;
+    display: inline-block;
+    text-decoration: none;
+    white-space: nowrap;
+}
+a.btn_normal, a.newabtn_ok, a.btn_notclick {
+    padding-left: 15px;
+}
+a.btn_normal {
+    background-position: 0 0;
+}
+a.btn_normal:hover{
+	background-position: -320px -146px;
+	background-position: 0 -50px !important;
+}
+a.btn_normal:hover em{
+	background-position: right -169px;
+	display:inline-block;
+	height:23px;
+	text-decoration: none;
+	cursor:pointer;
+	background-position: 100% -75px !important;
+}
+.MIB_btn a {
+    margin-right: 5px;
+}
+a.btn_normal:link, a.btn_normal:visited, a.btn_normal:hover, a.btn_hv:link, a.btn_hv:visited, a.btn_hv:hover, a.btn_notclick:link, a.btn_notclick:visited, a.btn_notclick:hover, a.btn_privacy:link, a.btn_privacy:visited, a.btn_privacy:hover {
+    text-decoration: none;
+}
+
+
+.btn_normal em {
+    background-position: right -123px;
+    height: 23px;
+    padding-right: 20px;
+}
+a.btn_normal em, a.newabtn_ok em, a.btn_notclick em {
+    color: #333333;
+    font-size: 12px;
+    height: 23px;
+    line-height: 23px;
+    padding-right: 15px;
+}
+a.btn_normal em {
+    background-position: 100% -25px;
+}
+/**/
+.pagination {
+    height: 30px;
+}
+.pagination .prev-next {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #E1E6EA;
+    color: #575757;
+    font-family: trebuchet ms,arial,verdana;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 5px;
+}
+.pagination a {
+    float: left;
+    margin-right: 2px;
+}
+.pagination .number:link {
+}
+
+.pagination .number {
+    background: none repeat scroll 0 0 #EEF3F6;
+    border: 1px solid #E1E6EA;
+    color: #575757;
+    font-family: trebuchet ms,arial,verdana;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+}
+.pagination .number:active {
+}
+.pagination .number.active {
+    background: none repeat scroll 0 0 #FFFFFF;
+    color: #7794A7;
+}
+.pagination .number:hover {
+    background: none repeat scroll 0 0 #FFFFFF;
+    color: #7794A7;
+    text-decoration: none;
+}
+.pagination .number:visited {
+}
+
+.progress-bar-large {
+    display: block;
+    text-align: right;
+}
+.progress-bar-large > div {
+    background: url("../images/back-progress-bar-pattern-large2.png") repeat scroll 0 0 transparent;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+.progress-bar-large > div a {
+    background: url("../images/back-progress-bar-blue-large2.png") repeat-x scroll left top transparent;
+    display: block;
+    height: 18px;
+}
+.hidefive{
+	display:none;
+}
+

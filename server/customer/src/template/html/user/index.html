@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>易幻客服系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	<link href="/css/main.css" rel="stylesheet">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">客服系统</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="/user">首页</a></li>
+              <!--
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact</a></li>
+              -->
+            </ul>
+            <p class="navbar-text pull-right">
+              Logged in as <a href="#" class="navbar-link">{{.UserName}} <a class="btn" id="logout">退出</a>
+            </p>
+            
+          </div><!--/.nav-collapse -->
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+		<form class="well form-inline">
+			<!-- 服务器：
+			<select class="span2" id="serverId">
+	            <option value="0">所有服务器</option>
+	            <option value="1">1-91平台</option>
+	        </select> -->
+            服务器名称:
+            <select class="span2" id="serverName">
+                <option value="">所有服务器</option>
+                <option value="一代真龙">一代真龙</option>
+                <option value="紫气东来">紫气东来</option>
+                <option value="君临天下">君临天下</option>
+                <option value="风起云涌">风起云涌</option>
+                <option value="天地三分">天地三分</option>
+                <option value="时光宝盒">时光宝盒</option>
+            </select>
+			问题类型：
+			<select class="span2" id="questionT">
+				<option value="0">所有类型</option>
+	            <option value="1">1-BUG</option>
+	            <option value="2">2-建议</option>
+	            <option value="3">3-投诉</option>
+	        </select>
+			回复状态：
+			<select class="span2" id="status">
+				<option value="0">所有状态</option>
+	            <option value="1">1-未回复</option>
+	            <option value="2">2-已回复</option>
+	            <option value="3">3-关闭</option>
+	            <option value="4">4-已阅</option>
+	        </select>
+	        角色ID：<input type="text" class="input-small" id="playerId">
+	        问题：<input type="text" class="input-small" id="question">
+			<button type="button" class="btn" onclick="condSearch(this)">查找</button>
+		</form>
+		<a onclick="pageChange('prev')" class='btn'>上一页</a> 当前正在第{{.Page}}/{{.Count}}页 <a onclick="pageChange('next')" class='btn'>下一页</a>
+		<table class="table table-bordered" five="fortime">
+			<tr>
+				<td>序号</td>
+				<td>类型</td>
+				<td>服务器</td>
+				<td>玩家</td>
+				<td>问题状态</td>
+				<td>反馈内容</td>
+				<td>回复操作</td>
+			</tr>
+			
+			{{range .ReportsAllRet}}
+				<tr>
+					<td>{{.Id}}</td>
+					<td>{{.T}}</td>
+					<td>{{.ServerName}}</td>
+					<td>{{.PlayerName}}</td>
+					<td>{{.Status|showQType}}
+					<td>
+						{{.Report}}<br />
+						时间：{{.Ct|DateTimeExpander }}
+					</td>
+					<td width="400px;">
+						[<a id="reponse" rid="{{.Id}}" onclick="responseFunc(this)" style="cursor:pointer">回复</a>]
+						[<a id="close" rid="{{.Id}}" style="cursor:pointer" onclick="closeStatusFunc(this)" >关闭</a>]
+						<br />
+						<div id="content_{{.Id}}">
+							{{range .Contents}}
+								<pre class="pre_{{.T}}">[{{if .T|showContentType}}玩家{{else}}客服{{end}}]{{.M}}<br>{{.Ct|DateTimeExpander}}</pre>
+							{{end}}
+						</div>
+						<br />
+						<div id="answer_{{.Id}}">
+							
+						</div>
+					</td>
+				</tr>
+			{{end}}
+		</table>
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/bootstrap/js/jquery.js"></script>
+    <script src="/bootstrap/js/bootstrap-transition.js"></script>
+    <script src="/bootstrap/js/bootstrap-alert.js"></script>
+    <script src="/bootstrap/js/bootstrap-modal.js"></script>
+    <script src="/bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="/bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="/bootstrap/js/bootstrap-tab.js"></script>
+    <script src="/bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="/bootstrap/js/bootstrap-popover.js"></script>
+    <script src="/bootstrap/js/bootstrap-button.js"></script>
+    <script src="/bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="/bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="/bootstrap/js/bootstrap-typeahead.js"></script>
+	<script src="/js/base.js"></script>
+	<script>
+		//生成回复文本框
+		function getHtmlTextarea(rid){
+			var result = '';
+			result += '<div class="well form-vertical">';
+			result += '<textarea class="input-xlarge" id="textarea_';
+			result += rid;
+			result += '" rows="3""></textarea>' ;
+			result += '<br />';
+			result += '<button type="button" class="btn" onclick="responseGo(this,'+rid+')">提交</button>';
+			result += '<button type="button" class="btn" onclick="$(this).parent().remove()">取消</button>';
+			result += '</div>';
+			return result;
+		};
+		//点击回复生成回复框
+		function responseFunc(obj){
+			var rid = $(obj).attr("rid");
+			$("#answer_"+rid).html(getHtmlTextarea(rid));
+		};
+		//点击关闭，设置状态为3=关闭
+		function closeStatusFunc(obj){
+			var url = "/read/";
+			var rid = $(obj).attr("rid");
+			$.post(url, {id:rid, status:3}, function(d){
+				if(d["Ret"] == 1){
+					location.reload();
+				}
+			});
+		};
+		
+		//发送回复内容
+		function responseGo(obj, rid){
+			var m = $("#textarea_"+rid).val();
+			var url = "/cresponse/";
+			var setStatusUrl = "/read/";
+			var statusData = {id:rid, status:2}
+			$.post(url, {id:rid, m:m, t:2}, function(d){
+				if(d["Ret"] == 1){
+					$.post(setStatusUrl, statusData, function(da){
+						if(da["Ret"] == 1){
+							location.reload();
+						}else{
+							alert("提交失败")
+						}
+					});
+				}else{
+					alert("提交失败")
+				}
+			});
+		};
+
+	
+		//查询
+		function condSearch(obj){
+			var url = "/user/";
+
+            var serverName    = $("#serverName").val();
+			var questionT 	= $("#questionT").val();
+			var status		= $("#status").val();
+			var question 	= $("#question").val();
+			var playerId 	= $("#playerId").val();
+			// var data = {questionT:questionT, status:status, question:question};
+			location.href = "/user/?questionT="+questionT+"&status="+status+"&question="+question+"&serverName="+serverName+"&playerId="+playerId;
+		};
+
+		//上一页
+		function pageChange(type){
+			var page = {{ .Page }};
+			if (type == 'prev'){
+				if (page!=1){
+					page -= 1;
+				}
+			}
+			if (type == 'next'){
+				if (page < {{.Count}}){
+					page += 1;
+				}
+			}
+            var serverName    = $("#serverName").val();
+			var questionT 	= $("#questionT").val();
+			var status		= $("#status").val();
+			var question 	= $("#question").val();
+			location.href = "/user/?questionT="+questionT+"&status="+status+"&question="+question+"&serverName="+serverName+"&page="+page;
+		}
+		$(document).ready(function(d){
+            if ({{ .ServerName}} != ""){
+                $("#serverName").val({{.ServerName}});
+            }
+			if ({{ .QuestionT}} != ""){
+				$("#questionT").val({{.QuestionT}});
+			}
+			if ({{ .Status}} !=""){
+				$("#status").val({{.Status}});
+			}
+			if ({{ .Question}} !=""){
+				$("#question").val({{.Question}});
+			}
+			
+		});
+	</script>
+  </body>
+</html>

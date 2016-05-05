@@ -1,0 +1,85 @@
+{% extends "other/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+
+{% endblock %}
+{%- block main -%}
+        <div class="span10">
+            
+            <div class="well form-inline">
+                key:
+                <input type="text" class="input-big" id="key">
+                value:
+                <input type="text" class="input-big" id="value">
+                <button type="button" class="btn" id='submit'>增加</button>
+                
+            </div>
+            <div class="well form-inline hidefive" id="disfive">
+                编辑：<br />
+                id:
+                <input type="text" class="input-big" id="edit_id" readonly="readonly">
+                key:
+                <input type="text" class="input-big" id="edit_key">
+                value:
+                <input type="text" class="input-big" id="edit_value">
+                <button type="button" class="btn" id='edit_submit'>提交</button>
+                <button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+            </div>
+            <table class="table table-bordered">
+                <tr>
+                    <td>key</td>
+                    <td>value</td>
+                    <td>操作</td>
+                </tr>
+                {%- for r in ret -%}
+                <tr>
+                    <td><p id='{{ r.mongo_id }}_key'>{{ r.key }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_value'>{{ r.value }}</p></td>
+                    <td>
+                        <button type="button" class="btn" onclick="GAME.load.other_setting(this, '{{ r.mongo_id }}')" stype="del" href="/other/setting/order/">删除</button>
+                        <button type="button" class="btn" onclick="GAME.load.other_setting(this, '{{ r.mongo_id }}')" stype="edit" href="/other/setting/order/">编辑</button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var key = $("#key").val();
+            var val = $("#value").val();
+            var url = "{{ url_for('other.setting_order') }}";
+            $.post(url,{
+                key:key, val:val, opType:"new"
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload() 
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var key = $("#edit_key").val();
+            var val = $("#edit_value").val();
+            var url = "{{ url_for('other.setting_order') }}";
+            $.post(url,{
+                key:key, val:val, id:id, opType:"edit"
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload() 
+                }
+            });
+        });
+        
+    });
+</script>
+{%- endblock -%}

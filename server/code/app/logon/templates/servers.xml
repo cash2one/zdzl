@@ -1,0 +1,10 @@
+$def with (servers, current, db_ver, client_ver)
+<?xml version="1.0" encoding="UTF-8"?>
+<servers>
+	$for svr in servers:
+		<svr id="$svr['id']" name="$svr['name']" status="$svr['status']" host="$svr['host']" port="$svr['port']"/>
+</servers>
+<current value="$current" />
+<db_ver value="$db_ver" />
+<client_ver value="$client_ver" />
+

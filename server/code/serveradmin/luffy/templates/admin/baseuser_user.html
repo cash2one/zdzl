@@ -1,0 +1,121 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress,paginate, search %}
+{%- block main -%}
+
+<div class="span10">
+	
+	用户表：
+	{% if g.user.role >= 300 or g.user.right[3] == 1 %}
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[2] == 1 %}
+	总注册人数：{{ count }} ,{{ paginate(page_count,url_for('admin.baseuser_user'),current_page=page) }}
+	{{ search(g.GAME_BASEUSER, coll) }}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>密码</td>
+			<td>邮件</td>
+			<td>设备id</td>
+			<td>设备标记devToken</td>
+			<td>MAC</td>
+			<td>创建时间</td>
+			<td>最后登录时间</td>
+			<td>最后登出时间</td>
+			<td>禁止登录</td>
+			<td>禁止聊天</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.name }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.pwd }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.email }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.UDID }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.DT }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.MAC }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.tNew|format_date()  }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.tLogin|format_date()  }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.tLogout|format_date() }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.fbLogin }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td><span>{{ r.fbChat }}</span><input type="text" style="display:none; width:100px;"/></td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[3] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAME_BASEUSER, table=coll, id=r['_id']) }}">删除</button>
+				 <button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %} 
+		<tr id="appendText" style="display:none;"> </tr> 
+	</table>
+	{% endif %}
+	<script type="text/javascript">
+		function edit_click(val){
+			var id = val;
+			for(i=2; i<12; i++){
+				$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+				$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+				$('#'+id+' td:nth-child('+i+')>span').text("");
+			}
+			$('#'+id+' td:nth-child(2)>span').append("<font style='font-size:12px'>名字</font>");
+			$('#'+id+' td:nth-child(3)>span').append("<font style='font-size:12px'>密码</font>");
+			$('#'+id+' td:nth-child(4)>span').append("<font style='font-size:12px'>邮件</font>");
+			$('#'+id+' td:nth-child(5)>span').append("<font style='font-size:12px'>设备id</font>");
+			$('#'+id+' td:nth-child(6)>span').append("<font style='font-size:12px'>设备标记devToken</font>");
+			$('#'+id+' td:nth-child(7)>span').append("<font style='font-size:12px'>创建时间</font>");
+			$('#'+id+' td:nth-child(8)>span').append("<font style='font-size:12px'>最后登录时间</font>");
+			$('#'+id+' td:nth-child(9)>span').append("<font style='font-size:12px'>最后登出时间</font>");
+			$('#'+id+' td:nth-child(10)>span').append("<font style='font-size:12px'>禁止登录</font>");
+			$('#'+id+' td:nth-child(11)>span').append("<font style='font-size:12px'>禁止聊天</font>");
+			$('#'+id+' td:nth-child(12)>button:nth-child(3)').css({display:"inline"});
+			$('#'+id+' td:nth-child(12)>button:nth-child(2)').css({display:"none"});
+		}
+		function save_click(val){
+			
+			var  id1 = val;
+			var name = $('#'+id1+' td:nth-child(2)>input').val();
+			var pwd = $('#'+id1+' td:nth-child(3)>input').val();
+			var email = $('#'+id1+' td:nth-child(4)>input').val();
+			var UDID = $('#'+id1+' td:nth-child(5)>input').val();
+			var DT = $('#'+id1+' td:nth-child(6)>input').val();
+			var tNew = $('#'+id1+' td:nth-child(7)>input').val();
+			var tLogin = $('#'+id1+' td:nth-child(8)>input').val();
+			var tLogout = $('#'+id1+' td:nth-child(9)>input').val();
+			var fbLogin = $('#'+id1+' td:nth-child(10)>input').val();
+			var fbChat = $('#'+id1+' td:nth-child(11)>input').val();
+			$.post('/admin/baseuser/user/save/',{
+				id:id1,
+				name:name,
+				pwd:pwd,
+				email:email,
+				UDID:UDID,
+				DT:DT,
+				tNew:tNew,
+				tLogin:tLogin,
+				tLogout:tLogout,
+				fbLogin:fbLogin,
+				fbChat:fbChat
+			},function(data) {
+				if(data['success'] == "0"){
+					alert("修改角色经验失败");
+				}else{
+					for(i=2; i<12; i++){
+						$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+						$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());;
+					}
+					$('#'+id1+' td:nth-child(12)>button:nth-child(2)').css({display:"inline"});
+					$('#'+id1+' td:nth-child(12)>button:nth-child(3)').css({display:"none"});
+				}
+			});
+		}
+
+	</script>
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

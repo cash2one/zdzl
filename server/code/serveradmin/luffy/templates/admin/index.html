@@ -1,0 +1,48 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	<form class="well form-inline">
+		统计起始时间：
+	  <input type="text" class="input-small" placeholder="开始日期" id="start_time">
+	  <input type="password" class="input-small" placeholder="结束日期" id="end_time">
+	  <input class="btn" type="button" value="搜索" id="server_search">
+	  <input class="btn" type="button" value="今天" id="server_today">
+     <input class="btn" type="button" value="前一天" id="server_yesterday">
+     <input class="btn" type="button" value="后一天" id="server_tomorrow">
+     <input class="btn" type="button" value="全部" id="server_all">
+	</form>
+	<table class="table table-bordered">
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+    </div><!--/span-->
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+{%- endblock -%}

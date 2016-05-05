@@ -1,0 +1,28 @@
+{%- extends "admin/layout.html" -%} 
+{% from "base_macros.html" import input,radio,select,submit,checkbox,password %}
+{%- block main -%}
+<div class="panel clearfix">
+	<div class="title"> <h3 class="h-user"> 邮件群发 </h3> </div>
+	<div class="content no-pad">
+		 {{ form.form_tag() }} 
+		 {{ input(form.tos,style="width:450px") }}
+		 {{ input(form.subject,style="width:500px") }}
+		 <div class="new_item">
+			<div class="tit">
+			<label for="subject">邮件正文</label>
+			</div>
+			<div class="bdmain">
+				 {{ form.content(style="height:370px;width:945px;border:1px solid gray") }}
+			</div> 
+			<div style="" class="new_plus" id="red_subject">
+				<div style="" class="errormt">
+					<i></i>
+					<strong><span>请输入要发送的邮件标题</span></strong>
+				</div>
+			</div>
+		</div>
+		 
+		 {{ submit('马上发送') }}   
+	</div>
+</div>
+{%- endblock -%}

@@ -1,0 +1,114 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block subjs-%}
+<script type="text/javascript">
+
+var showResult = {}
+showResult['name'] = "{{ ret['name']}}";
+showResult['mapId'] = "{{ ret['mapId'] }}";
+showResult['monster'] = "{{ ret['monster'] }}";
+
+function getMonsterItemHtml(){
+	result = '<div id="containItem">'
+	result += '怪物id：';
+	result += '<select class="span1" id="insideMapId">';
+	result += '{% for item in monster_ret%}';
+	result += '<option value="{{ item._id}}">{{ item._id}}-{{ item.name}}</option>';
+	result += '{% endfor %}';
+    result += '</select>';
+    result += '坐标：';
+    result += 'x:<input type="text" class="input-small" id="posX">';
+    result += 'y:<input type="text" class="input-small" id="posY">';
+    result += '战斗id：<input type="text" class="input-small" id="level">';
+    result += '<button type="button" class="btn" id="remove" onclick="$(this).parent().remove()">移除</button>';
+    result += '</div>';
+    return result;
+}
+
+function getContainResult(){
+	result = []
+	var itemList = $('#monster_contain').find('#containItem');
+	for (var i=0; i<itemList.length; i++){
+		var item = itemList[i];
+		var mapId= parseInt($(item).find('#insideMapId').find("option:selected").val());
+		var posX = parseInt($(item).find('#posX').val());
+		var posY = parseInt($(item).find('#posY').val());
+		var level = parseInt($(item).find('#level').val());
+		result.push(mapId+":{"+posX+","+posY+"}:"+level);
+	}
+	return result.join('|');
+}
+
+$(document).ready(function(){
+	$('#addConfig').click(function(){
+		$('#monster_contain').append(getMonsterItemHtml());
+	});
+	$('#submit').click(function(){
+		var name = $('#name').val();
+		var mapId = $('#mapId').val();
+		var id = {{ id }};
+		var containResult = getContainResult();
+		$.post('/admin/admin/stage/save/',{
+			id:id,
+			name:name,
+			mapId:mapId,
+			monster:containResult
+		},function(d){
+			if (d['success'] == '1'){
+				location.href= '/admin/admin/stage/';
+			}else{
+				alert('保存失败');
+			}
+		})
+	});
+	
+	if (showResult){
+		$('#name').val(showResult['name']);
+		$('#mapId').val(showResult['mapId']);
+		if (showResult['monster']){
+			monsterR = showResult['monster'].split('|');
+			for(var i=0;i<monsterR.length;i++){
+				$('#monster_contain').append(getMonsterItemHtml());
+				var target = $('#monster_contain').find('#containItem').last();
+				tmpMon = monsterR[i].split(':');
+				$(target).find('#insideMapId').val(tmpMon[0]);
+				var tmpPos = tmpMon[1].replace("{","");
+				var tmpPos = tmpPos.replace("}","");
+				var tmpPos = tmpPos.split(",");
+				$(target).find('#posX').val(tmpPos[0]);
+				$(target).find('#posY').val(tmpPos[1]);
+				$(target).find('#level').val(tmpMon[2]);
+			}
+		}
+	}
+
+})
+
+
+</script>
+{% endblock %}
+{%- block main -%}
+	{% if g.user.role == 300 or g.user.right[0] == 1 %}
+		<div class="span10">
+			副本表：
+			<div class="well form-inline">
+				名字：
+			  	<input type="text" class="input-small" id="name" placeholder="str">
+			  	地图id：
+			  	<select class="span1" id="mapId">
+					{% for item in map_ret%}
+		            <option value="{{ item['_id']}}">{{ item['_id']}}-{{ item['name']}}</option>
+		            {% endfor %}
+		        </select>
+			  	<br />怪物配置：
+			  	<div id='monster_contain'>
+			  	</div>
+			  	<button type="button" class="btn" id='addConfig'>添加怪物配置</button>
+			  	<button type="button" class="btn" id='submit'>提交</button>
+			</div>
+		</div>
+		{% endif %}
+	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

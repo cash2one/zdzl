@@ -1,0 +1,31 @@
+package player;
+
+import "game.proto";
+
+//设置角色其它信息
+message SetOthers {
+	repeated game.KeyValue others = 1; //需要新增或者修改的其它信息
+}
+
+//删除其它信息
+message DelOthers {
+	repeated string keys = 1; //需要删除的key列表
+}
+
+//穿戴装备或命格
+message WearItem {
+	required int32 piid = 1; //穿戴的物品列表id,限制:装备或命格
+	required int32 mid = 2; //穿戴的配将id
+	optional int32 place = 3; //命格部位:1~6,装备不需要制定部位
+}
+
+//脱装备或命格
+message TackOffItem {
+	required int32 piid = 1; //脱的物品列表id,限制:装备或命格
+}
+
+//出售物品
+message SellItems {
+	repeated int32 piids = 1; //物品列表id列表
+}
+

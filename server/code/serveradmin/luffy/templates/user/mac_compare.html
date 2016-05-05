@@ -1,0 +1,20 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >=300 or g.user.right[9] == 1 %}
+        <div class="span10">
+            <form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+                选择xls/xlsx文件：  <input type="file" name="xlsfile">
+                <input type="submit" value="提交">
+            </form>
+            
+        </div>
+        {{ count }}
+        {% endif %}
+    </div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

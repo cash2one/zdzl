@@ -1,0 +1,90 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	同盟等级表：
+    {% if g.user.role >= 300 or g.user.right[1] == 1 %}
+    <form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+        选择xls/xlsx文件：  <input type="file" name="xlsfile">
+        <input type="submit" value="提交">
+    </form>
+    <button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+    <div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	等级：
+	  	<input type="text" class="input-small" id="edit_level">
+	  	贡献值：
+	  	<input type="text" class="input-small" id="edit_contrib">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>等级</td>
+			<td>贡献值</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.level}}</td>
+			<td>{{ r.contrib }}</td>
+			<td>
+				<button type="button" class="btn" id='delete' onclick="GAME.load.href_click(this)" val="{{ r._id }}" href="/admin/admin/group/level/delete/">删除</button>
+				<button type="button" class="btn" id='edit' onclick="GAME.load.edit_click(this, 'group_level')" val="{{ r._id }}" href="/admin/admin/group/level/data/">编辑</button>
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+    {% endif %}
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#submit").click(function(){
+				var level = $("#level").val();
+				var contrib = $("#contrib").val();
+			
+					$.get('/admin/admin/group/level/save/',{
+						level:level,
+						contrib:contrib
+					},function(data){
+						if(data['success'] == "0"){
+							alert("添加角色等级失败");
+						}else{
+							location.reload() 
+						}
+					});
+				
+					
+			});
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var level = $("#edit_level").val();
+				var contrib = $("#edit_contrib").val();
+		
+					$.get('/admin/admin/group/level/save/',{
+						id:id,
+						level:level,
+						contrib:contrib
+					},function(data){
+						if(data['success'] == "0"){
+							alert("添加角色等级失败");
+						}else{
+							location.reload() 
+						}
+					});
+				
+					
+			});
+		});
+	</script>
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

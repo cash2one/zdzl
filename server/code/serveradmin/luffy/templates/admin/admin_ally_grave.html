@@ -1,0 +1,138 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	同盟－宝具铭刻表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	铭刻类型：
+	  	<input type="text" class="input-small" id="edit_t" placeholder="int">
+	  	银币消耗：
+	  	<input type="text" class="input-small" id="edit_coin1" placeholder="int">
+	  	元宝消耗：
+	  	 <input type="text" class="input-small" id="edit_coin3" placeholder="int">
+	  	 1级同盟能获得的练历 ：
+	  	 <input type="text" class="input-small" id="edit_lv1arm" placeholder="int">
+	  	 2级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv2arm" placeholder="int">
+	  	 3级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv3arm" placeholder="int">
+	  	 4级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv4arm" placeholder="int">
+	  	 5级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv5arm" placeholder="int">
+	  	 6级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv6arm" placeholder="int">
+	  	 7级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv7arm" placeholder="int">
+	  	 8级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv8arm" placeholder="int">
+	  	 9级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv9arm" placeholder="int">
+	  	 10级同盟能获得的练历：
+	  	 <input type="text" class="input-small" id="edit_lv10arm" placeholder="int">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>铭刻类型</td>
+			<td>银币消耗</td>
+			<td>元宝消耗</td>
+			<td>1级同盟能获得的练历</td>
+			<td>2级同盟能获得的练历</td>
+			<td>3级同盟能获得的练历</td>
+			<td>4级同盟能获得的练历</td>
+			<td>5级同盟能获得的练历</td>
+			<td>6级同盟能获得的练历</td>
+			<td>7级同盟能获得的练历</td>
+			<td>8级同盟能获得的练历</td>
+			<td>9级同盟能获得的练历</td>
+			<td>10级同盟能获得的练历</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.t }}</td>
+			<td>{{ r.coin1 }}</td>
+			<td>{{ r.coin3 }}</td>
+			<td>{{ r.lv1arm }}</td>
+			<td>{{ r.lv2arm }}</td>
+			<td>{{ r.lv3arm }}</td>
+			<td>{{ r.lv4arm }}</td>
+			<td>{{ r.lv5arm }}</td>
+			<td>{{ r.lv6arm }}</td>
+			<td>{{ r.lv7arm }}</td>
+			<td>{{ r.lv8arm }}</td>
+			<td>{{ r.lv9arm }}</td>
+			<td>{{ r.lv10arm }}</td>			
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+                <button type="button" class="btn" id='edit' onclick="GAME.load.get_data(this)" href="{{url_for('admin.admin_data', db=g.GAMEBASE, table=coll, id=r['_id'])}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var t = $("#edit_t").val();
+				var coin1 = $("#edit_coin1").val();
+				var coin3 = $("#edit_coin3").val();
+				var lv1arm = $("#edit_lv1arm").val();
+				var lv2arm = $("#edit_lv2arm").val();
+				var lv3arm = $("#edit_lv3arm").val();
+				var lv4arm = $("#edit_lv4arm").val();
+				var lv5arm = $("#edit_lv5arm").val();
+				var lv6arm = $("#edit_lv6arm").val();
+				var lv7arm = $("#edit_lv7arm").val();
+				var lv8arm = $("#edit_lv8arm").val();
+				var lv9arm = $("#edit_lv9arm").val();
+				var lv10arm = $("#edit_lv10arm").val();
+				$.post('/admin/admin/ally/grave/save/',{
+					id:id,
+					t:t,
+					coin1:coin1,
+					coin3:coin3,
+					lv1arm:lv1arm,
+					lv2arm:lv2arm,
+					lv3arm:lv3arm,
+					lv4arm:lv4arm,
+					lv5arm:lv5arm,
+					lv6arm:lv6arm,
+					lv7arm:lv7arm,
+					lv8arm:lv8arm,
+					lv9arm:lv9arm,
+					lv10arm:lv10arm
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload() 
+					}
+				});
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

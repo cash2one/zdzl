@@ -1,0 +1,83 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+$(function () {
+            var chart;
+            $(document).ready(function() {
+                        chart = new Highcharts.Chart({
+                            chart: {
+                                renderTo: 'container',
+                                type: 'line',
+                                margin: [ 50, 50, 100, 80]
+                            },
+                            title: {
+                                text: '角色创建统计'
+                            },
+                            xAxis: {
+                                categories: {{ keys|safe }},
+                    labels: {
+                rotation: -45,
+                        align: 'right',
+                        style: {
+                    fontSize: '13px',
+                            fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+    min: 0,
+            title: {
+        text: ''
+    }
+},
+legend: {
+    enabled: false
+},
+tooltip: {
+    formatter: function() {
+        return '<b>'+ this.x +'</b><br/>'+
+                ''+ Highcharts.numberFormat(this.y, 0) +
+                '';
+    }
+},
+series: [{
+    name: 'Population',
+    data: {{ rets|safe }},
+dataLabels: {
+    enabled: true,
+            rotation: -90,
+            color: '#FFFFFF',
+            align: 'right',
+            x: 4,
+            y: 10,
+            style: {
+        fontSize: '13px',
+                fontFamily: 'Verdana, sans-serif'
+    }
+}
+}]
+});
+});
+
+});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+
+			<br />
+			注册时间搜索：开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}"> 
+			结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+			<button type="button" class="btn" href="{{ url_for('user.server_player_count') }}" onclick="GAME.load.reg_search(this,'day')">按日统计</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_player_count') }}" onclick="GAME.load.reg_search(this,'month')">按月统计</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_player_count') }}" onclick="GAME.load.reg_search(this,'year')">按年统计</button>
+
+			<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

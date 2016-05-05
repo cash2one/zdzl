@@ -1,0 +1,63 @@
+package scene;
+
+import "game.proto";
+
+//同场景按分房间方式设计,并定时拆分、合并房间;支持角色独立房间;
+
+
+//角色场景状态
+enum SceneState {
+	SS_STAND = 1; //站立
+	SS_SIT = 2; //打坐
+}
+
+//角色场景信息
+message ScenePlayer {
+	required game.Player player = 1; //角色
+	required game.Position pos = 2; //位置
+	required SceneState state = 2; //状态
+}
+
+//移动,没应答
+message Move {
+	repeated game.Position pos = 1; //移到的位置坐标
+}
+
+//进入地图
+message EnterMap {
+	required int32 mid = 1; //地图id
+}
+
+message EnterMapResponse {
+	required game.ResultType result = 1; //是否进入地图成功
+}
+
+//获取地图玩家列表,
+message GetMapPlayers {	
+	optional int32 mid = 2; //地图id,可以不指定
+}
+
+//
+message MapPlayersResponse {
+	repeated ScenePlayer players = 1; //角色场景信息列表
+}
+
+//场景角色变更列表,角色id有可能不存在;最小每0.1秒发送一次;
+message ChangeResponse {
+	repeated int32 move_pids = 1; //移动角色id列表
+	repeated ScenePlayer enter_players = 2; //进入角色id列表
+	repeated int32 leave_pids = 3; //退出角色id列表
+	repeated game.Position move_poses = 4; //移到的位置坐标列表
+}
+
+//查看其他玩家信息
+message GetOtherPlayerInfo {
+	required int32 pid = 1; //其他玩家id
+}
+
+message OtherPlayerInfoResponse {
+	required game.PlayerInfo info = 1; //角色详细信息
+	required game.PlayerGens gens = 2; //配将列表
+}
+
+

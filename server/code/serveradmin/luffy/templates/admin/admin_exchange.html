@@ -1,0 +1,211 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress, paginate %}
+{%- block main -%}
+
+<div class="span10">
+	兑换表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 or g.user.right[12] %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	<div class="well form-inline">
+		批次名：
+	  	<input type="text" class="input-small" id="name" placeholder="str">
+	  	创建批次时间(日期当日的0时)：
+	  	<input type="text" class="input-small" id="ct" placeholder="str" onClick="WdatePicker()">
+	  	结束时间(日期当日的23:59时)：
+	  	<input type="text" class="input-small" id="et" placeholder="str" onClick="WdatePicker()">
+	  	一个角色是否只能领取一次：
+        <select class="span1" id="one">
+            <option value="1">1-是</option>
+            <option value="0">0-否</option>
+        </select>
+        兑换码长度：
+        <select class="span1" id="length">
+            <option value="10">10位</option>
+            <option value="8">8位</option>
+            <option value="16">16位</option>
+            <option value="32">32位</option>
+        </select>
+	  	奖励ID：
+	  	<input type="text" class="input-small" id="rid" placeholder="int">
+        可用次数：
+        <input type="text" class="input-small" id="num" placeholder="int" value="1">
+        <!--特定服务列表：-->
+	  	<!--<input type="text" class="input-small" id="svrs" placeholder="str">-->
+        生成数量：
+        <input type="text" class="input-small" id="nums" placeholder="int">
+	  	<button type="button" class="btn" id="submit">生成</button>
+	</div>
+
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+        批次名：
+        <input type="text" class="input-small" id="edit_name" placeholder="str">
+        创建批次时间(日期当日的0时)：
+        <input type="text" class="input-small" id="edit_ct" placeholder="str" onClick="WdatePicker()">
+        结束时间(日期当日的23:59时)：
+        <input type="text" class="input-small" id="edit_et" placeholder="str" onClick="WdatePicker()">
+        一个角色是否只能领取一次：
+        <select class="span1" id="edit_one">
+            <option value="1">1-是</option>
+            <option value="0">0-否</option>
+        </select>
+        <!--兑换码长度：-->
+        <!--<select class="span1" id="edit_length">-->
+            <!--<option value="32">32位</option>-->
+            <!--<option value="16">16位</option>-->
+        <!--</select>-->
+        奖励ID：
+        <input type="text" class="input-small" id="edit_rid" placeholder="int">
+        可用次数：
+        <input type="text" class="input-small" id="edit_num" placeholder="int" value="1">
+        <!--特定服务列表：-->
+        <!--<input type="text" class="input-small" id="svrs" placeholder="str">-->
+        <!--生成数量：-->
+        <!--<input type="text" class="input-small" id="edit_nums" placeholder="int">-->
+        <button type="button" class="btn" id="edit_submit">生成</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+        <br />(重置所有与当前批次名相同的兑换码，兑换码不变)
+	</div>
+    {% endif %}
+    {% if g.user.role >= 300 or g.user.right[0] == 1 or g.user.right[12] %}
+    {{ paginate(page_count,'/admin/admin/exchange/',current_page=page, kwargs={'name':name}) }}
+    <br />
+    <select class="span2" id="makexls_name">
+        <option value="0">默认导出全部</option>
+        {% for item in all_ret %}
+        <option value="{{ item }}">{{ item }}</option>
+        {% endfor %}
+    </select>
+    <button type="button" class="btn" id="makexls">生成Excel</button>
+    <button type="button" class="btn" id="filter">筛选</button>
+    <table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>批次名</td>
+			<td>创建批次时间</td>
+			<td>结束时间</td>
+			<td>一个角色是否只能领取一次</td>
+			<td>奖励ID</td>
+            <td>可用次数</td>
+			<td>兑换码</td>
+            <!--<td>特定服务列表</td>-->
+            <!--<td>领取时间</td>-->
+            <!--<td>领取服</td>-->
+            <!--<td>领取帐号</td>-->
+            <!--<td>领取角色</td>-->
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.name}}</td>
+			<td>{{ r.ct|format_date('%Y-%m-%d') }}</td>
+			<td>{{ r.et|format_date('%Y-%m-%d') }}</td>
+			<td>{{ r.one }}</td>
+
+			<td>{{ r.rid }}</td>
+            <td>{{ r.num }}</td>
+            <td>{{ r.code }}</td>
+			<!--<td>{{ r.svrs }}</td>-->
+            <!--<td>{{ r.gt }}</td>-->
+            <!--<td>{{ r.svr }}</td>-->
+            <!--<td>{{ r.uid }}</td>-->
+            <!--<td>{{ r.pid }}</td>-->
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.href_click(this)" val="{{ r._id }}" href="/admin/admin/exchange/delete/">删除</button>
+				<button type="button" class="btn" id='edit' onclick="GAME.load.edit_click(this, 'exchange')" val="{{ r._id }}" href="/admin/admin/exchange/data/">重置</button>
+				{% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#submit").click(function(){
+				var name = $("#name").val();
+				var ct = $("#ct").val();
+				var et = $("#et").val();
+				var one = $("#one").val();
+				var rid = $("#rid").val();
+                var length = $("#length").val();
+//				var svrs = $("#svrs").val();
+                var num = $("#num").val();
+				var nums = $("#nums").val();
+                $.get('/admin/admin/exchange/save/',{
+                    name:name,
+                    ct:ct,
+                    et:et,
+                    one:one,
+                    rid:rid,
+                    length:length,
+                    num:num,
+//                    svrs:svrs,
+                    nums:nums
+                },function(data){
+                    if(data['success'] == "0"){
+                        alert("添加角色等级失败");
+                    }else{
+                        location.reload()
+                    }
+                });
+			});
+            $('#makexls').click(function(){
+                var name = $("#makexls_name").val();
+                $.get('/admin/admin/exchange/makexls/',{name:name},function(d){
+                   if(d['success'] == 1){
+                       if (name=="0"){
+                           name = "allcode"
+                       }
+                       location.href = '/static/mongobackup/exchange/'+name+'.xls';
+                   }
+                });
+            });
+            $('#filter').click(function(){
+                var name = $("#makexls_name").val();
+                location.href = "/admin/admin/exchange/?name="+name;
+            })
+            $("#edit_submit").click(function(){
+                var id = $("#edit_id").val();
+                var name = $("#edit_name").val();
+                var ct = $("#edit_ct").val();
+                var et = $("#edit_et").val();
+                var one = $("#edit_one").val();
+                var rid = $("#edit_rid").val();
+                var num = $("#edit_num").val();
+//                var length = $("#length").val();
+//				var svrs = $("#svrs").val();
+//                var nums = $("#nums").val();
+                $.get('/admin/admin/exchange/reset/',{
+                    id:id,
+                    name:name,
+                    ct:ct,
+                    et:et,
+                    one:one,
+                    rid:rid,
+                    num:num
+//                    length:length,
+//                    svrs:svrs,
+//                    nums:nums
+                },function(data){
+                    if(data['success'] == "0"){
+                        alert("添加角色等级失败");
+                    }else{
+                        location.reload()
+                    }
+                });
+            });
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

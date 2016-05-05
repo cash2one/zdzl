@@ -1,0 +1,202 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script xmlns="http://www.w3.org/1999/html">
+    function backup(obj, opType){
+        if(confirm("确定执行吗?")){
+            var url = $(obj).attr('href');
+            var mid = $(obj).attr('mid');
+            var isDrop = $(obj).attr('isDrop');
+            var img_html = "{{ 'frontend.static'|url('images/loading.gif') }}";
+            $('#show_loading').append('<img src="'+img_html+'" />');
+            $.get(url,{opType:opType, mid:mid, isDrop:isDrop},function(d){
+                $('#show_loading').html(d['info']);
+            });
+        }
+
+    };
+</script>
+{% endblock %}
+{%- block main -%}
+{% if g.user.role >= 300  or g.user.right[4] == 1 %}
+<div class="span10">
+    <div id="show_loading"></div>
+    <div class="well form-inline">
+        ip：
+        <input type="text" class="input-big" id="ip">
+        端口：
+        <input type="text" class="input-small" id="port" value="27017">
+        用户名：
+        <input type="text" class="input-small" id="username">
+        密码：
+        <input type="password" class="input-big" id="password">
+        本地库名：
+        <input type="text" class="input-small" id="local_database">
+        服务器库名：
+        <input type="text" class="input-small" id="database">
+        <br/>表名：
+        <select class="span2" id="tables">
+            {% for t in tables%}
+            <option value="{{t.mongo_id}}">{{t.title}}</option>
+            {% endfor %}
+        </select>
+        <!-- <textarea type="text" class="input-big" id="backup"></textarea> -->
+        备注：
+        <textarea type="text" class="input-big" id="remark"></textarea>
+        服务器：
+        <select class="span2" id="st">
+            <option value="zl">正式服</option>
+            <option value="zl_test">正式测试</option>
+            <option value="bd">博动</option>
+            <option value="bd_test">博动测试</option>
+        </select>
+        is Drop:
+        <select class="span1" id="isDrop">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+        <button type="button" class="btn" id='submit'>增加服务器</button>
+    </div>
+    <div class="well form-inline hidefive" id="disfive">
+        编辑：<br />
+        id:
+        <input type="text" class="input-big" id="edit_id" readonly="readonly">
+        ip：
+        <input type="text" class="input-big" id="edit_ip">
+        端口：
+        <input type="text" class="input-small" id="edit_port">
+        用户名：
+        <input type="text" class="input-small" id="edit_username">
+        密码：
+        <input type="password" class="input-big" id="edit_password">
+        <br/>本地库名：
+        <input type="text" class="input-small" id="edit_local_database">
+        服务器库名：
+        <input type="text" class="input-small" id="edit_database">
+        表名：
+        <select class="span2" id="edit_tables">
+            {% for t in tables%}
+            <option value="{{t.mongo_id}}">{{t.title}}</option>
+            {% endfor %}
+        </select>
+        <!-- <textarea type="text" class="input-big" id="edit_backup"></textarea> -->
+        备注：
+        <textarea type="text" class="input-big" id="edit_remark"></textarea>
+        服务器：
+        <select class="span1" id="edit_st">
+            <option value="zl">正式服</option>
+            <option value="zl_test">正式测试</option>
+            <option value="bd">博动</option>
+            <option value="bd_test">博动测试</option>
+        </select>
+        is Drop:
+        <select class="span1" id="edit_isDrop">
+            <option value="1">Yes</option>
+            <option value="0">No</option>
+        </select>
+        <button type="button" class="btn" id='edit_submit'>提交</button>
+        <button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+    </div>
+    <table class="table table-bordered">
+        <tr>
+            <td>ip</td>
+            <td>端口</td>
+            <td>用户名</td>
+            <td>密码</td>
+            <td>本地库名</td>
+            <td>服务器库名</td>
+            <td>新表名</td>
+            <!-- <td>原表名</td> -->
+            <td>备注</td>
+            <td>服务器</td>
+            <td>isDrop</td>
+            <td>操作</td>
+        </tr>
+        {%- for r in ret -%}
+        <tr>
+            <td><p id='{{ r.mongo_id }}_ip'>{{ r.ip }}</p></td>
+            <td><p id='{{ r.mongo_id }}_port'>{{ r.port }}</p></td>
+            <td><p id='{{ r.mongo_id }}_username'>{% if r.username %}{{ r.username }}{% endif %}</p></td>
+            <td><input type="password" class="input-big" id="{{ r.mongo_id }}_password" readonly="readonly" value="{% if r.password %}{{ r.password }}{% endif %}"></td>
+            <td><p id='{{ r.mongo_id }}_local_database'>{{ r.localdatabase }}</p></td>
+            <td><p id='{{ r.mongo_id }}_database'>{{ r.database }}</p></td>
+           <!--  <td style="width: 400px;"><p id='{{ r.mongo_id }}_backup'>{{ r.backup }}</p></td> -->
+           <td><input type="hidden" id="{{r.mongo_id}}_tables" value="{{r.tables_oid}}"></input>{{r.tables}}</td>
+           <!-- <td>{{r.backup}}</td> -->
+            <td><p id='{{ r.mongo_id }}_remark'>{{ r.remark }}</p></td>
+            <td><p id='{{ r.mongo_id }}_st'>{{ r.st }}</p></td>
+            <td><p id='{{ r.mongo_id }}_isDrop'>{{ r.is_drop }}</p></td>
+            <td>
+                {% if g.user.role >= 300 or g.user.right[0] == 1 %}
+                <button type="button" class="btn" onclick="GAME.load.database_backup(this, '{{ r.mongo_id }}')" stype="del" href="/user/database/restore/operation/">删除</button>
+                <button type="button" class="btn" onclick="GAME.load.database_backup(this, '{{ r.mongo_id }}')" stype="edit" href="/user/database/restore/operation/">编辑</button>
+                <br />
+                <br />
+                <button type="button" class="btn" isDrop="{{r.is_drop}}" onclick="backup(this, 'push')" mid="{{ r.mongo_id }}" href="/user/database/server/restore/">本地->服务器</button>
+
+                <button type="button" class="btn"  isDrop="{{r.is_drop}}" onclick="backup(this, 'pull')" mid="{{ r.mongo_id }}" href="/user/database/server/restore/">服务器->本地</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#submit").click(function(){
+            var ip = $("#ip").val();
+            var port = $("#port").val();
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var localdatabase = $("#local_database").val();
+            var database = $("#database").val();
+            // var backup = $("#backup").val();
+            var tables = $("#tables").val();
+            var remark = $("#remark").val();
+            var st = $("#st").val();
+            var isDrop = $("#isDrop").val();
+            var url = "{{ url_for('user.database_restore_operation', opType='add') }}";
+            $.post(url,{
+                name:name,ip:ip, port:port, username:username, password:password,st:st,isDrop:isDrop,
+                tables:tables, database:database, remark:remark, localdatabase:localdatabase
+            },function(data){
+                if(data['success'] == 0){
+                    alert("添加角色等级失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+        $("#edit_submit").click(function(){
+            var id = $("#edit_id").val();
+            var ip = $("#edit_ip").val();
+            var port = $("#edit_port").val();
+            var username = $("#edit_username").val();
+            var password = $("#edit_password").val();
+            var localdatabase = $("#edit_local_database").val();
+            var database = $("#edit_database").val();
+            var tables = $("#edit_tables").val();
+            var remark = $("#edit_remark").val();
+            var st = $("#edit_st").val();
+            var isDrop = $("#edit_isDrop").val();
+            var url = "{{ url_for('user.database_restore_operation', opType='edit') }}";
+            $.post(url,{
+                name:name,id:id,ip:ip,port:port,username:username,password:password,st:st,isDrop:isDrop,
+                tables:tables,database:database, remark:remark, localdatabase:localdatabase
+            },function(data){
+                if(data['success'] == 0){
+                    alert("修改失败");
+                }else{
+                    location.reload()
+                }
+            });
+        });
+    });
+</script>
+{%- endblock -%}

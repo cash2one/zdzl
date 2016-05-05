@@ -1,0 +1,16 @@
+更新步骤：
+1、同步测试服数据到正式服；
+2、修改测试服gconfig版本号加".0"；
+3、修改正式服gconfig中版本号升级为新版本号；
+4、后台更新数据库版本;
+4、重启正式服；
+
+
+
+#130717:
+    player表:增加Payed字段
+    goods表:增加snsType字段
+
+#130325:
+    1. server表: 增加sid记录server id;
+    2. gconfig表:ClientVer记录前端版本号,会影响logon生成的servers.json文件名;

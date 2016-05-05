@@ -1,0 +1,43 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script>
+    $(document).ready(function(d){
+        $("#builder").click(function(){
+            if(confirm("确定执行吗?")){
+                var url = "{{ url_for('user.server_manage_builder') }}";
+                var img_html = "{{ 'frontend.static'|url('images/loading.gif') }}";
+                $('#show_loading').append('<img src="'+img_html+'" />');
+                $.post(url,{},function(data){
+                    if(data['success'] == 0){
+                        alert("执行失败");
+                    }else{
+                        $('#show_loading').html(data['info']);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock%}
+{%- block main -%}
+  
+	<div class="span6">
+        <div id="show_loading"></div>
+        <table class="table table-striped table-bordered table-condensed">
+            <!--角色ID:<input type="text" class="input-small" id="pid" />-->
+            <tr>
+                <td>
+                    <button type="button" class="btn" id='builder'>builder.shell</button>
+                </td>
+            </tr>
+         </table>
+	</div>
+    <div class="span4">
+        <div id="gm_log_show"></div>
+    </div>
+
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

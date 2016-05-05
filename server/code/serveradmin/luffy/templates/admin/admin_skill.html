@@ -1,0 +1,168 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">
+	技能表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>动画</td>
+			<td>范围</td>
+			<td>是否远攻</td>
+			<td>范围主目标伤害率</td>
+			<td>范围次目标伤害率</td>
+			<td>效果名</td>
+			<td>效果范围</td>
+			<td>效果是否命中才出现</td>
+            <td>是否震屏</td>
+			<td>说明</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.name }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.act }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.range }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.far }}</span>
+				<select class="span1" style="display:none;width:50px;" >
+			  		<option value="0">0-否</option>
+		            <option value="1">1-是</option>
+       		    </select></td>
+			<td><span>{{ r.rHurt1 }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.rHurt2 }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.effect }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.effectRG }}</span><input type="text" style="display:none; width:50px;"/></td>
+			<td><span>{{ r.effectDIS }}</span><input type="text" style="display:none; width:50px;"/></td>
+            <td><span>{{ r.shock }}</span>
+                <select class="span1" style="display:none;width:50px;" >
+                    <option value="0">0-否</option>
+                    <option value="1">1-是</option>
+                </select></td>
+			<td><span>{{ r.info }}</span><input class="input-big" type="text" style="display:none; "/></td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+			    <button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>
+                {% endif %}
+			</td>
+		</tr>	
+		{% endfor %}  
+		<tr id="appendText" style="display:none;"> </tr>
+	</table>
+	<script type="text/javascript">
+		function edit_click(val){
+			var id = val;
+			$('#'+id+' td:nth-child(2)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(3)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(4)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(5)>select').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(6)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(7)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(8)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(9)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(10)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(11)>select').css({display:"inline-block"});
+            $('#'+id+' td:nth-child(12)>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child(2)>input').val($('#'+id+' td:nth-child(2)>span').text());
+			$('#'+id+' td:nth-child(3)>input').val($('#'+id+' td:nth-child(3)>span').text());
+			$('#'+id+' td:nth-child(4)>input').val($('#'+id+' td:nth-child(4)>span').text());
+			$('#'+id+' td:nth-child(5)>select').val($('#'+id+' td:nth-child(5)>span').text());
+			$('#'+id+' td:nth-child(6)>input').val($('#'+id+' td:nth-child(6)>span').text());
+			$('#'+id+' td:nth-child(7)>input').val($('#'+id+' td:nth-child(7)>span').text());
+			$('#'+id+' td:nth-child(8)>input').val($('#'+id+' td:nth-child(8)>span').text());
+			$('#'+id+' td:nth-child(9)>input').val($('#'+id+' td:nth-child(9)>span').text());
+			$('#'+id+' td:nth-child(10)>input').val($('#'+id+' td:nth-child(10)>span').text());
+            $('#'+id+' td:nth-child(11)>select').val($('#'+id+' td:nth-child(11)>span').text());
+			$('#'+id+' td:nth-child(12)>input').val($('#'+id+' td:nth-child(12)>span').text());
+			$('#'+id+' td:nth-child(2)>span').text("");
+			$('#'+id+' td:nth-child(3)>span').text("");
+			$('#'+id+' td:nth-child(4)>span').text("");
+			$('#'+id+' td:nth-child(5)>span').text("");
+			$('#'+id+' td:nth-child(6)>span').text("");
+			$('#'+id+' td:nth-child(7)>span').text("");
+			$('#'+id+' td:nth-child(8)>span').text("");
+			$('#'+id+' td:nth-child(9)>span').text("");
+			$('#'+id+' td:nth-child(10)>span').text("");
+			$('#'+id+' td:nth-child(11)>span').text("");
+            $('#'+id+' td:nth-child(12)>span').text("");
+			$('#'+id+' td:nth-child(13)>button:nth-child(3)').css({display:"inline"});
+			$('#'+id+' td:nth-child(13)>button:nth-child(2)').css({display:"none"});
+		}
+		function save_click(val){
+			var id1 = val;
+			var name = $('#'+id1+' td:nth-child(2)>input').val();
+			var act =$('#'+id1+' td:nth-child(3)>input').val();
+			var range = $('#'+id1+' td:nth-child(4)>input').val();
+			var far = $('#'+id1+' td:nth-child(5)>select').val();
+			var rHurt1 = $('#'+id1+' td:nth-child(6)>input').val();
+			var rHurt2 = $('#'+id1+' td:nth-child(7)>input').val();
+			var effect =$('#'+id1+' td:nth-child(8)>input').val();
+			var effectRG = $('#'+id1+' td:nth-child(9)>input').val();
+			var effectDIS = $('#'+id1+' td:nth-child(10)>input').val();
+            var shock = $('#'+id1+' td:nth-child(11)>select').val();
+			var info = $('#'+id1+' td:nth-child(12)>input').val();
+			$.post('/admin/admin/skill/save/',{
+				id:id1,
+				name:name,
+				act:act,
+				far:far,
+				range:range,
+				rHurt1:rHurt1,
+				rHurt2:rHurt2,
+				effect:effect,
+				effectRG:effectRG,
+				effectDIS:effectDIS,
+                shock:shock,
+				info:info
+			},function(data) {
+				if(data['success'] == "0"){
+					alert("修改角色经验失败");
+				}else{
+					$('#'+id1+' td:nth-child(2)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(3)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(4)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(5)>select').css({display:"none"});
+					$('#'+id1+' td:nth-child(6)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(7)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(8)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(9)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(10)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(11)>select').css({display:"none"});
+					$('#'+id1+' td:nth-child(12)>input').css({display:"none"});
+					$('#'+id1+' td:nth-child(2)>span').text($('#'+id1+' td:nth-child(2)>input').val());
+					$('#'+id1+' td:nth-child(3)>span').text($('#'+id1+' td:nth-child(3)>input').val());
+					$('#'+id1+' td:nth-child(4)>span').text($('#'+id1+' td:nth-child(4)>input').val());
+					$('#'+id1+' td:nth-child(5)>span').text($('#'+id1+' td:nth-child(5)>select').val());
+					$('#'+id1+' td:nth-child(6)>span').text($('#'+id1+' td:nth-child(6)>input').val());
+					$('#'+id1+' td:nth-child(7)>span').text($('#'+id1+' td:nth-child(7)>input').val());
+					$('#'+id1+' td:nth-child(8)>span').text($('#'+id1+' td:nth-child(8)>input').val());
+					$('#'+id1+' td:nth-child(9)>span').text($('#'+id1+' td:nth-child(9)>input').val());
+					$('#'+id1+' td:nth-child(10)>span').text($('#'+id1+' td:nth-child(10)>input').val());
+                    $('#'+id1+' td:nth-child(11)>span').text($('#'+id1+' td:nth-child(11)>select').val());
+					$('#'+id1+' td:nth-child(12)>span').text($('#'+id1+' td:nth-child(12)>input').val());
+					$('#'+id1+' td:nth-child(13)>button:nth-child(2)').css({display:"inline"});
+					$('#'+id1+' td:nth-child(13)>button:nth-child(3)').css({display:"none"});
+				}
+			});
+		}
+
+	</script>
+	
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

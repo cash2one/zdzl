@@ -1,0 +1,27 @@
+package chat;
+
+import "game.proto";
+
+enum ChatType {
+	CT_WORLD = 1; //世界
+	CT_LEAGUE = 2; //同盟
+	CT_PRIVATE = 3; //私聊
+}
+
+//发送聊天信息
+message SendChat {
+	required ChatType type = 1; //发送到哪个频道
+	required bytes msg = 2; //信息
+	optional int32 to_pid = 3; //私聊用
+}
+
+//收到聊天信息
+message ChatMsgResponse {
+	required ChatType type = 1; //发送到哪个频道
+	required bytes msg = 2; //信息
+	optional int32 from_pid = 3; //私聊用
+}
+
+
+
+

@@ -1,0 +1,132 @@
+if [ ! -d "./gmaps" ];
+then
+	echo "./gmaps not existed!"
+	exit
+fi
+if [ ! -d "./images" ];
+then
+	echo "./images not existed!"
+	exit
+fi
+
+resource=`pwd`/resources
+echo 'resource===' $resource
+dat=zl
+
+find ./gmaps/* -type d -name ".svn"|xargs rm -rf
+find ./images/* -type d -name ".svn"|xargs rm -rf
+
+rm -rf $resource/gmaps
+rm -rf $resource/images
+
+mkdir $resource/gmaps
+mkdir $resource/images
+mkdir $resource/images/fight
+mkdir $resource/images/fight/fbg
+mkdir $resource/images/fight/ani
+mkdir $resource/images/fight/eff
+mkdir $resource/images/fight/eff/effects
+mkdir $resource/images/fight/sname
+mkdir $resource/images/npcs
+mkdir $resource/images/monsters
+mkdir $resource/images/animations
+mkdir $resource/images/animations/car
+mkdir $resource/images/animations/role
+mkdir $resource/images/ui
+mkdir $resource/images/ui/equip_pic
+mkdir $resource/images/ui/equipment
+mkdir $resource/images/ui/fate
+mkdir $resource/images/ui/item
+mkdir $resource/images/ui/weapon
+mkdir $resource/images/ui/spirits
+mkdir $resource/images/ui/task_icon
+mkdir $resource/images/ui/carIcons
+mkdir $resource/images/ui/characterIcon
+mkdir $resource/images/talk
+mkdir $resource/images/inbetweening
+ 
+cd ./gmaps
+cp *.map $resource/gmaps
+for i in `ls`; do zip -r -o $resource/gmaps/$i.$dat $i; done
+cd ../
+ 
+cp ./images/fight/fbg/* $resource/images/fight/fbg
+cp ./images/fight/sname/* $resource/images/fight/sname
+ 
+cd ./images/fight/ani
+for i in `ls`; do zip -r -o $resource/images/fight/ani/$i.$dat $i; done
+cd ../../../
+ 
+cd ./images/fight/eff/effects
+for i in `ls`; do zip -r -o $resource/images/fight/eff/effects/$i.$dat $i; done
+cd ../../../../
+ 
+cd ./images/npcs
+for i in `ls`; do zip -r -o $resource/images/npcs/$i.$dat $i; done
+cd ../../
+ 
+cd ./images/monsters
+for i in `ls`; do zip -r -o $resource/images/monsters/$i.$dat $i; done
+cd ../../
+ 
+cd ./images/animations/car
+for i in `ls`; do zip -r -o $resource/images/animations/car/$i.$dat $i; done
+cd ../../../
+ 
+cd ./images/animations/role
+for i in `ls`; do zip -r -o $resource/images/animations/role/$i.$dat $i; done
+cd ../../../
+ 
+cd ./images/ui/equip_pic
+cp *.png $resource/images/ui/equip_pic
+cd ../../../
+ 
+cd ./images/ui/equipment
+cp *.png $resource/images/ui/equipment
+cd ../../../
+ 
+cd ./images/ui/fate
+cp *.png $resource/images/ui/fate
+cd ../../../
+ 
+cd ./images/ui/item
+cp *.png $resource/images/ui/item
+cd ../../../
+ 
+cd ./images/ui/weapon
+cp *.png $resource/images/ui/weapon
+cd ../../../
+ 
+cd ./images/ui/spirits
+cp *.png $resource/images/ui/spirits
+cd ../../../
+ 
+cd ./images/ui/task_icon
+cp *.png $resource/images/ui/task_icon
+cd ../../../
+
+cd ./images/ui/carIcons
+cp *.png $resource/images/ui/carIcons
+cd ../../../
+ 
+cd ./images/ui/characterIcon
+cp -rf head_icon $resource/images/ui/characterIcon
+cp -rf monster_icon $resource/images/ui/characterIcon
+cp -rf mumber_icon $resource/images/ui/characterIcon
+cp -rf recruit_icon $resource/images/ui/characterIcon
+cp -rf team_icon $resource/images/ui/characterIcon
+cd ../../../
+
+cd ./images/talk
+cp -rf n $resource/images/talk
+cp -rf r $resource/images/talk
+cd ../../
+
+cd ./images/inbetweening
+cp * $resource/images/inbetweening
+cd ../../
+
+chmod -R 777 $resource/gmaps
+chmod -R 777 $resource/images
+
+

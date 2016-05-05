@@ -1,0 +1,252 @@
+{%- extends "base_layout.html" -%}
+{% from "base_macros.html" import servers_select %}
+{%- block css -%}
+<link rel="stylesheet" href="{{ 'frontend.static'|url('bootstrap/css/bootstrap.css') }}" type="text/css" />
+<link rel="stylesheet" href="{{ 'frontend.static'|url('bootstrap/css/bootstrap-responsive.css') }}" type="text/css" />  
+{%- endblock -%} 
+{%- block subcss -%}
+{%- endblock -%}
+{%- block bootjs-%}
+<script type="text/javascript" src="{{ 'frontend.static'|url('bootstrap/js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/efun.js') }}"></script>
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/My97DatePicker/WdatePicker.js') }}"></script>
+{%- block subjs-%}{% endblock %}
+{% endblock %}
+{%- block content -%}
+{% set group_right =  g.user.role >= 300 or g.user.right[0] == 1 or g.user.right[1] == 1  %}
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">
+          {% if g.current_server %}
+            {{ g.current_server.name }}
+          {% else %}
+          指点真龙
+          {% endif %}
+      </a>
+      <div class="nav-collapse collapse">
+      	<p class="navbar-text pull-left">
+      		{% if g.user.role>=300 or (g.user.right and (g.user.right[1] ==1 or g.user.right[0] ==1 or
+                                g.user.right[2]==1 or g.user.right[3]==1 or g.user.right[12] == 1)) %}
+      		<a href="/admin/show/">数据录入</a>
+      		{% endif %}
+      		{% if g.user.role>=300 or  (g.user.right and (g.user.right[4] ==1 or g.user.right[5] ==1 or
+              g.user.right[6]==1 or g.user.right[7]==1)) %}
+      		<a href="/user/">服务器管理</a>
+      		{% endif %}
+      		{% if g.user.role >= 300 %}
+      		<a href="{{ url_for('admin.admin_user')}}">帐户管理</a>
+      		{% endif %}
+
+      	</p>
+        <p class="navbar-text pull-right">
+            {{ servers_select(g) }}
+        </p>
+        <!--
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        -->
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+          
+<div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2">
+          {%if not admin_index%}
+          <a type="button" class="btn" href="{{ url_for('admin.admin_database')}}">数据版本管理</a>
+          <div class="well sidebar-nav">
+	            <div class="accordion" id="accordion2">
+                    {% if group_right %}
+	            	<div class="accordion-group">
+		              <div class="accordion-heading">
+		                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+		                  基础数据I
+		                </a>
+		              </div>
+		              <div id="collapseOne" class="{% if SIDEBAR == 'ADMIN' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+		                <div class="accordion-inner">
+				  			<ul>
+                                <li><a href="{{ url_for('admin.admin_intro')}}">新手表</a></li>
+                                <li><a href="{{ url_for('admin.admin_ban_word')}}">敏感词表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_role')}}">角色表</a></li>
+                          <li><a href="{{ url_for('admin.admin_roleup')}}">武将升段表</a></li>
+                          <li><a href="{{ url_for('admin.admin_roleup_type')}}">武将升段类型表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_role_level')}}">角色等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_role_exp')}}">角色经验表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fete_rate')}}">祭天获取表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_arm')}}">武器表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_skill')}}">技能表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_state')}}">技能状态表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_sk_state')}}">技能状态关系表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_arm_level')}}">武器等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_arm_exp')}}">武器等级练成表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_equip')}}">装备表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_eq_level')}}">装备等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_eq_set')}}">套装表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_str_eq')}}">装备强化表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_mine_rate')}}">玄铁获取概率表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fate')}}">命格表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fate_level')}}">命格等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fate_rate')}}">命格获取概率表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fate_cost')}}">猎命消耗表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_item')}}">物品表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fusion')}}">物品合成表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_reward')}}">奖励表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_monster')}}">怪物表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_monster_level')}}">怪物等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_npc')}}">NPC表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_car')}}">坐骑表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_ally_level')}}">同盟等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_ally_right')}}">同盟权限表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_ally_grave')}}">同盟宝具铭刻表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_map')}}">地图表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_stage')}}">副本表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_fight')}}">战斗表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_position')}}">阵型表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_pos_level')}}">阵型等级表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_buff')}}">食馆buff表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_task')}}">任务表</a></li>
+			                    <li><a href="{{ url_for('admin.admin_chapter')}}">章节表</a></li>
+			                    
+			                    
+			                </ul>
+		                </div>
+		              </div>
+		            </div>
+                    {% endif %}
+
+                    {% if group_right  or g.user.right[12] == 1 %}
+                    <div class="accordion-group">
+                      <div class="accordion-heading">
+                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+                          基础数据II
+                        </a>
+                      </div>
+                      <div id="collapseThree" class="{% if SIDEBAR == 'ACHI' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+                        <div class="accordion-inner">
+                            <ul>
+				{% if group_right %}
+                                <li><a href="{{ url_for('admin.create_json')}}">create_json</a></li>
+                                <li><a href="{{ url_for('admin.achi_day')}}">成就day</a></li>
+                                <li><a href="{{ url_for('admin.achi_eternal')}}">成就eternal</a></li>
+                                <li><a href="{{ url_for('admin.admin_setting')}}">全局设置表</a></li>
+                                <li><a href="{{ url_for('admin.admin_names')}}">随机名</a></li>
+                                <li><a href="{{ url_for('admin.admin_rule')}}">功能规则说明表</a></li>
+				{% endif %}
+				{% if group_right   or g.user.right[12] == 1 %}
+                                <li><a href="{{ url_for('admin.admin_exchange')}}">兑换码表</a></li>
+				{% endif %}
+				{% if group_right %}
+                                <li><a href="{{ url_for('admin.admin_error')}}">错误定义表</a></li>
+                                <li><a href="{{ url_for('admin.admin_goods')}}">促销商品表</a></li>
+                                <li><a href="{{ url_for('admin.admin_tips')}}">提示表</a></li>
+                                <li><a href="{{ url_for('admin.admin_horn')}}">大喇叭表</a></li>
+                                <li><a href="{{ url_for('admin.admin_bf_task')}}">兵符任务表</a></li>
+                                <li><a href="{{ url_for('admin.admin_bf_rate')}}">兵符概率表</a></li>
+                                <li><a href="{{ url_for('admin.admin_tbox')}}">时光盒</a></li>
+                                <li><a href="{{ url_for('admin.admin_deep_box')}}">深渊－宝箱</a></li>
+                                <li><a href="{{ url_for('admin.admin_deep_pos')}}">深渊－阵型</a></li>
+                                <li><a href="{{ url_for('admin.admin_deep_guard')}}">深渊－精英怪配置表</a></li>
+                                <li><a href="{{ url_for('admin.admin_shop')}}">神秘商店表</a></li>
+                                <li><a href="{{ url_for('admin.admin_direct_shop')}}">可购商品表</a></li>
+                                <li><a href="{{ url_for('admin.admin_activity')}}">活动表</a></li>
+                                <li><a href="{{ url_for('admin.admin_boss_reward')}}">BOSs奖励表</a></li>
+                                <li><a href="{{ url_for('admin.admin_boss_cd')}}">BOSs战玩家冷却时间表</a></li>
+                                <li><a href="{{ url_for('admin.admin_boss_level')}}">BOSs等级表</a></li>
+                                <li><a href="{{ url_for('admin.admin_daily')}}">日常活动表</a></li>
+                                <li><a href="{{ url_for('admin.admin_reward_online')}}">在线奖励表</a></li>
+                                <li><a href="{{ url_for('admin.admin_reward_activity')}}">活动奖励表</a></li>
+                                <li><a href="{{ url_for('admin.admin_reward_setting')}}">活动设置表</a></li>
+                                <li><a href="{{ url_for('admin.admin_fish')}}">钓鱼表</a></li>
+                                <li><a href="{{ url_for('admin.admin_reward_mail')}}">活动奖励邮件配置表</a></li>
+                                <li><a href="{{ url_for('admin.admin_funcs')}}">功能定义表</a></li>
+                                <li><a href="{{ url_for('admin.admin_gem')}}">珠宝表</a></li>
+                                <li><a href="{{ url_for('admin.admin_gem_level')}}">珠宝等级表</a></li>
+                                <li><a href="{{ url_for('admin.admin_gem_up_rate')}}">珠宝升级概率表</a></li>
+                                <li><a href="{{ url_for('admin.admin_gem_shop')}}">珠宝商店表</a></li>
+                                <li><a href="{{ url_for('admin.admin_day_lucky')}}">抽奖物品表</a></li>
+                                <li><a href="{{ url_for('admin.admin_day_sign')}}">每日签到表</a></li>
+                                <li><a href="{{  url_for('admin.admin_boatlevel')}}">天舟等级</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarworldassess')}}">魔龙降世评级表</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarworldscore')}}">魔龙降世评分表</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarnpcconfig')}}">战斗npc配置表</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarperconfig')}}">每场战斗配置表</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarstartconfig')}}">战斗开启配置表</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarbook')}}">天书</a></li>
+                                <li><a href="{{  url_for('admin.admin_boatexchange')}}">天舟兑换物品</a></li>
+                                <li><a href="{{  url_for('admin.admin_awarstrongmap')}}">魔龙降世势力地图表</a></li>
+				{% endif %}
+                            </ul>
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if g.user.role >= 300 or g.user.right[2] == 1  or g.user.right[3] == 1 %}
+		            <div class="accordion-group">
+		              <div class="accordion-heading">
+		                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+		                  用户数据录入
+		                </a>
+		              </div>
+		              <div id="collapseTwo" class="{% if SIDEBAR == 'USER' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+		                <div class="accordion-inner">
+				  			<ul>
+			                    <li><a href="{{ url_for('admin.baseuser_user')}}">用户表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_player')}}">玩家表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_attr')}}">玩家属性表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_role')}}">玩家角色表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_equip')}}">玩家装备表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_item')}}">玩家物品表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_fate')}}">玩家命格表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_position')}}">玩家阵型表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_task')}}">玩家任务表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_map')}}">玩家地图表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_car')}}">玩家坐骑表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_mail')}}">玩家邮件表</a></li>
+			                    <li><a href="{{ url_for('admin.baseuser_p_social')}}">玩家社交表</a></li>
+                          <li><a href="{{ url_for('admin.baseuser_p_arena')}}">玩家竞技场表</a></li>
+                          <li><a href="{{ url_for('admin.baseuser_p_buff')}}">玩家buff表</a></li>
+                          <li><a href="{{ url_for('admin.baseuser_p_deep')}}">玩家深渊表</a></li>
+                          <li><a href="{{ url_for('admin.baseuser_p_tbox')}}">玩家时光盒表</a></li>
+                          <li><a href="{{ url_for('admin.baseuser_p_wait')}}">玩家待收物品表</a></li>
+			                </ul>
+		                </div>
+		              </div>
+		            </div>
+		            <div class="accordion-group">
+		              <div class="accordion-heading">
+		                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#translate_list">
+		                  翻译
+		                </a>
+		              </div>
+		              <div id="translate_list" class="{% if SIDEBAR == 'LANG' %}accordion-body in{% else %}accordion-body collapse{% endif %}">
+		                <div class="accordion-inner">
+					<ul>
+		      				<li><a href="{{ url_for('admin.tranlate_language')}}">语言翻译</a></li>
+		      				<li><a href="{{ url_for('admin.translate_opertate_coll')}}">翻译字段操作</a></li>
+					</ul>
+		                </div>
+		              </div>
+		            </div>
+                    {% endif %}
+                    
+	          </div>
+          </div><!--/.well -->
+          {% endif %}
+        </div><!--/span-->
+    {%- block main -%}{%- endblock -%}
+{%- endblock -%}
+{% block jsonload %}{% endblock %} 

@@ -1,0 +1,601 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script>
+    function gm_action(gtype){
+        var url = '{{ url_for("user.server_gm_player_order") }}';
+        var pid = $('#pid').val();
+        var data = {};
+        data['pid'] = pid;
+        data['gtype'] = gtype;
+        if (gtype == 'tbox_reset'){
+            data['num'] = $('#tbox_reset_num').val();
+        }else if(gtype == 'tbox_change'){
+            data['chapter'] = $('#tbox_change_chapter').val();
+            data['tbids'] = $('#tbox_change_tbids').val();
+        }else if(gtype == 'set_allyboss_start'){
+            data['notice'] = $('#start_aboss_notice').val();
+        }else if(gtype == 'p_attr_copy'){
+            data['spid'] = $('#p_attr_copy_spid').val();
+        }else if(gtype == 'add_money'){
+            data['coin1'] = $('#add_money_coin1').val();
+            data['coin2'] = $('#add_money_coin2').val();
+            data['coin3'] = $('#add_money_coin3').val();
+        }else if(gtype == 'add_exp'){
+            data['exp'] = $('#add_exp_exp').val();
+        }else if(gtype == 'add_train'){
+            data['train'] = $('#add_train_train').val();
+        }else if(gtype == 'add_fate'){
+            data['fid'] = $('#add_fate_fid').val();
+            data['level'] = $('#add_fate_level').val();
+            data['cantrade'] = $('#add_fate_cantrade').val();
+        }else if(gtype == 'del_role'){
+            data['rid'] = $('#del_role_rid').val();
+        }else if(gtype == 'add_item'){
+            data['iid'] = $('#add_item_iid').val();
+            data['count'] = $('#add_item_count').val();
+        }else if(gtype == 'add_roleup'){
+            data['num'] = $('#add_roleup_count').val();
+        }else if(gtype == 'add_task'){
+            data['tid'] = $('#add_task_tid').val();
+        }else if(gtype == 'turn_task'){
+            data['tid'] = $('#turn_task_tid').val();
+            data['auto'] = $('#turn_task_auto').val();
+        }else if(gtype == 'task_complete'){
+            data['tid'] = $('#task_complete_tid').val();
+        }else if(gtype == 'task_clear'){
+            data['ids'] = $('#task_clear_ids').val();
+        }else if(gtype == 'vip_level'){
+            data['level'] = $('#vip_level_level').val();
+        }else if(gtype == 'add_fete_num'){
+            data['num'] = $('#add_fete_num_num').val();
+            data['t'] = $('#add_fete_num_type').val();
+        }else if(gtype == 'add_fate_num'){
+            data['num'] = $('#add_fate_num_num').val();
+            data['t'] = $('#add_fate_num_type').val();
+        }else if(gtype == 'forbid_chat'){
+            data['time'] = $('#forbid_chat_time').val();
+        }else if(gtype == 'forbid_login'){
+            data['time'] = $('#forbid_login_time').val();
+        }else if(gtype == 'add_equip'){
+            data['eid'] = $('#add_equip_eid').val();
+            data['level'] = $('#add_equip_level').val();
+            data['cantrade'] = $('#add_equip_cantrade').val();
+        }else if(gtype == 'add_bf_boxes'){
+            data['num'] = $('#add_bf_boxes_num').val();
+        }else if(gtype == 'rest_daylucky'){
+            data['nums'] = $('#rest_daylucky_num').val();
+            data['role'] = $('#rest_daylucky_role').val();
+        }
+
+        else if(gtype == 'set_player_attr'){
+            data['attr'] = $('#set_player_attr_attr').val();
+            data['val'] = $('#set_player_attr_val').val();
+        }else if(gtype == 'deep_jump'){
+            data['level'] = $('#deep_jump_level').val();
+        }else if(gtype == 'deep_buff'){
+            data['count'] = $('#deep_buff_count').val();
+        }
+        else if(gtype == 'kill_boss'){
+            data['type'] = $('#kill_boss_type').val();
+        }
+        else if(gtype == 'one_hurt_boss'){
+            data['num'] = $('#one_hurt_num').val();
+        }
+        else if(gtype == 'scene_enter'){
+            data['mapId'] = $('#scene_enter_mapId').val();
+        }else if(gtype == 'unlock'){
+            data['gindex'] = $('#unlock_index').val();
+        }else if(gtype == 'change_uid'){
+            data['uid'] = $('#change_uid_target').val();
+        }else if(gtype == 'set_level'){
+            data['level'] = $('#set_level_level').val();
+        }else if(gtype == 'add_ally_members'){
+            data['name'] = $('#add_ally_members_name').val();
+            data['p_name'] = $('#add_ally_player_name').val();
+            data['nums'] = $('#add_ally_members_nums').val();
+        }else if(gtype == 'clear_ally_members'){
+            data['name'] = $('#clear_ally_members_name').val();
+        }else if(gtype == 'change_ally_member_duty'){
+            data['pid'] = $('#change_ally_pid').val();
+            data['duty'] = $('#change_ally_duty').val();
+            data['name'] = $('#change_ally_name').val();
+        }else if(gtype == 'get_reward'){
+            data['rid'] = $('#reward_rid').val();
+        }else if(gtype == 'add_arena_count'){
+            data['num'] = $('#add_arena_count_num').val();
+        }else if(gtype == 'change_arena_rank'){
+            data['arena_rank'] = $('#arena_rank').val();
+        }else if (gtype =='set_sign_day'){
+            data['day'] = $('#set_sign_day_id').val();
+        }else if(gtype == 'set_CBE'){
+            data['val'] = $('#set_CBE_CBE').val();
+        }else if(gtype == 'add_car'){
+            data['cid'] = $('#car_id').val();
+        }else if(gtype == 'add_gem'){
+            data['gid'] = $('#add_gem_gid').val();
+            data['level'] = $('#add_gem_level').val();
+            data['trade'] = $('#add_gem_trade').val();
+        }
+        $.get(url, data, function(d){
+            if(d){
+                $('#gm_log_show').append(d['ret']);
+                $('#gm_log_show').append('<br />');
+            }
+        });
+    }
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[5] == 1 %}
+		<div class="span4">
+            <table class="table table-striped table-bordered table-condensed">
+            自身pid:<input type="text" class="input-small" id="pid" value="{{ pid }}" />角色名:{{name}}<br/>
+            <hr>
+                在线GM指令：
+                <!--<input type="button" class="btn" value="删除" onclick="gm_action('del_player')"/>-->
+                <tr>
+                    <td>重置时光盒次数增加</td>
+                    <td>
+                        num:<input type="text" class="input-small" id="tbox_reset_num" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('tbox_reset')"/></td>
+                </tr>
+                <tr>
+                    <td>狩龙战秒杀该地图的所有npc</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('awar_kill_monster')"/></td>
+                </tr>
+                <tr>
+                    <td>时光盒数据更改</td>
+                    <td>
+                        第几章:<input type="text" class="input-small" id="tbox_change_chapter" /><br>
+                        时光盒资源ids(多个id用“,”隔开):<input type="text" class="input-small" id="tbox_change_tbids" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('tbox_change')"/></td>
+                </tr>
+                <tr>
+                    <td>增加竞技场次数</td>
+                    <td>
+                        num:<input type="text" class="input-small" id="add_arena_count_num" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_arena_count')"/></td>
+                </tr>
+                <tr>
+                    <td>修改竞技场排名</td>
+                    <td>
+                        调到的名次:<input type="text" class="input-small" id="arena_rank" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('change_arena_rank')"/></td>
+                </tr>
+                <tr>
+                    <td>直接获取奖励</td>
+                    <td>
+                        num:<input type="text" class="input-small" id="reward_rid" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('get_reward')"/></td>
+                </tr>
+                <tr>
+                    <td>清除深渊数据</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('del_deep')"/></td>
+                </tr>
+                <tr>
+                    <td>重置神秘商店</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('reset_shop')"/></td>
+                </tr>
+                <tr>
+                    <td>设置签到已完成的最大天数</td>
+                    <td>
+                        day:<input type="text" class="input-small" id="set_sign_day_id" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('set_sign_day')"/></td>
+                </tr>
+                <tr>
+                    <td>设置下次签到可用</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('next_sign')"/></td>
+                </tr>
+                <tr>
+                    <td>开启同盟BOSS</td>
+                    <td>
+                        通知的时长(单位秒)(默认300秒):
+                        <input type="text" class="input-small" id="start_aboss_notice" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('set_allyboss_start')"/></td>
+                </tr>
+                <tr>
+                    <td>清楚该周已参加同盟boss的状态</td>
+                    <td>
+                        
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('fihgt_allyboss_clear')"/></td>
+                </tr>
+                <tr>
+                    <td>秒杀boss</td>
+                    <td>
+                        <select class="span1" id="kill_boss_type" style="width: 100px">
+                            <option value="0">世界boss</option>
+                            <option value="1">同盟boss</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('kill_boss')"/></td>
+                </tr>
+                <tr>
+
+                    <td>单次击杀世界boss的血量</td>
+                    <td>
+                        num:<input type="text" class="input-small" id="one_hurt_num" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('one_hurt_boss')"/></td>
+                </tr>
+                <tr>
+                    <td>跳转到深渊指定层数</td>
+                    <td>
+                        层数:<input type="text" class="input-small" id="deep_jump_level" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('deep_jump')"/></td>
+                </tr>
+                <tr>
+                    <td>重置珠宝开采</td>
+                    <td>
+                        
+                    </td>
+                    <td>
+                        <input type="button" class="btn" value="执行" onclick="gm_action('reset_gem_mine')"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>增加buff</td>
+                    <td>
+                        buff数:<input type="text" class="input-small" id="deep_buff_count" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('deep_buff')"/></td>
+                </tr>
+                <tr>
+                    <td>清除背包</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('clear_bag')"/></td>
+                </tr>
+                <tr>
+                    <td>祭天次数增加</td>
+                    <td>
+                        次数:<input type="text" class="input-small" id="add_fete_num_num" />
+                        类型:
+                        <select class="span1" id="add_fete_num_type" style="width: 100px">
+                            <option value="1">免费</option>
+                            <option value="2">元宝</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_fete_num')"/></td>
+                </tr>
+                <tr>
+                    <td>猎命次数增加</td>
+                    <td>
+                        次数:<input type="text" class="input-small" id="add_fate_num_num" />
+                        类型:
+                        <select class="span1" id="add_fate_num_type" style="width: 100px">
+                            <option value="1">免费</option>
+                            <option value="2">元宝</option>
+                        </select>
+                        <br/>
+                        (注：免费最多50次，元宝最多20次)
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_fate_num')"/></td>
+                </tr>
+                <tr>
+                    <td>兵符任务</td>
+                    <td>
+                        次数:<input type="text" class="input-small" id="add_bf_boxes_num" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_bf_boxes')"/></td>
+                </tr>
+                <tr>
+                    <td>重置抽奖</td>
+                    <td>
+                        次数:<input type="text" class="input-small" id="rest_daylucky_num" />
+                        <br/>
+                        是否清除纪录:
+                        <select class="span1" id="rest_daylucky_role" style="width: 100px">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('rest_daylucky')"/></td>
+                </tr>
+
+                <tr>
+                    <td>复制人物属性</td>
+                    <td>
+                        复制源PID:<input type="text" class="input-small" id="p_attr_copy_spid" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('p_attr_copy')"/></td>
+                </tr>
+
+                <tr>
+                    <td>增加经验</td>
+                    <td>
+                        经验:<input type="text" class="input-small" id="add_exp_exp" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_exp')"/></td>
+                </tr>
+                <tr>
+                    <td>增加练历</td>
+                    <td>
+                        练历:<input type="text" class="input-small" id="add_train_train" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_train')"/></td>
+                </tr>
+                <tr>
+                    <td>添加命格</td>
+                    <td>
+                        命格FID:<input type="text" class="input-small" id="add_fate_fid" />
+                        命格等级:<input type="text" class="input-small" id="add_fate_level" />
+                        是否可交易:
+                        <select class="span1" id="add_fate_cantrade">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_fate')"/></td>
+                </tr>
+                <tr>
+                    <td>添加珠宝</td>
+                    <td>
+                        珠宝GID:<input type="text" class="input-small" id="add_gem_gid" />
+                        珠宝等级:<input type="text" class="input-small" id="add_gem_level" />
+                        是否可交易:
+                        <select class="span1" id="add_gem_trade">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_gem')"/></td>
+                </tr>
+                <tr>
+                    <td>添加装备</td>
+                    <td>
+                        装备ID:<input type="text" class="input-small" id="add_equip_eid" />
+                        装备等级:<input type="text" class="input-small" id="add_equip_level" />
+                        是否可交易:
+                        <select class="span1" id="add_equip_cantrade">
+                            <option value="0">否</option>
+                            <option value="1">是</option>
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_equip')"/></td>
+                </tr>
+                <tr>
+                    <td>删除配将角色</td>
+                    <td>
+                        配将id:<input type="text" class="input-small" id="del_role_rid" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('del_role')"/></td>
+                </tr>
+                <tr>
+                    <td>增加物品</td>
+                    <td>
+                        物品id:<input type="text" class="input-small" id="add_item_iid" />
+                        物品数量:<input type="text" class="input-small" id="add_item_count" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_item')"/></td>
+                </tr>
+                <tr>
+                    <td>武将升段次数更改</td>
+                    <td>
+                        更改的数目:<input type="text" class="input-small" id="add_roleup_count" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_roleup')"/></td>
+                </tr>
+                <tr>
+                    <td>增加任务</td>
+                    <td>
+                        任务id:<input type="text" class="input-small" id="add_task_tid" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_task')"/></td>
+                </tr>
+                <tr>
+                    <td>完成任务</td>
+                    <td>
+                        任务id:<input type="text" class="input-small" id="task_complete_tid" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('task_complete')"/></td>
+                </tr>
+                <tr>
+                    <td>清除已完成任务</td>
+                    <td>
+                        任务id:<input type="text" class="input-small" id="task_clear_ids" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('task_clear')"/></td>
+                </tr>
+                <tr>
+                    <td>踢下线</td>
+                    <td></td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('kick')"/></td>
+                </tr>
+                <tr>
+                    <td>改变VIP等级</td>
+                    <td>
+                        等级:<input type="text" class="input-small" id="vip_level_level" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('vip_level')"/></td>
+                </tr>
+                <tr>
+                    <td>清除时光盒战报</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('clear_tbox_news')"/></td>
+                </tr>
+                <tr>
+                    <td>设置用户属性</td>
+                    <td>
+                        属性:
+                        <select class="span2" id="set_player_attr_attr">
+                            <option value="introstep">introstep</option>
+                            <option value="CBE">战斗力</option>
+                        </select>
+                        <input type="text" class="input-small" id="set_player_attr_val" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('set_player_attr')"/></td>
+                </tr>
+                <tr>
+                    <td>重置同盟组队炼妖</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('clear_ally_tbox_team')"/></td>
+                </tr>
+
+            </table>
+            <hr />
+
+		</div>
+        <div class="span4">
+            <table class="table table-striped table-bordered table-condensed">
+                离线GM指令：
+                <tr>
+                    <td>删除角色</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('del_offline_player')"/></td>
+                </tr>
+                <tr>
+                    <td>角色转换帐号</td>
+                    <td>
+                        目标UID：<input type="text" class="input-small" id="change_uid_target" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('change_uid')"/></td>
+                </tr>
+                <tr>
+                    <td>解锁功能</td>
+                    <td>
+                        <select id="unlock_index" class="span2">\
+                            <option value="21">竞技场</option>\
+                            <option value="20">深渊</option>\
+                            <option value="19">同伴</option>\
+                            <option value="18">隐藏任务</option>\
+                            <option value="17">悬赏任务</option>\
+                            <option value="16">支线任务</option>\
+                            <option value="15">世界boss</option>\
+                            <option value="14">采矿</option>\
+                            <option value="13">修练</option>\
+                            <option value="12">同盟</option>\
+                            <option value="11">日常</option>\
+                            <option value="10">钓鱼</option>\
+                            <option value="9">社交</option>\
+                            <option value="8">时光盒</option>\
+                            <option value="7">观星</option>\
+                            <option value="6">武器</option>\
+                            <option value="5">商人</option>\
+                            <option value="4">食馆</option>\
+                            <option value="3">锻造</option>\
+                            <option value="2">点将</option>\
+                            <option value="1">阵型</option>\
+                        </select>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('unlock')"/></td>
+                </tr>
+                <tr>
+                    <td>进入地图</td>
+                    <td>
+                        地图id:<input type="text" class="input-small" id="scene_enter_mapId" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('scene_enter')"/></td>
+                </tr>
+                <tr>
+                    <td>禁言</td>
+                    <td>
+                        禁言时间:<input type="text" class="input-small" id="forbid_chat_time" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('forbid_chat')"/></td>
+                </tr>
+                <tr>
+                    <td>解禁言</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('unforbid_chat')"/></td>
+                </tr>
+                <tr>
+                    <td>禁止登录</td>
+                    <td>
+                        禁止登录时间:<input type="text" class="input-small" id="forbid_login_time" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('forbid_login')"/></td>
+                </tr>
+                <tr>
+                    <td>开放登录</td>
+                    <td>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('unforbid_login')"/></td>
+                </tr>
+                <tr>
+                    <td>增加金钱</td>
+                    <td>
+                        银币:<input type="text" class="input-small" id="add_money_coin1" />
+                        元宝：<input type="text" class="input-small" id="add_money_coin2" />
+                        绑无宝：<input type="text" class="input-small" id="add_money_coin3" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_money')"/></td>
+                </tr>
+                <tr>
+                    <td>添加同盟人数</td>
+                    <td>
+                        同盟名字:<input type="text" class="input-small" id="add_ally_members_name" /><br/>
+                        玩家名字:<input type="text" class="input-small" id="add_ally_player_name" />
+                        只添加一人, 添加多人不填此值<br/>
+                        人数:<input type="text" class="input-small" id="add_ally_members_nums" value="1" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_ally_members')"/></td>
+                </tr>
+                <tr>
+                    <td>清除同盟人数</td>
+                    <td>
+                        同盟名字:<input type="text" class="input-small" id="clear_ally_members_name" /><br/>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('clear_ally_members')"/></td>
+                </tr>
+                <tr>
+                    <td>改变同盟玩家职责</td>
+                    <td>
+                        pid:<input type="text" class="input-small" id="change_ally_pid" /><br/>
+                        职责(盟主1-盟友6):<input type="text" class="input-small" id="change_ally_duty" /><br/>
+                        同盟名字:<input type="text" class="input-small" id="change_ally_name" /><br/>
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('change_ally_member_duty')"/></td>
+                </tr>
+                <tr>
+                    <td>设置等级</td>
+                    <td>
+                        等级:<input type="text" class="input-small" id="set_level_level" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('set_level')"/></td>
+                </tr>
+                <tr>
+                    <td>设置战力</td>
+                    <td>
+                        战力:<input type="text" class="input-small" id="set_CBE_CBE" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('set_CBE')"/></td>
+                </tr>
+                <tr>
+                    <td>添加座骑</td>
+                    <td>
+                        座骑号码:<input type="text" class="input-small" id="car_id" />
+                    </td>
+                    <td><input type="button" class="btn" value="执行" onclick="gm_action('add_car')"/></td>
+                </tr>
+            </table>
+        </div>
+        <div class='span2'>
+            <div id="gm_log_show"></div>
+        </div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

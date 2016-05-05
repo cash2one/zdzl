@@ -1,0 +1,132 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress, boot_input, boot_submit %}
+{%- block main -%}
+
+<div class="span10">
+	套装表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	名字：
+	  	<input type="text" class="input-small" id="edit_name">
+	  	2件特效：
+	  	<input type="text" class="input-small" id="edit_effect2">
+	  	4件特效：
+	  	<input type="text" class="input-small" id="edit_effect4">
+	  	6件特效：
+	  	<input type="text" class="input-small" id="edit_effect6">
+	  	品质：
+	  	<input type="text" class="input-small" id="edit_quality">
+	  	装备等级：
+	  	<input type="text" class="input-small" id="edit_lv" placeholder="int">
+	  	是否可穿戴：
+	  	<input type="text" class="input-small" id="edit_cond" placeholder="int">
+	  	说明：
+	  	<input type="text" class="input-small" id="edit_info">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>名字</td>
+			<td>2件特效</td>
+			<td>4件特效</td>
+			<td>6件特效</td>
+			<td>品质</td>
+			<td>装备等级</td>
+			<td>是否可穿戴</td>
+			<td>说明</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr id='{{ r._id }}'>
+			<td>{{ r._id }}</td>
+			<td><span>{{ r.name }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.effect2 }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.effect4 }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.effect6 }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.quality }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.lv }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.cond }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td><span>{{ r.info }}</span><input type="text" style="display:none; width:80px; "/></td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+				<button type="button" class="btn" id="edit" onclick="edit_click({{ r._id }})">编辑</button>
+                <button id="save" class="btn" onclick="save_click({{ r._id }})" style="display:none">保存</button>	
+                {% endif %}	
+			</td>
+		</tr>	
+		{% endfor %}  
+		<tr id="appendText" style="display:none;"> </tr> 
+	</table>
+	
+	<script type="text/javascript">
+		function edit_click(val){
+		var  id = val;
+		for(i=2; i<9; i++){
+			$('#'+id+' td:nth-child('+i+')>input').css({display:"inline-block"});
+			$('#'+id+' td:nth-child('+i+')>input').val($('#'+id+' td:nth-child('+i+')>span').text());
+			$('#'+id+' td:nth-child('+i+')>span').text("");
+		}
+		$('#'+id+' td:nth-child(2)>span').append("<font style='font-size:12px'>名字</font>");
+		$('#'+id+' td:nth-child(3)>span').append("<font style='font-size:12px'>2件特效</font>");
+		$('#'+id+' td:nth-child(4)>span').append("<font style='font-size:12px'>4件特效</font>");
+		$('#'+id+' td:nth-child(5)>span').append("<font style='font-size:12px'>6件特效</font>");
+		$('#'+id+' td:nth-child(6)>span').append("<font style='font-size:12px'>品质</font>");
+		$('#'+id+' td:nth-child(7)>span').append("<font style='font-size:12px'>装备等级</font>");
+		$('#'+id+' td:nth-child(8)>span').append("<font style='font-size:12px'>是否可穿戴</font>");
+		$('#'+id+' td:nth-child(9)>span').append("<font style='font-size:12px'>说明</font>");
+		$('#'+id+' td:nth-child(10)>button:nth-child(3)').css({display:"inline-block"});
+		$('#'+id+' td:nth-child(10)>button:nth-child(2)').css({display:"none"});
+	}
+	function save_click(val){
+		var  id1 = val;
+		var name = $('#'+id1+' td:nth-child(2)>input').val();
+		var effect2 = $('#'+id1+' td:nth-child(3)>input').val();
+		var effect4 =$('#'+id1+' td:nth-child(4)>input').val();
+		var effect6 = $('#'+id1+' td:nth-child(5)>input').val();
+		var quality = $('#'+id1+' td:nth-child(6)>input').val();
+		var lv = $('#'+id1+' td:nth-child(7)>input').val();
+		var cond = $('#'+id1+' td:nth-child(8)>input').val();
+		var info = $('#'+id1+' td:nth-child(9)>input').val();
+		$.post('/admin/admin/eq/set/save/',{
+			id:id1,
+			name:name,
+			effect2:effect2,
+			effect4:effect4,
+			effect6:effect6,
+			quality:quality,
+			lv:lv,
+			cond:cond,
+			info:info
+		},function(data) {
+			if(data['success'] == "0"){
+				alert("修改角色失败");
+			}else{
+				for(i=2; i<10; i++){
+				$('#'+id1+' td:nth-child('+i+')>input').css({display:"none"});
+				$('#'+id1+' td:nth-child('+i+')>span').text($('#'+id1+' td:nth-child('+i+')>input').val());
+			}
+				$('#'+id1+' td:nth-child(10)>button:nth-child(2)').css({display:"inline-block"});
+				$('#'+id1+' td:nth-child(10)>button:nth-child(3)').css({display:"none"});
+			}
+		});
+	}
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

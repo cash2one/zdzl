@@ -1,0 +1,133 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+
+<div class="span10">神秘商店表：
+	{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+	<form action="" method="POST" enctype="multipart/form-data"  class="well form-inline">
+		选择xls/xlsx文件：  <input type="file" name="xlsfile">
+		<input type="submit" value="提交">
+	</form>
+	<button type="button" class="btn" href="/admin/admin/confirm/delete/" val="{{ coll }}" onclick="GAME.load.delete_all(this)">清除所有数据</button>
+	<div class="well form-inline hidefive" id="disfive">
+	  	编辑：<br />
+	  	id:
+	  	<input type="text" class="input-small" id="edit_id" readonly="readonly">
+	  	类型：
+	  	<select class="span1" id="edit_t">
+            <option value="1"> 1-物品</option>
+            <option value="2"> 2-命格</option>
+        </select>
+	  	物品id(或命格品质)：
+	  	<input type="text" class="input-small" id="edit_iid" placeholder="int">
+	  	概率：
+	  	<input type="text" class="input-small" id="edit_r" placeholder="int">
+	  	数量：
+	  	<input type="text" class="input-small" id="edit_c" placeholder="int">
+	  	qt:
+	  	<input type="text" class="input-small" id="edit_qt" placeholder="int">
+	  	coin1：
+	  	<input type="text" class="input-small" id="edit_coin1" placeholder="int">
+	  	coin2：
+	  	<input type="text" class="input-small" id="edit_coin2" placeholder="int">
+	  	coin3：
+	  	<input type="text" class="input-small" id="edit_coin3" placeholder="int">
+        是否隐藏：
+        <select class="span1" id="edit_hide">
+            <option value="0"> 0-不隐藏</option>
+            <option value="1"> 1-隐藏</option>
+        </select>
+        start:
+	  	<input type="text" class="input-small" id="edit_start" placeholder="int">
+	  	end:
+	  	<input type="text" class="input-small" id="edit_end" placeholder="int">
+	  	<button type="button" class="btn" id='edit_submit'>提交</button>
+	  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+	</div>
+	{% endif %}
+	{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>id</td>
+			<td>类型</td>
+			<td>物品id(或命格品质)</td>
+			<td>概率</td>
+			<td>数量</td>
+			<td>qt</td>
+			<td>coin1</td>
+			<td>coin2</td>
+			<td>coin3</td>
+            <td>隐藏</td>
+            <td>start</td>
+            <td>end</td>
+			<td>操作</td>
+		 </tr>
+		 {%- for r in ret -%}
+		<tr>
+			<td>{{ r._id }}</td>
+			<td>{{ r.t }}</td>
+			<td>{{ r.iid }}</td>
+			<td>{{ r.r }}</td>
+			<td>{{ r.c }}</td>
+			<td>{{ r.qt }}</td>
+			<td>{{ r.coin1 }}</td>
+			<td>{{ r.coin2 }}</td>
+			<td>{{ r.coin3 }}</td>
+            <td>{{ r.hide }}</td>
+            <td>{{ r.start }}</td>
+            <td>{{ r.end }}</td>
+			<td>
+				{% if g.user.role >= 300 or g.user.right[1] == 1 %}
+				<button type="button" class="btn" id='delete' onclick="GAME.load.delete(this)" href="{{ url_for('admin.admin_delete', db=g.GAMEBASE, table=coll, id=r['_id']) }}">删除</button>
+                <button type="button" class="btn" id='edit' onclick="GAME.load.get_data(this)" href="{{url_for('admin.admin_data', db=g.GAMEBASE, table=coll, id=r['_id'])}}">编辑</button>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}  
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#edit_submit").click(function(){
+				var id = $("#edit_id").val();
+				var t = $("#edit_t").val();
+				var iid = $("#edit_iid").val();
+				var r = $("#edit_r").val();
+				var c = $("#edit_c").val();
+				var qt = $("#edit_qt").val();
+				var coin1 = $("#edit_coin1").val();
+				var coin2 = $("#edit_coin2").val();
+				var coin3 = $("#edit_coin3").val();
+                var hide = $('#edit_hide').val();
+                var start = $('#edit_start').val();
+                var end = $('#edit_end').val();
+				$.post('/admin/admin/shop/save/',{
+					id:id,
+					t:t,
+					iid:iid,
+					r:r,
+					c:c,
+					qt:qt,
+					coin1:coin1,
+					coin2:coin2,
+					coin3:coin3,
+                    hide:hide,
+                    start:start,
+                    end:end
+				},function(data){
+					if(data['success'] == "0"){
+						alert("添加角色等级失败");
+					}else{
+						location.reload()
+					}
+				});
+				
+					
+			});
+		});
+	</script>
+	{% endif %}
+		</div>
+  </div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

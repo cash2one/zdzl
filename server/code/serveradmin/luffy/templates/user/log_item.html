@@ -1,0 +1,42 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/sorttable.js') }}"></script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[10] == 1 %}
+<div class="span10">
+    <br />
+    物品日志:
+    开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}">
+    结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+    类型：<input type="text" class="input-small" id="t" value="{{ t }}">
+    pid:<input type="text" class="input-small" id="pid" value="{{pid}}">
+    <button type="button" class="btn" href="{{ url_for('user.log_item') }}" onclick="GAME.load.log_rpc(this)">查询</button>
+    {{ paginate(page_count,url_for('user.log_item'),current_page=page, kwargs={'start_time':start_time,'end_time':end_time,'t':t, 'pid':pid}) }}
+    <table class="table table-bordered sortable" id="unique_id">
+        <tr>
+            <td>ID</td>
+            <td>玩家id</td>
+            <td>类型</td>
+            <td>物品id或items</td>
+            <td>使用时间</td>
+            <td>附加信息</td>
+        </tr>
+        {% for v in ret %}
+        <tr>
+            <td>{{ v['_id'] }}</td>
+            <td>{{ v['p'] }}</td>
+            <td>{{ v['t'] }}</td>
+            <td>{{ v['i'] }}</td>
+            <td>{{ v['ct']|format_date }}</td>
+            <td>{{ v['d'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endif %}
+</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

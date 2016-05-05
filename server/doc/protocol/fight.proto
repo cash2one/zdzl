@@ -1,0 +1,16 @@
+package fight;
+
+import "game.proto";
+
+
+//完成战斗获取奖励
+message CompleteFight {
+	required int32 fight_id = 1; //战斗id
+}
+
+message CompleteFightResponse {
+	optional game.Reward reward = 1; //任务奖励
+}
+
+
+

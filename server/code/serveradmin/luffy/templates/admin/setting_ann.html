@@ -1,0 +1,43 @@
+{%- extends "admin/layout.html" -%}
+{% from "base_macros.html" import progress %}
+{%- block main -%}
+<div class="container">
+	<table class="table table-striped table-bordered table-condensed">
+		<tr>
+			<td>序号</td>
+			<td>公告内容</td>
+		 </tr>
+	
+		<tr>
+			<td><input type="text" class="input-small" id="roleid"></td>
+			<td><input type="text" class="input-xlarge" id="account"></td>
+		</tr>	 
+		<tr>
+			<td><input type="text" class="input-small" id="roleid"></td>
+			<td><input type="text" class="input-xlarge" id="account"></td>
+		</tr>
+		<tr>
+			<td><input type="text" class="input-small" id="roleid"></td>
+			<td><input type="text" class="input-xlarge" id="account"></td>
+		</tr>
+		
+	</table>
+	<button type="button" class="btn" id='submit'>更新</button> 
+	
+	<div id="ret"></div>
+  	
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#submit").click(function(){
+				var roleid = $('#roleid').val();
+				var account = $('#account').val();
+				var rolename = $('#rolename').val();
+				$.get('/admin/player/detail/result/',{ roleid:roleid, account:account, rolename:rolename },function(data){
+					$("#ret").html(data)
+					return false
+				});
+			});
+		});
+	</script>
+{%- endblock -%}

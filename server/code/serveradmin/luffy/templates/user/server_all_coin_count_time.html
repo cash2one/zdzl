@@ -1,0 +1,89 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+<script type="text/javascript">
+
+$(function () {
+    var chart;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container',
+                type: 'line',
+                marginRight: 130,
+                marginBottom: 55
+            },
+            title: {
+                text: '玩家资金消费时间分布-总计',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '时间分布',
+                x: -20
+            },
+            xAxis: {
+                categories: {{ keys|format_date_list('%Y-%m-%d')|safe }}
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        this.x +': '+ this.y +'';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -10,
+                y: 100,
+                borderWidth: 0
+            },
+            series: [{
+                name: '消费银币－coin1',
+                data: {{ c1s|safe }}
+            }, {
+                name: '消费元宝-coin2',
+                data: {{ c2s|safe }}
+            }, {
+                name: '消费绑元宝-coin3',
+                data: {{ c3s|safe }}
+            }, {
+                name: '消费角色数',
+                data: {{ pids|safe }}
+            }]
+        });
+    });
+    
+});
+</script>
+{% endblock%}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[7] == 1 %}
+		<div class="span10">
+			<br />
+            开始时间：<input type="text" class="input-small" id="start_time"  onClick="WdatePicker()" value="{{ start_time }}"> 
+            结束时间<input type="text" class="input-small" id="end_time"  onClick="WdatePicker()" value="{{ end_time }}">
+            <button type="button" class="btn" href="{{ url_for('user.server_all_coin_count_time') }}" onclick="GAME.load.coin_time(this,'day')">查询</button>
+			<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+            <table class="table table-bordered">
+                <tr>
+                </tr>
+                <tr>
+
+                </tr>
+            </table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+</div><!--/.fluid-container-->
+{%- endblock -%}

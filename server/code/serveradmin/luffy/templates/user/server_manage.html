@@ -1,0 +1,188 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{% block subjs %}
+
+{% endblock %}
+{%- block main -%}
+	{% if g.user.role >= 300 or g.user.right[4] == 1 %}
+		<div class="span10">
+			
+			<div class="well form-inline">
+				服务器名称：
+			  	<input type="text" class="input-big" id="name">
+				ip：
+			  	<input type="text" class="input-big" id="ip">
+			  	端口：
+			  	<input type="text" class="input-small" id="port" value="27017">
+			  	用户名：
+			  	<input type="text" class="input-small" id="username">
+			  	密码：
+			  	<input type="text" class="input-big" id="password">
+                <br/>grpc连接(IP:PORT)：
+                <input type="text" class="input-big" id="gport">
+                类型：
+                <select class="span2" id="t">
+                    <option value="1">管理员专用</option>
+                    <option value="2">所有人</option>
+                    <option value="3">测试</option>
+                </select>
+                语言:
+		{{ form.current_lang(class="span2", id="tf")}}
+                资源库:
+                <input type="text" class="input-small" id="db_res">
+                用户库：
+                <input type="text" class="input-small" id="db_user">
+                日志库
+                <input type="text" class="input-small" id="db_log">
+                资源路径：
+                <input type="text" class="span3" id="res_path">
+                sid:
+                <input type="text" class="input-small" id="sid">
+			  	<button type="button" class="btn" id='submit'>增加服务器</button>
+			  	
+			</div>
+			<div class="well form-inline hidefive" id="disfive">
+			  	编辑：<br />
+			  	id:
+			  	<input type="text" class="input-big" id="edit_id" readonly="readonly">
+			  	服务器名称：
+			  	<input type="text" class="input-big" id="edit_name">
+			  	ip：
+			  	<input type="text" class="input-big" id="edit_ip">
+			  	端口：
+			  	<input type="text" class="input-small" id="edit_port">
+			  	用户名：
+			  	<input type="text" class="input-small" id="edit_username">
+                <br/>密码：
+			  	<input type="text" class="input-big" id="edit_password">
+                grpc连接(IP:PORT)：
+                <input type="text" class="input-big" id="edit_gport">
+                类型：
+                <select class="span2" id="edit_t">
+                    <option value="1">管理员专用</option>
+                    <option value="2">所有人</option>
+                    <option value="3">测试</option>
+                </select>
+                语言:
+		{{ form.current_lang(class="span2", id="edit_tf")}}
+                <br/>资源库:
+                <input type="text" class="input-small" id="edit_db_res">
+                用户库：
+                <input type="text" class="input-small" id="edit_db_user">
+                日志库
+                <input type="text" class="input-small" id="edit_db_log">
+                资源路径：
+                <input type="text" class="span3" id="edit_res_path">
+                sid:
+                <input type="text" class="input-small" id="edit_sid">
+			  	<button type="button" class="btn" id='edit_submit'>提交</button>
+			  	<button type="button" class="btn" id='edit_cancel' onclick="$(this).parent().attr('class','well form-inline hidefive')">取消</button>
+			</div>
+			<table class="table table-bordered">
+				<tr>
+					<td>服务器名称</td>
+					<td>ip</td>
+					<td>端口</td>
+					<td>用户名</td>
+					<td>密码</td>
+                    <td>GM连接端口</td>
+                    <td>类型</td>
+                    <td>语言</td>
+                    <td>资源库</td>
+                    <td>用户库</td>
+                    <td>日志库</td>
+                    <td>资源地址</td>
+                    <td>sid</td>
+					<td>操作</td>
+				</tr>
+				{%- for r in ret -%}
+				<tr>
+					<td><p id='{{ r.mongo_id }}_name'>{{ r.name }}</p></td>
+					<td><p id='{{ r.mongo_id }}_ip'>{{ r.ip }}</p></td>
+					<td><p id='{{ r.mongo_id }}_port'>{{ r.port }}</p></td>
+					<td><p id='{{ r.mongo_id }}_username'>{{ r.username }}</p></td>
+					<td><p id='{{ r.mongo_id }}_password'>{{ r.password }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_gport'>{{ r.gport }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_t'>{{ r.t }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_tf'>{{ r.tf }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_db_res'>{{ r.db_res }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_db_user'>{{ r.db_user }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_db_log'>{{ r.db_log }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_res_path'>{{ r.res }}</p></td>
+                    <td><p id='{{ r.mongo_id }}_sid'>{{ r.sid|d('') }}</p></td>
+					<td>
+						{% if g.user.role >= 300 or g.user.right[0] == 1 %}
+						<button type="button" class="btn" onclick="GAME.load.server_manage(this, '{{ r.mongo_id }}')" stype="del" href="/user/server/manage/operation/">删除</button>
+						<button type="button" class="btn" onclick="GAME.load.server_manage(this, '{{ r.mongo_id }}')" stype="edit" href="/user/server/manage/operation/">编辑</button>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+
+			</table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#submit").click(function(){
+			var name = $("#name").val();
+			var ip = $("#ip").val();
+			var port = $("#port").val();
+			var username = $("#username").val();
+			var password = $("#password").val();
+            var gport = $("#gport").val();
+            var t = $("#t").val();
+            var tf = $("#tf").val();
+            var db_res = $("#db_res").val();
+            var db_user = $("#db_user").val();
+            var db_log = $("#db_log").val();
+            var res_path = $("#res_path").val();
+            var sid = $("#sid").val();
+			var url = "{{ url_for('user.server_manage_operation', opType='add') }}";
+			$.post(url,{
+				name:name,ip:ip, port:port, username:username, password:password,
+                gport:gport, t:t, db_res:db_res, db_user:db_user, db_log:db_log, tf:tf, res_path:res_path,
+                sid:sid
+			},function(data){
+				if(data['success'] == 0){
+					alert("添加角色等级失败");
+				}else{
+					location.reload() 
+				}
+			});
+		});
+		$("#edit_submit").click(function(){
+			var name = $("#edit_name").val();
+			var id = $("#edit_id").val();
+			var ip = $("#edit_ip").val();
+			var port = $("#edit_port").val();
+			var username = $("#edit_username").val();
+			var password = $("#edit_password").val();
+            var gport = $("#edit_gport").val();
+            var t = $("#edit_t").val();
+            var tf = $("#edit_tf").val();
+            var db_res = $("#edit_db_res").val();
+            var db_user = $("#edit_db_user").val();
+            var db_log = $("#edit_db_log").val();
+            var sid = $("#edit_sid").val();
+            var res_path = $("#edit_res_path").val();
+            var url = "{{ url_for('user.server_manage_operation', opType='edit') }}";
+			$.post(url,{
+				name:name,id:id,ip:ip,port:port,username:username,password:password,
+                gport:gport,t:t, db_res:db_res, db_user:db_user, db_log:db_log, tf:tf, res_path:res_path, sid:sid			
+            },function(data){
+				if(data['success'] == 0){
+					alert("修改失败");
+				}else{
+					location.reload()
+				}
+			});
+		});
+		
+	});
+</script>
+{%- endblock -%}

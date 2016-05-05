@@ -1,0 +1,12 @@
+{%- extends "base_layout.html" -%}
+{% from "base_macros.html" import input,submit,checkbox,password %}
+{%- block content -%}
+{%- block js %}
+<script type="text/javascript" src="{{ 'frontend.static'|url('js/jquery.simplemodal-1.4.2.js') }}"></script>
+{%- endblock %} 
+{{ form.form_tag() }}
+{{ input(form.username) }}
+{{ password(form.password) }}
+{{ checkbox(form.remember) }} 
+{{ submit('马上登录') }}  
+{%- endblock -%}

@@ -1,0 +1,45 @@
+{% extends "user/layout.html"%}
+{% from "base_macros.html" import paginate %}
+{%- block main -%}
+{% if g.user.role >= 300 or g.user.right[6] == 1 %}
+		<div class="span10">
+			<br />
+			角色id：<input type="text" class="input-small" id="playerId"> 
+			角色名：<input type="text" class="input-small" id="playerName">
+			<button type="button" class="btn" href="{{ url_for('user.server_vip_info') }}" onclick="GAME.load.vip_info(this)">查询</button>
+			<button type="button" class="btn" href="{{ url_for('user.server_vip_info') }}" onclick="GAME.load.player_search_all(this)">所有VIP角色</button>
+			{{ paginate(page_count,url_for( 'user.server_vip_info' ),current_page=page, kwargs={'stype':stype, 'playerId':playerId, 'playerName':playerName}) }}
+			<table class="table table-bordered">
+				<tr>
+					<td>pid</td>
+					<td>vip等级</td>
+					<td>vipCoin</td>
+					<td>uid</td>
+					<td>等级</td>
+					<td>经验</td>
+					<td>银币</td>
+					<td>元宝</td>
+					<td>绑元宝</td>
+					<td>角色名</td>
+				</tr>
+				{% for r in ret %}
+				<tr>
+					<td>{{ r['_id'] }}</td>
+					<td>{{ r['vip'] }}</td>
+					<td>{{ r['vipCoin'] }}</td>
+					<td>{{ r['uid'] }}</td>
+                    <td>{{ r['level'] }}</td>
+                    <td>{{ r['exp'] }}</td>
+                    <td>{{ r['coin1'] }}</td>
+                    <td>{{ r['coin2'] }}</td>
+                    <td>{{ r['coin3'] }}</td>
+					<td><a href="/user/server/gm/player/?pid={{ r['_id']}}" target="_blank">{{ r['name'] }}</a></td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		{% endif %}
+ 	</div><!--/row-->
+
+</div><!--/.fluid-container-->
+{%- endblock -%}

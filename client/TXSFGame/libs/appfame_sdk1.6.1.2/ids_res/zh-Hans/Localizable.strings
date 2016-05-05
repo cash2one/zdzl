@@ -1,0 +1,205 @@
+/*
+ Localizable.strings
+ Gao7AppBox
+ 
+ Created by wang mingfu on 12-4-9.
+ Copyright (c) 2012年 tandy. All rights reserved.
+ */
+
+//菜单
+"Game center" = "游戏中心";
+"Rechargeable" = "充值";
+"Customer service" = "在线客服";
+"Account center" = "帐号中心";
+"Game strategy" = "游戏攻略";
+"Cancellation" = "游戏注销";
+
+// 通用
+"GamePlatform" = "云顶游戏平台";
+"Menu" = "菜单";
+"ReturnGame"= "回游戏";
+"Regist" = "注册";
+"Back" = "返回";
+
+//绑定页面
+"BindAppFame" = "您好,请先绑定你的平台帐号";
+"Email"="常用邮箱";
+"Pwd"="密码";
+"NickName"="昵称";
+"NickNameUnAmend"="(昵称不可修改)";
+"Sure" = "确定";
+"OtherBind" = "其他绑定方式";
+"ChangeAccount"="切换帐号";
+"BindAccount"= "绑定帐号";
+
+//登入页面
+"Login"="登录";
+"Forget"="忘记密码";
+"OtherLogin" = "其他登录方式";
+"FastChangeLogin" = "快速切换";
+"PlatformLogout" = "平台帐号注销";
+"accislogin" = "该帐号处于登录状态";
+"islogining..." = "正在请求连接...";
+"pleaseLoginFirst" = "请先登录";
+
+
+//修改密码
+"AmendyPwd" = "修改密码";
+"NewPwd" = "新密码";
+"Email:"="常用邮箱:";
+"PwdAmendy" = "密码修改";
+"FinePwd" = "密码找回";
+"clearpwdsuc" = "清除密码成功";
+
+
+//帐号详细页
+"AccountDetail" = "帐号中心";
+"AccountCenter" = "云顶帐号中心";
+"AppNickName" = "云顶昵称:";
+"AccountBind" = "账号信息:";
+"clearpwd" = "清除密码";
+"deleteAccount" = "删除账号";
+"deleteAccountSuccess"="删除账号成功";
+
+
+//提示
+"connect failed,retry?" = "连接失败,重新尝试？";
+"connect failed"="连接异常";
+"tourist account cant delete" = "游客账号无法删除";
+
+
+// 第三方登录
+"weibo login" = "登录";
+"Loading" = "加载中";
+"sina weibo login" = "新浪微博登录";
+"qq login" = "QQ登录";
+"sina weibo bind" = "新浪微博绑定";
+"qq bind" = "QQ绑定";
+"Loading failed" = "加载失败，请检查网络是否连接正常。";
+"yunding" = "云顶";
+
+//支付
+"Pay" = "支付";
+
+//提示
+"Please check the network is normal!" = "请检查网络连接是否正常!";
+
+
+"Close" = "关闭";
+"Cancel" = "取消";
+
+"Delete" = "删除";
+
+// 登录页
+"loginState"="已登录";
+"More Apps" = "更多应用";
+"Account" = "帐号";
+"Password" = "密码";
+"Auto login" = "自动登录";
+"Remember password" = "记住密码";
+"Forget password" = "忘记密码";
+"Other login" = "其他登录方式:";
+"Login Failed" = "登录失败";
+"Logining" = "登录中...";
+"Please try again later!" = "服务器异常，请稍候重试！";
+"Email can not be empty" = "邮箱地址不能为空";
+"Email Address" = "电子邮箱地址";
+"Please enter a valid email address!" = "请输入正确的邮箱地址!";
+"PassWord can not be empty" = "密码不能为空";
+"Password length:[6-12]"= "密码请输入6-12位非中文字符";
+"Password cannot contain Chinese characters" = "新密码请使用英文、数字或英文符号";
+
+"oldpwd" = "旧密码";
+
+
+
+// 注册页
+"Letters, numbers, symbols" = "6-12位非中文字符";
+"Any characters" = "任意字符组成";
+"Regist failed" = "注册失败";
+"NickName can not be empty" = "昵称不能为空！";
+"Registing..." = "注册中...";
+"Fast Login" = "一键登录";
+
+// 忘记密码
+"Server Error" = "服务端错误";
+"Submit" = "提交";
+"Submiting..." = "提交中...";
+"Submit Failed" = "提交失败";
+"Your request is accepted, a new password will be sent through the mail to your account!" = "您的请求已受理，新密码将会通过邮件发送到您的帐户邮箱！";
+"Submit Succeed" = "提交成功";
+
+// 个人信息修改
+"Profile modify" = "个人信息修改";
+"Saving..." = "保存中";
+"Logout..." = "注销出...";
+
+"Logout" = "注销";
+"Save Failed" = "保存失败";
+"Logout Failed" = "注销失败";
+"Are you sure you want to logout?" = "注销后需要重新登录，确定要注销吗？";
+"Modified your nickname successfully!" = "昵称修改成功！";
+"Account binding" = "帐号绑定";
+
+// 密码修改
+"Modify password" = "密码修改";
+"Modify password failure" = "密码修改失败";
+"Modify..." = "修改中...";
+"Old Password" = "旧密码";
+"New Password" = "新密码";
+"Confirm Password" = "确认密码";
+"old PassWord can not be empty" = "旧密码不能为空";
+"new PassWord can not be empty" = "新密码不能为空";
+"new comfirm PassWord can not be empty" = "确认密码不能为空";
+"Password successfully changed" = "密码修改成功";
+"Modify password failure" = "密码修改失败";
+"Password confirmation failed" = "新密码与确认密码不一致";
+"new Password length:[6-12]" = "新密码长度在［6－12］之间";
+"newc Password length:[6-12]" = "确认密码长度在［6－12］之间";
+"old Password length:[6-12]" = "旧密码长度在［6－12］之间";
+"your password has been modified" = "您的密码已修改成功！";
+"Submit" = "提交";
+"Modify Failed" = "修改失败";
+
+
+// 帐号绑定
+"Account binding notice" = "特别注意：绑定之后，在本机上使用快速登录将重新生成一个游客账号，请使用绑定好的账号登录！";
+"Account binding failed" = "帐号绑定失败";
+"Binding..." = "绑定中...";
+"Account binding successfully" = "帐号绑定成功！";
+"nickname length>4" = "昵称长度不足";
+"tourist account" = "游客";
+
+//
+"unchoosemoney" = "请选择充值金额";
+
+
+
+//反馈页面
+"FeedBack" = "问题反馈";
+
+//游戏中心
+"GameCenter" = "游戏论坛";
+
+"Update" = "更新";
+"Update RightNow" = "立即更新";
+
+"SinaBind" = "新浪绑定";
+"QQBind" = "QQ绑定";
+"SinaLogin" = "新浪登录";
+"QQLogin" = "QQ登录";
+"QQ" = "QQ";
+"sina" = "新浪";
+
+"servererroe"="出错了,请重新尝试";
+
+
+
+//默认菜单标题
+"title_gameCenter" = "游戏中心";
+"title_accountcenter" = "我的账号";
+"title_gamelogout" = "游戏注销";
+
+
+
+
